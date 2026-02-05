@@ -1,3 +1,5 @@
+library;
+
 /// Application root widget and configuration.
 
 import 'package:flutter/material.dart';

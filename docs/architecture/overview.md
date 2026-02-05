@@ -1,5 +1,9 @@
 # CustomSubs Architecture Overview
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **High-level system architecture and design principles for CustomSubs.**
 
 This document explains how the system is organized, how components interact, and why key architectural decisions were made.

@@ -34,16 +34,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Notification Permission Description (REQUIRED for App Store) -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>CustomSubs needs notification permission to remind you before subscription charges. All reminders are local - no data leaves your device.</string>
+	<!-- Photo Library Permission Description (REQUIRED by file_picker package) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CustomSubs needs access to your photo library so you can select backup files saved in your Photos. Your photos are never uploaded or accessed otherwise.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>CustomSubs may need to save backup files to your photo library if you choose to save them there. Your photos are never uploaded or accessed otherwise.</string>
 </dict>
 </plist>

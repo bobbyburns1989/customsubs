@@ -1,5 +1,9 @@
 # Working with Notifications
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **⚠️ CRITICAL: This is the #1 feature of CustomSubs.**
 
 Reliable notifications are the app's primary value proposition. This guide explains how to implement, schedule, and test notifications correctly.

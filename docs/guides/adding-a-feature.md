@@ -1,5 +1,9 @@
 # Adding a Feature
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **Step-by-step guide for implementing new features following CustomSubs architecture patterns.**
 
 This guide walks through adding a complete feature with screen, controller, routing, and integration with existing services.

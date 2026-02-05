@@ -4,6 +4,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'notification_service.g.dart';
 
@@ -264,8 +265,6 @@ class NotificationService {
       Duration(days: subscription.reminders.firstReminderDays),
     );
 
-    if (reminderDate.isBefore(DateTime.now())) return;
-
     final scheduledDate = tz.TZDateTime(
       tz.local,
       reminderDate.year,
@@ -274,6 +273,9 @@ class NotificationService {
       subscription.reminders.reminderHour,
       subscription.reminders.reminderMinute,
     );
+
+    // Check if scheduled time has passed (compare full timestamp, not just date)
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final daysUntil = subscription.reminders.firstReminderDays;
     final formattedDate = DateFormat.yMMMd().format(subscription.nextBillingDate);
@@ -306,8 +308,6 @@ class NotificationService {
       Duration(days: subscription.reminders.secondReminderDays),
     );
 
-    if (reminderDate.isBefore(DateTime.now())) return;
-
     final scheduledDate = tz.TZDateTime(
       tz.local,
       reminderDate.year,
@@ -316,6 +316,9 @@ class NotificationService {
       subscription.reminders.reminderHour,
       subscription.reminders.reminderMinute,
     );
+
+    // Check if scheduled time has passed (compare full timestamp, not just date)
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final formattedDate = DateFormat.yMMMd().format(subscription.nextBillingDate);
     final formattedAmount = _formatAmount(subscription);
@@ -349,8 +352,6 @@ class NotificationService {
   Future<void> _scheduleDayOfReminder(Subscription subscription) async {
     final reminderDate = subscription.nextBillingDate;
 
-    if (reminderDate.isBefore(DateTime.now())) return;
-
     final scheduledDate = tz.TZDateTime(
       tz.local,
       reminderDate.year,
@@ -359,6 +360,9 @@ class NotificationService {
       subscription.reminders.reminderHour,
       subscription.reminders.reminderMinute,
     );
+
+    // Check if scheduled time has passed (compare full timestamp, not just date)
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final formattedAmount = _formatAmount(subscription);
 
@@ -386,39 +390,32 @@ class NotificationService {
   /// Schedule trial-specific notifications
   Future<void> _scheduleTrialNotifications(Subscription subscription) async {
     final trialEndDate = subscription.trialEndDate!;
-    final now = DateTime.now();
 
     // 3 days before trial ends
     final threeDaysBefore = trialEndDate.subtract(const Duration(days: 3));
-    if (threeDaysBefore.isAfter(now)) {
-      await _scheduleTrialReminder(
-        subscription,
-        threeDaysBefore,
-        'trial_3days',
-        '🔔 ${subscription.name} — Trial ending in 3 days',
-      );
-    }
+    await _scheduleTrialReminder(
+      subscription,
+      threeDaysBefore,
+      'trial_3days',
+      '🔔 ${subscription.name} — Trial ending in 3 days',
+    );
 
     // 1 day before trial ends
     final oneDayBefore = trialEndDate.subtract(const Duration(days: 1));
-    if (oneDayBefore.isAfter(now)) {
-      await _scheduleTrialReminder(
-        subscription,
-        oneDayBefore,
-        'trial_1day',
-        '🔔 ${subscription.name} — Trial ending tomorrow',
-      );
-    }
+    await _scheduleTrialReminder(
+      subscription,
+      oneDayBefore,
+      'trial_1day',
+      '🔔 ${subscription.name} — Trial ending tomorrow',
+    );
 
     // Morning of trial end date
-    if (trialEndDate.isAfter(now)) {
-      await _scheduleTrialReminder(
-        subscription,
-        trialEndDate,
-        'trial_end',
-        '🔔 ${subscription.name} — Trial ends today',
-      );
-    }
+    await _scheduleTrialReminder(
+      subscription,
+      trialEndDate,
+      'trial_end',
+      '🔔 ${subscription.name} — Trial ends today',
+    );
   }
 
   /// Schedule a single trial reminder
@@ -436,6 +433,9 @@ class NotificationService {
       subscription.reminders.reminderHour,
       subscription.reminders.reminderMinute,
     );
+
+    // Check if scheduled time has passed (compare full timestamp, not just date)
+    if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final formattedDate = DateFormat.yMMMd().format(subscription.trialEndDate!);
     final postAmount = subscription.postTrialAmount ?? subscription.amount;
@@ -570,7 +570,7 @@ class NotificationService {
 }
 
 @riverpod
-Future<NotificationService> notificationService(NotificationServiceRef ref) async {
+Future<NotificationService> notificationService(Ref ref) async {
   final service = NotificationService();
   await service.init();
   return service;

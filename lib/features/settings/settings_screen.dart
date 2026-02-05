@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/constants/app_colors.dart';
+import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/data/services/backup_service.dart';
+import 'package:custom_subs/data/repositories/subscription_repository.dart';
+import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final primaryCurrency = ref.watch(primaryCurrencyProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -20,21 +29,86 @@ class SettingsScreen extends ConsumerWidget {
       body: ListView(
         children: [
           // General section
-          _SectionHeader(title: 'General'),
+          const _SectionHeader(title: 'General'),
           ListTile(
             leading: const Icon(Icons.attach_money),
             title: const Text('Primary Currency'),
-            subtitle: const Text('USD'),
+            subtitle: Text(
+              '$primaryCurrency - ${CurrencyUtils.getCurrencyName(primaryCurrency)}',
+            ),
             trailing: const Icon(Icons.chevron_right),
-            onTap: () {
-              // TODO: Implement currency picker
+            onTap: () async {
+              final selected = await showDialog<String>(
+                context: context,
+                builder: (context) => CurrencyPickerDialog(
+                  currentCurrency: primaryCurrency,
+                ),
+              );
+
+              if (selected != null && selected != primaryCurrency) {
+                await ref.read(settingsRepositoryProvider.notifier).setPrimaryCurrency(selected);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Primary currency changed to $selected'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          Consumer(
+            builder: (context, ref, child) {
+              final settingsAsync = ref.watch(settingsRepositoryProvider);
+              final defaultReminderTime = settingsAsync.when(
+                data: (_) {
+                  final repository = ref.read(settingsRepositoryProvider.notifier);
+                  final hour = repository.getDefaultReminderHour();
+                  final minute = repository.getDefaultReminderMinute();
+                  return TimeOfDay(hour: hour, minute: minute);
+                },
+                loading: () => const TimeOfDay(hour: 9, minute: 0),
+                error: (_, __) => const TimeOfDay(hour: 9, minute: 0),
+              );
+
+              return ListTile(
+                leading: const Icon(Icons.access_time),
+                title: const Text('Default Reminder Time'),
+                subtitle: Text(
+                  '${defaultReminderTime.hour.toString().padLeft(2, '0')}:${defaultReminderTime.minute.toString().padLeft(2, '0')}',
+                ),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: defaultReminderTime,
+                  );
+
+                  if (time != null) {
+                    await ref.read(settingsRepositoryProvider.notifier).setDefaultReminderTime(time.hour, time.minute);
+
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Default reminder time set to ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
+                  }
+                },
+              );
             },
           ),
 
           const Divider(height: 1),
 
           // Notifications section
-          _SectionHeader(title: 'Notifications'),
+          const _SectionHeader(title: 'Notifications'),
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
             title: const Text('Test Notification'),
@@ -53,40 +127,315 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSizes.base,
+              vertical: AppSizes.sm,
+            ),
+            child: Text(
+              'CustomSubs sends reminders at your chosen time before billing dates. Make sure notifications are enabled in your device settings.',
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
 
           const Divider(height: 1),
 
           // Data section
-          _SectionHeader(title: 'Data'),
+          const _SectionHeader(title: 'Data'),
+          Consumer(
+            builder: (context, ref, child) {
+              final settingsAsync = ref.watch(settingsRepositoryProvider);
+              final lastBackupDate = settingsAsync.when(
+                data: (_) {
+                  final repository = ref.read(settingsRepositoryProvider.notifier);
+                  return repository.getLastBackupDate();
+                },
+                loading: () => null,
+                error: (_, __) => null,
+              );
+
+              return ListTile(
+                leading: const Icon(Icons.access_time),
+                title: const Text('Last Backup'),
+                subtitle: Text(
+                  lastBackupDate != null
+                      ? _formatBackupDate(lastBackupDate)
+                      : 'Never backed up',
+                  style: TextStyle(
+                    color: lastBackupDate == null ? AppColors.warning : null,
+                    fontWeight:
+                        lastBackupDate == null ? FontWeight.w600 : null,
+                  ),
+                ),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.upload_file),
             title: const Text('Export Backup'),
             subtitle: const Text('Save your subscriptions to a file'),
-            onTap: () {
-              // TODO: Implement export
+            onTap: () async {
+              try {
+                // Show loading indicator
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Preparing backup...'),
+                      duration: Duration(seconds: 1),
+                    ),
+                  );
+                }
+
+                // Export backup
+                await ref.read(exportBackupProvider.future);
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Backup exported successfully!'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to export backup: $e'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
             },
           ),
           ListTile(
             leading: const Icon(Icons.download),
             title: const Text('Import Backup'),
             subtitle: const Text('Restore subscriptions from a file'),
-            onTap: () {
-              // TODO: Implement import
+            onTap: () async {
+              try {
+                // Import backup
+                final result = await ref.read(importBackupProvider.future);
+
+                if (context.mounted) {
+                  // Show result dialog
+                  await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Import Complete'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Found: ${result.totalFound} subscriptions'),
+                          Text('Duplicates skipped: ${result.duplicates}'),
+                          Text('Imported: ${result.imported} subscriptions'),
+                          if (result.imported > 0) ...[
+                            const SizedBox(height: AppSizes.base),
+                            const Text(
+                              'Notifications have been scheduled for all imported subscriptions.',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('OK'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } on BackupException catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.message),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to import backup: $e'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_forever, color: AppColors.error),
+            title: const Text(
+              'Delete All Data',
+              style: TextStyle(color: AppColors.error),
+            ),
+            subtitle: const Text('Permanently delete all subscriptions'),
+            onTap: () async {
+              // First confirmation
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete All Data?'),
+                  content: const Text(
+                    'This will permanently delete all subscriptions and settings. This cannot be undone.\n\nAre you sure you want to continue?',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      child: const Text('Continue'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (confirmed != true || !context.mounted) return;
+
+              // Second confirmation - type DELETE
+              final textController = TextEditingController();
+              final finalConfirmed = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Final Confirmation'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'This action is irreversible. All your subscription data will be lost forever.',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: AppSizes.base),
+                      const Text('Type DELETE to confirm:'),
+                      const SizedBox(height: AppSizes.sm),
+                      TextField(
+                        controller: textController,
+                        decoration: const InputDecoration(
+                          hintText: 'DELETE',
+                          border: OutlineInputBorder(),
+                        ),
+                        textCapitalization: TextCapitalization.characters,
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        if (textController.text == 'DELETE') {
+                          Navigator.pop(context, true);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please type DELETE to confirm'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: AppColors.error,
+                      ),
+                      child: const Text('Delete All'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (finalConfirmed != true || !context.mounted) return;
+
+              // Delete all data
+              try {
+                final repository = await ref.read(subscriptionRepositoryProvider.future);
+                final notificationService = await ref.read(notificationServiceProvider.future);
+
+                // Cancel all notifications
+                await notificationService.cancelAllNotifications();
+
+                // Delete all subscriptions
+                await repository.deleteAll();
+
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('All data deleted successfully'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+
+                  // Pop back to home
+                  context.pop();
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to delete data: $e'),
+                      backgroundColor: AppColors.error,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                }
+              }
             },
           ),
 
           const Divider(height: 1),
 
           // About section
-          _SectionHeader(title: 'About'),
+          const _SectionHeader(title: 'About'),
           const ListTile(
             leading: Icon(Icons.info_outline),
             title: Text('Version'),
             subtitle: Text('1.0.0'),
           ),
+          ListTile(
+            leading: const Icon(Icons.privacy_tip_outlined),
+            title: const Text('Privacy Policy'),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () async {
+              final url = Uri.parse('https://customsubs.us/privacy');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: const Text('Terms of Service'),
+            trailing: const Icon(Icons.open_in_new, size: 20),
+            onTap: () async {
+              final url = Uri.parse('https://customsubs.us/terms');
+              if (await canLaunchUrl(url)) {
+                await launchUrl(url, mode: LaunchMode.externalApplication);
+              }
+            },
+          ),
           const ListTile(
             leading: Icon(Icons.favorite_outline),
-            title: Text('Made with ♥ by Custom*'),
+            title: Text('Made with love by CustomApps LLC'),
           ),
         ],
       ),
@@ -118,5 +467,28 @@ class _SectionHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Format backup date for display
+String _formatBackupDate(DateTime date) {
+  final now = DateTime.now();
+  final difference = now.difference(date);
+
+  if (difference.inDays == 0) {
+    return 'Today at ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+  } else if (difference.inDays == 1) {
+    return 'Yesterday';
+  } else if (difference.inDays < 7) {
+    return '${difference.inDays} days ago';
+  } else if (difference.inDays < 30) {
+    final weeks = (difference.inDays / 7).floor();
+    return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
+  } else if (difference.inDays < 365) {
+    final months = (difference.inDays / 30).floor();
+    return '$months ${months == 1 ? 'month' : 'months'} ago';
+  } else {
+    final years = (difference.inDays / 365).floor();
+    return '$years ${years == 1 ? 'year' : 'years'} ago';
   }
 }

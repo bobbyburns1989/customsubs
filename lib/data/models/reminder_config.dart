@@ -69,4 +69,26 @@ class ReminderConfig extends HiveObject {
       reminderMinute,
     );
   }
+
+  /// Convert to JSON for backup export
+  Map<String, dynamic> toJson() {
+    return {
+      'firstReminderDays': firstReminderDays,
+      'secondReminderDays': secondReminderDays,
+      'remindOnBillingDay': remindOnBillingDay,
+      'reminderHour': reminderHour,
+      'reminderMinute': reminderMinute,
+    };
+  }
+
+  /// Create from JSON for backup import
+  factory ReminderConfig.fromJson(Map<String, dynamic> json) {
+    return ReminderConfig(
+      firstReminderDays: json['firstReminderDays'] as int? ?? 7,
+      secondReminderDays: json['secondReminderDays'] as int? ?? 1,
+      remindOnBillingDay: json['remindOnBillingDay'] as bool? ?? true,
+      reminderHour: json['reminderHour'] as int? ?? 9,
+      reminderMinute: json['reminderMinute'] as int? ?? 0,
+    );
+  }
 }

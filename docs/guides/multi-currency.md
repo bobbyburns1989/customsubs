@@ -1,5 +1,9 @@
 # Multi-Currency Support Guide
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **Complete guide to implementing and using multi-currency features in CustomSubs.**
 
 This guide covers currency conversion, formatting, display patterns, and best practices for handling subscriptions in different currencies.

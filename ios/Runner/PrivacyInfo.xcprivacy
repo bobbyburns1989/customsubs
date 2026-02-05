@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Privacy Manifest for CustomSubs -->
+	<!-- This app is 100% offline and collects NO data -->
+
+	<!-- No tracking whatsoever -->
+	<key>NSPrivacyTracking</key>
+	<false/>
+
+	<!-- Tracking domains (none - we're offline-only) -->
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+
+	<!-- Data collection types (none - all data stays local) -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+
+	<!-- Required API usage declarations -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!-- System Boot Time API (for notification scheduling) -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- 35F9.1: Measure time for notifications and timers -->
+				<string>35F9.1</string>
+			</array>
+		</dict>
+
+		<!-- File Timestamp API (for Hive database and backup files) -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- 0A2A.1: Display file timestamps to user -->
+				<!-- C617.1: Access timestamps of app-created files -->
+				<string>C617.1</string>
+			</array>
+		</dict>
+
+		<!-- User Defaults API (for app settings) -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- CA92.1: Store user preferences locally -->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

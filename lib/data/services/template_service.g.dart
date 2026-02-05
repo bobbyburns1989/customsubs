@@ -6,7 +6,7 @@ part of 'template_service.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$templateServiceHash() => r'be9bd4e56bb87ab09e3d363163b57c0fcb05e410';
+String _$templateServiceHash() => r'4e7812320053f032d5cb5e16d80b3561d1ea6ae5';
 
 /// See also [templateService].
 @ProviderFor(templateService)
@@ -24,7 +24,7 @@ final templateServiceProvider = AutoDisposeProvider<TemplateService>.internal(
 // ignore: unused_element
 typedef TemplateServiceRef = AutoDisposeProviderRef<TemplateService>;
 String _$subscriptionTemplatesHash() =>
-    r'935b35b10a29bc67c14925e0d82f8d5d12a1f4f4';
+    r'25bfe2aeaacfd39e77c83f8f40a1e1a977a46615';
 
 /// See also [subscriptionTemplates].
 @ProviderFor(subscriptionTemplates)

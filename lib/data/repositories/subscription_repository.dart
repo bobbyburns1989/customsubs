@@ -70,11 +70,15 @@ class SubscriptionRepository {
   }
 
   /// Get subscription by ID
+  ///
+  /// Returns null if no subscription with the given ID exists.
+  /// This is safer than throwing for missing IDs (e.g., when accessing stale references).
   Subscription? getById(String id) {
-    return _getBox.values.firstWhere(
-      (sub) => sub.id == id,
-      orElse: () => throw Exception('Subscription not found'),
-    );
+    try {
+      return _getBox.values.firstWhere((sub) => sub.id == id);
+    } catch (e) {
+      return null;  // Not found - return null as signature promises
+    }
   }
 
   /// Creates a new subscription or updates an existing one.

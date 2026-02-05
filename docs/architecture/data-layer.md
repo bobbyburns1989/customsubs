@@ -1,5 +1,9 @@
 # Data Layer Architecture
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **Complete guide to data persistence, models, and repository patterns in CustomSubs.**
 
 This document explains how data is stored, accessed, and managed using Hive and the repository pattern.

@@ -2,6 +2,7 @@ import 'package:hive/hive.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
+import 'package:custom_subs/core/extensions/date_extensions.dart';
 
 part 'subscription.g.dart';
 
@@ -195,6 +196,9 @@ class Subscription extends HiveObject {
   }
 
   /// Get next billing date after the current one
+  ///
+  /// Uses DateTimeExtensions.addMonths() for monthly/quarterly/biannual cycles
+  /// to correctly handle month-end dates (e.g., Jan 31 → Feb 28/29 → Mar 31).
   DateTime calculateNextBillingDate() {
     switch (cycle) {
       case SubscriptionCycle.weekly:
@@ -202,29 +206,13 @@ class Subscription extends HiveObject {
       case SubscriptionCycle.biweekly:
         return nextBillingDate.add(const Duration(days: 14));
       case SubscriptionCycle.monthly:
-        return DateTime(
-          nextBillingDate.year,
-          nextBillingDate.month + 1,
-          nextBillingDate.day,
-        );
+        return nextBillingDate.addMonths(1);
       case SubscriptionCycle.quarterly:
-        return DateTime(
-          nextBillingDate.year,
-          nextBillingDate.month + 3,
-          nextBillingDate.day,
-        );
+        return nextBillingDate.addMonths(3);
       case SubscriptionCycle.biannual:
-        return DateTime(
-          nextBillingDate.year,
-          nextBillingDate.month + 6,
-          nextBillingDate.day,
-        );
+        return nextBillingDate.addMonths(6);
       case SubscriptionCycle.yearly:
-        return DateTime(
-          nextBillingDate.year + 1,
-          nextBillingDate.month,
-          nextBillingDate.day,
-        );
+        return nextBillingDate.addMonths(12);
     }
   }
 
@@ -237,4 +225,81 @@ class Subscription extends HiveObject {
 
   @override
   int get hashCode => id.hashCode;
+
+  /// Convert to JSON for backup export
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'amount': amount,
+      'currencyCode': currencyCode,
+      'cycle': cycle.name,
+      'nextBillingDate': nextBillingDate.toIso8601String(),
+      'startDate': startDate.toIso8601String(),
+      'category': category.name,
+      'isActive': isActive,
+      'isTrial': isTrial,
+      'trialEndDate': trialEndDate?.toIso8601String(),
+      'postTrialAmount': postTrialAmount,
+      'cancelUrl': cancelUrl,
+      'cancelPhone': cancelPhone,
+      'cancelNotes': cancelNotes,
+      'cancelChecklist': cancelChecklist,
+      'checklistCompleted': checklistCompleted,
+      'notes': notes,
+      'iconName': iconName,
+      'colorValue': colorValue,
+      'reminders': reminders.toJson(),
+      'isPaid': isPaid,
+      'lastMarkedPaidDate': lastMarkedPaidDate?.toIso8601String(),
+    };
+  }
+
+  /// Create from JSON for backup import
+  factory Subscription.fromJson(Map<String, dynamic> json) {
+    return Subscription(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      currencyCode: json['currencyCode'] as String,
+      cycle: SubscriptionCycle.values.firstWhere(
+        (e) => e.name == json['cycle'],
+        orElse: () => SubscriptionCycle.monthly,
+      ),
+      nextBillingDate: DateTime.parse(json['nextBillingDate'] as String),
+      startDate: DateTime.parse(json['startDate'] as String),
+      category: SubscriptionCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => SubscriptionCategory.other,
+      ),
+      isActive: json['isActive'] as bool? ?? true,
+      isTrial: json['isTrial'] as bool? ?? false,
+      trialEndDate: json['trialEndDate'] != null
+          ? DateTime.parse(json['trialEndDate'] as String)
+          : null,
+      postTrialAmount: json['postTrialAmount'] != null
+          ? (json['postTrialAmount'] as num).toDouble()
+          : null,
+      cancelUrl: json['cancelUrl'] as String?,
+      cancelPhone: json['cancelPhone'] as String?,
+      cancelNotes: json['cancelNotes'] as String?,
+      cancelChecklist: (json['cancelChecklist'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      checklistCompleted: (json['checklistCompleted'] as List<dynamic>?)
+              ?.map((e) => e as bool)
+              .toList() ??
+          [],
+      notes: json['notes'] as String?,
+      iconName: json['iconName'] as String?,
+      colorValue: json['colorValue'] as int,
+      reminders: ReminderConfig.fromJson(
+          json['reminders'] as Map<String, dynamic>),
+      isPaid: json['isPaid'] as bool? ?? false,
+      lastMarkedPaidDate: json['lastMarkedPaidDate'] != null
+          ? DateTime.parse(json['lastMarkedPaidDate'] as String)
+          : null,
+    );
+  }
 }

@@ -9,16 +9,20 @@
 /// - Smart notifications with timezone support
 /// - Multi-currency support with bundled exchange rates
 /// - 40+ pre-populated subscription templates
+library;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:custom_subs/app/app.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
+import 'package:custom_subs/data/models/monthly_snapshot.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
@@ -45,10 +49,22 @@ void main() async {
   Hive.registerAdapter(SubscriptionCycleAdapter());
   Hive.registerAdapter(SubscriptionCategoryAdapter());
   Hive.registerAdapter(ReminderConfigAdapter());
+  Hive.registerAdapter(MonthlySnapshotAdapter());
 
   // Initialize timezone database for accurate notification scheduling
   // This loads timezone data for all regions worldwide
   tz.initializeTimeZones();
+
+  // Set local timezone to device's actual timezone
+  // CRITICAL: Without this, all notifications schedule in UTC!
+  try {
+    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    tz.setLocalLocation(tz.getLocation(timeZoneName));
+  } catch (e) {
+    // Fallback to UTC if timezone detection fails
+    debugPrint('⚠️ Failed to get local timezone: $e. Falling back to UTC.');
+    tz.setLocalLocation(tz.getLocation('UTC'));
+  }
 
   // Load bundled currency exchange rates from assets/data/exchange_rates.json
   // This enables multi-currency support without network calls
@@ -60,6 +76,10 @@ void main() async {
   // Initialize subscription repository (opens Hive box)
   // Using async provider pattern to handle initialization properly
   final repository = await container.read(subscriptionRepositoryProvider.future);
+
+  // Open monthly snapshots box for analytics (stores historical spending data)
+  // Used for month-over-month comparison in analytics screen
+  await Hive.openBox<MonthlySnapshot>('monthly_snapshots');
 
   // Initialize notification service (sets up platform-specific handlers)
   // The provider now auto-initializes the service

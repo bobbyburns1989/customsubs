@@ -1,5 +1,9 @@
 # State Management Guide
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **CustomSubs uses Riverpod with code generation for all state management.**
 
 This guide explains our Riverpod patterns, conventions, and when to use each approach.

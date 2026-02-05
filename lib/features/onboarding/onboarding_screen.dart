@@ -51,7 +51,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   3,
-                  (index) => Container(
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
                     margin: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
                     width: _currentPage == index ? 24 : 8,
                     height: 8,
@@ -75,7 +77,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     _currentPage = index;
                   });
                 },
-                children: [
+                children: const [
                   _OnboardingPage(
                     showLogo: true,
                     title: 'Welcome to CustomSubs',
@@ -178,7 +180,7 @@ class _OnboardingPage extends StatelessWidget {
             Container(
               width: 120,
               height: 120,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.primarySurface,
                 shape: BoxShape.circle,
               ),

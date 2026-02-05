@@ -43,8 +43,33 @@ class AddSubscriptionController extends _$AddSubscriptionController {
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     final notificationService = await ref.read(notificationServiceProvider.future);
 
+    // When editing, preserve state that shouldn't be reset
+    final existingSubscription = state.value;
+    final isEditing = existingSubscription != null;
+
+    // Preserve checklist completion state when editing
+    // If checklist length changed, create new array preserving what we can
+    List<bool> checklistCompleted;
+    if (isEditing && existingSubscription.checklistCompleted.isNotEmpty) {
+      if (cancelChecklist.length == existingSubscription.cancelChecklist.length) {
+        // Same length - keep existing completion state
+        checklistCompleted = existingSubscription.checklistCompleted;
+      } else {
+        // Length changed - preserve what we can, fill rest with false
+        checklistCompleted = List.generate(
+          cancelChecklist.length,
+          (index) => index < existingSubscription.checklistCompleted.length
+              ? existingSubscription.checklistCompleted[index]
+              : false,
+        );
+      }
+    } else {
+      // New subscription - all unchecked
+      checklistCompleted = List.filled(cancelChecklist.length, false);
+    }
+
     final subscription = Subscription(
-      id: state.value?.id ?? const Uuid().v4(),
+      id: existingSubscription?.id ?? const Uuid().v4(),
       name: name,
       amount: amount,
       currencyCode: currencyCode,
@@ -54,7 +79,8 @@ class AddSubscriptionController extends _$AddSubscriptionController {
       category: category,
       colorValue: colorValue,
       reminders: reminders,
-      isActive: isActive,
+      // Preserve isActive when editing (don't reset paused subscriptions)
+      isActive: isEditing ? existingSubscription.isActive : isActive,
       isTrial: isTrial,
       trialEndDate: trialEndDate,
       postTrialAmount: postTrialAmount,
@@ -62,9 +88,12 @@ class AddSubscriptionController extends _$AddSubscriptionController {
       cancelPhone: cancelPhone,
       cancelNotes: cancelNotes,
       cancelChecklist: cancelChecklist,
-      checklistCompleted: List.filled(cancelChecklist.length, false),
+      checklistCompleted: checklistCompleted,
       notes: notes,
       iconName: iconName,
+      // Preserve paid status when editing (don't reset marked-as-paid subscriptions)
+      isPaid: isEditing ? existingSubscription.isPaid : false,
+      lastMarkedPaidDate: isEditing ? existingSubscription.lastMarkedPaidDate : null,
     );
 
     await repository.upsert(subscription);

@@ -236,4 +236,22 @@ extension DateTimeExtensions on DateTime {
     final now = DateTime.now();
     return now.difference(this).inDays;
   }
+
+  /// Get human-readable string for days until this date ("in 3 days", "Tomorrow", "Today", etc.)
+  String relativeDaysUntil() {
+    final now = DateTime.now();
+    final difference = this.difference(now);
+
+    if (difference.isNegative) {
+      return 'Overdue';
+    } else if (difference.inDays == 0) {
+      return 'Today';
+    } else if (difference.inDays == 1) {
+      return 'Tomorrow';
+    } else if (difference.inDays < 7) {
+      return 'in ${difference.inDays} days';
+    } else {
+      return 'in ${difference.inDays} days';
+    }
+  }
 }

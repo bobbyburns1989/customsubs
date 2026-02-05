@@ -1,5 +1,9 @@
 # Quick Reference
 
+**Status**: ✅ Complete
+**Last Updated**: February 4, 2026
+**Relevant to**: Developers
+
 **Fast lookup for common tasks and patterns in CustomSubs.**
 
 Bookmark this page for quick access during development.
@@ -272,6 +276,55 @@ CircleAvatar(
 - **Productivity**: Microsoft 365, Adobe, Canva, Notion, Evernote
 - **Fitness**: Peloton, Strava, Headspace, Calm
 - **And 30+ more services!**
+
+---
+
+## 🎬 Micro-Animations
+
+**Added in v0.2.0** - Subtle animations for polish and feedback
+
+### Button Press Animation
+
+```dart
+import 'package:custom_subs/core/widgets/subtle_pressable.dart';
+
+SubtlePressable(
+  onPressed: () => doSomething(),
+  child: ElevatedButton(
+    onPressed: null, // Set to null
+    child: const Text('Press Me'),
+  ),
+)
+```
+
+### Badge Fade In/Out
+
+```dart
+AnimatedOpacity(
+  opacity: isVisible ? 1.0 : 0.0,
+  duration: const Duration(milliseconds: 250),
+  curve: Curves.easeOut,
+  child: YourBadge(),
+)
+```
+
+### Smooth Width/Color Transition
+
+```dart
+AnimatedContainer(
+  duration: const Duration(milliseconds: 300),
+  curve: Curves.easeInOut,
+  width: isActive ? 24 : 8,
+  color: isActive ? activeColor : inactiveColor,
+  child: YourWidget(),
+)
+```
+
+**Guidelines:**
+- Keep animations < 300ms
+- Use 2% scale for button press (0.98)
+- Use `Curves.easeOut` for fades
+- See `docs/design/MICRO_ANIMATIONS.md` for full guide
 
 ---
 

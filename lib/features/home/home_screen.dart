@@ -4,17 +4,50 @@ import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/core/utils/service_icons.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
+import 'package:custom_subs/core/providers/settings_provider.dart';
+import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
+import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:flutter/material.dart' as material;
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Check if backup reminder should be shown (after first frame)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkBackupReminder();
+    });
+  }
+
+  Future<void> _checkBackupReminder() async {
+    final homeController = ref.read(homeControllerProvider.notifier);
+    if (homeController.shouldShowBackupReminder()) {
+      final dontShowAgain = await showDialog<bool>(
+        context: context,
+        builder: (context) => const BackupReminderDialog(),
+      );
+
+      if (dontShowAgain == true) {
+        final settingsRepo = ref.read(settingsRepositoryProvider.notifier);
+        await settingsRepo.setBackupReminderShown();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final controller = ref.watch(homeControllerProvider);
 
@@ -38,6 +71,7 @@ class HomeScreen extends ConsumerWidget {
 
           final homeController = ref.read(homeControllerProvider.notifier);
           final upcoming = homeController.getUpcomingSubscriptions();
+          final primaryCurrency = homeController.getPrimaryCurrency();
           final monthlyTotal = homeController.calculateMonthlyTotal();
           final activeCount = homeController.getActiveCount();
           final trialsEndingSoon = homeController.getTrialsEndingSoon();
@@ -53,6 +87,7 @@ class HomeScreen extends ConsumerWidget {
                     child: _SpendingSummaryCard(
                       monthlyTotal: monthlyTotal,
                       activeCount: activeCount,
+                      currency: primaryCurrency,
                     ),
                   ),
                 ),
@@ -76,9 +111,7 @@ class HomeScreen extends ConsumerWidget {
                         const SizedBox(width: AppSizes.base),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () {
-                              // TODO: Navigate to analytics
-                            },
+                            onPressed: () => context.push(AppRouter.analytics),
                             icon: const Icon(Icons.analytics_outlined),
                             label: const Text('Analytics'),
                           ),
@@ -94,7 +127,7 @@ class HomeScreen extends ConsumerWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(AppSizes.base),
                       child: Card(
-                        color: AppColors.trial.withOpacity(0.1),
+                        color: AppColors.trial.withValues(alpha: 0.1),
                         child: Padding(
                           padding: const EdgeInsets.all(AppSizes.base),
                           child: Column(
@@ -197,15 +230,6 @@ class HomeScreen extends ConsumerWidget {
           child: Text('Error: $error'),
         ),
       ),
-      floatingActionButton: controller.maybeWhen(
-        data: (subs) => subs.isNotEmpty
-            ? FloatingActionButton(
-                onPressed: () => context.push(AppRouter.addSubscription),
-                child: const Icon(Icons.add),
-              )
-            : null,
-        orElse: () => null,
-      ),
     );
   }
 
@@ -291,10 +315,12 @@ class _EmptyState extends StatelessWidget {
 class _SpendingSummaryCard extends StatelessWidget {
   final double monthlyTotal;
   final int activeCount;
+  final String currency;
 
   const _SpendingSummaryCard({
     required this.monthlyTotal,
     required this.activeCount,
+    required this.currency,
   });
 
   @override
@@ -315,7 +341,7 @@ class _SpendingSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            CurrencyUtils.formatAmount(monthlyTotal, 'USD'),
+            CurrencyUtils.formatAmount(monthlyTotal, currency),
             style: theme.textTheme.displaySmall?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -324,14 +350,14 @@ class _SpendingSummaryCard extends StatelessWidget {
           Text(
             '/month',
             style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
           const SizedBox(height: AppSizes.sm),
           Text(
             '$activeCount active subscription${activeCount == 1 ? '' : 's'}',
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -341,7 +367,7 @@ class _SpendingSummaryCard extends StatelessWidget {
 }
 
 class _SubscriptionTile extends StatelessWidget {
-  final subscription;
+  final Subscription subscription;
   final VoidCallback onTap;
   final VoidCallback onMarkPaid;
   final VoidCallback onDelete;
@@ -385,21 +411,21 @@ class _SubscriptionTile extends StatelessWidget {
           onDelete();
         }
       },
-      child: Card(
-        margin: const EdgeInsets.symmetric(
-          horizontal: AppSizes.base,
-          vertical: AppSizes.xs,
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+      child: SubtlePressable(
+        onPressed: onTap,
+        scale: 0.99, // Extra subtle 1% scale for cards
+        child: Card(
+          margin: const EdgeInsets.symmetric(
+            horizontal: AppSizes.base,
+            vertical: AppSizes.xs,
+          ),
           child: Padding(
             padding: const EdgeInsets.all(AppSizes.base),
             child: Row(
               children: [
                 // Color indicator + Icon
                 CircleAvatar(
-                  backgroundColor: color.withOpacity(0.2),
+                  backgroundColor: color.withValues(alpha: 0.2),
                   child: ServiceIcons.hasCustomIcon(subscription.name)
                       ? Icon(
                           ServiceIcons.getIconForService(subscription.name),
@@ -430,15 +456,18 @@ class _SubscriptionTile extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          if (subscription.isPaid)
-                            Container(
+                          AnimatedOpacity(
+                            opacity: subscription.isPaid ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeOut,
+                            child: Container(
                               margin: const EdgeInsets.only(left: AppSizes.sm),
                               padding: const EdgeInsets.symmetric(
                                 horizontal: AppSizes.sm,
                                 vertical: AppSizes.xs,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.success.withOpacity(0.1),
+                                color: AppColors.success.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                               ),
                               child: Text(
@@ -449,6 +478,7 @@ class _SubscriptionTile extends StatelessWidget {
                                 ),
                               ),
                             ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: AppSizes.xs),
@@ -496,7 +526,7 @@ class _SubscriptionTile extends StatelessWidget {
                           vertical: AppSizes.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.trial.withOpacity(0.1),
+                          color: AppColors.trial.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                         ),
                         child: Text(

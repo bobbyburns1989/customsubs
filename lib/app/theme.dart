@@ -10,7 +10,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
+      colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         primaryContainer: AppColors.primarySurface,
         secondary: AppColors.primary,
@@ -130,11 +130,11 @@ class AppTheme {
       ),
 
       // FloatingActionButton theme
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: AppSizes.elevationMd,
-        shape: const CircleBorder(),
+        shape: CircleBorder(),
       ),
 
       // Elevated button theme

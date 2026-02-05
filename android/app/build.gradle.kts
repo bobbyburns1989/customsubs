@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.customapps.custom_subs"
+    namespace = "com.customsubs.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -20,8 +20,8 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.customapps.custom_subs"
+        // Application ID for CustomSubs
+        applicationId = "com.customsubs.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

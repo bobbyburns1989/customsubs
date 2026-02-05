@@ -1,3 +1,5 @@
+library;
+
 /// Service icon mapping for subscription templates.
 ///
 /// Maps service names to Material Icons for visual identification.

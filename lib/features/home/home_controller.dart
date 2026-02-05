@@ -1,6 +1,8 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
+import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/providers/settings_provider.dart';
 
 part 'home_controller.g.dart';
 
@@ -13,25 +15,51 @@ class HomeController extends _$HomeController {
   }
 
   /// Get upcoming subscriptions sorted by billing date
-  List<Subscription> getUpcomingSubscriptions() {
+  ///
+  /// Returns only subscriptions billing within the next [days] (default: 30).
+  /// Sorts by paid status first (unpaid first), then by billing date.
+  List<Subscription> getUpcomingSubscriptions({int days = 30}) {
     final subs = state.value ?? [];
-    final sortedSubs = List<Subscription>.from(subs);
+    final now = DateTime.now();
+    final cutoffDate = now.add(Duration(days: days));
+
+    // Filter to only subscriptions within the date range
+    final filteredSubs = subs.where((sub) {
+      return sub.nextBillingDate.isAfter(now) &&
+             sub.nextBillingDate.isBefore(cutoffDate);
+    }).toList();
 
     // Sort by paid status first (unpaid first), then by billing date
-    sortedSubs.sort((a, b) {
+    filteredSubs.sort((a, b) {
       if (a.isPaid != b.isPaid) {
         return a.isPaid ? 1 : -1;
       }
       return a.nextBillingDate.compareTo(b.nextBillingDate);
     });
 
-    return sortedSubs;
+    return filteredSubs;
   }
 
-  /// Calculate total monthly spending
+  /// Calculate total monthly spending in primary currency
+  ///
+  /// Converts all subscriptions to primary currency before summing.
   double calculateMonthlyTotal() {
     final subs = state.value ?? [];
-    return subs.fold(0.0, (sum, sub) => sum + sub.effectiveMonthlyAmount);
+    final primaryCurrency = getPrimaryCurrency();
+    return subs.fold(0.0, (sum, sub) {
+      // Convert subscription's monthly amount to primary currency
+      final convertedAmount = CurrencyUtils.convert(
+        sub.effectiveMonthlyAmount,
+        sub.currencyCode,
+        primaryCurrency,
+      );
+      return sum + convertedAmount;
+    });
+  }
+
+  /// Get primary currency for display from settings
+  String getPrimaryCurrency() {
+    return ref.read(primaryCurrencyProvider);
   }
 
   /// Get count of active subscriptions
@@ -73,5 +101,18 @@ class HomeController extends _$HomeController {
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     await repository.toggleActive(subscriptionId);
     await refresh();
+  }
+
+  /// Check if backup reminder should be shown
+  ///
+  /// Returns true if:
+  /// - User has exactly 3 active subscriptions
+  /// - Backup reminder hasn't been shown before
+  bool shouldShowBackupReminder() {
+    final count = getActiveCount();
+    final settingsRepo = ref.read(settingsRepositoryProvider.notifier);
+    final hasShown = settingsRepo.hasShownBackupReminder();
+
+    return count == 3 && !hasShown;
   }
 }

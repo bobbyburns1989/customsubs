@@ -1,3 +1,5 @@
+library;
+
 /// Currency formatting and conversion utilities.
 
 import 'dart:convert';

@@ -1,4 +1,4 @@
-package com.customapps.custom_subs
+package com.customsubs.app
 
 import io.flutter.embedding.android.FlutterActivity
 

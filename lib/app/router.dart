@@ -1,3 +1,5 @@
+library;
+
 /// Navigation configuration using GoRouter.
 
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import 'package:custom_subs/features/home/home_screen.dart';
 import 'package:custom_subs/features/settings/settings_screen.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_screen.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_screen.dart';
+import 'package:custom_subs/features/analytics/analytics_screen.dart';
 
 /// Centralized app routing configuration.
 ///
@@ -16,6 +19,7 @@ class AppRouter {
   static const String onboarding = '/onboarding';
   static const String home = '/';
   static const String settings = '/settings';
+  static const String analytics = '/analytics';
   static const String addSubscription = '/add-subscription';
   static const String editSubscription = '/edit-subscription';
   static const String subscriptionDetail = '/subscription';
@@ -30,6 +34,7 @@ class AppRouter {
   /// - `/onboarding` - First-time user introduction
   /// - `/` - Main home screen with subscription list
   /// - `/settings` - App settings and preferences
+  /// - `/analytics` - Spending analytics and insights
   /// - `/add-subscription` - Create new subscription
   /// - `/edit-subscription?id=<id>` - Edit existing subscription
   /// - `/subscription/:id` - View subscription details
@@ -48,6 +53,10 @@ class AppRouter {
         GoRoute(
           path: settings,
           builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: analytics,
+          builder: (context, state) => const AnalyticsScreen(),
         ),
         GoRoute(
           path: addSubscription,

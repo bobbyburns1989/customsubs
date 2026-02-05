@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 part 'template_service.g.dart';
 
@@ -140,13 +141,12 @@ class TemplateService {
 }
 
 @riverpod
-TemplateService templateService(TemplateServiceRef ref) {
+TemplateService templateService(Ref ref) {
   return TemplateService();
 }
 
 @riverpod
-Future<List<SubscriptionTemplate>> subscriptionTemplates(
-    SubscriptionTemplatesRef ref) async {
+Future<List<SubscriptionTemplate>> subscriptionTemplates(Ref ref) async {
   final service = ref.watch(templateServiceProvider);
   return service.loadTemplates();
 }

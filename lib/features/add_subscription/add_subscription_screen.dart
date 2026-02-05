@@ -40,7 +40,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   SubscriptionCategory _category = SubscriptionCategory.entertainment;
   DateTime _nextBillingDate = DateTime.now().add(const Duration(days: 30));
   DateTime _startDate = DateTime.now();
-  int _colorValue = AppColors.subscriptionColors[0].value;
+  int _colorValue = AppColors.subscriptionColors[0].toARGB32();
   ReminderConfig _reminders = ReminderConfig();
 
   bool _isTrial = false;
@@ -606,7 +606,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                               ],
                             ),
                           );
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),
