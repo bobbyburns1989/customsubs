@@ -14,9 +14,11 @@ CustomSubs is a mobile application designed to help you track and manage your su
 
 **📊 Development Status:** 98% Complete - Ready for Device Testing! | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
 
+**🆕 Latest Update (v1.0.3):** Add Subscription screen modernized with 60% size reduction, collapsible sections, and sleek compact design!
+
 ### Key Features
 
-✅ **Completed Features (Phases 0-2)**
+✅ **Completed Features (Phases 0-2 + UI Modernization)**
 
 **Core Functionality:**
 - 📱 Clean Material 3 UI with custom theming
@@ -75,6 +77,16 @@ CustomSubs is a mobile application designed to help you track and manage your su
 - ✅ Performance optimized (60fps)
 - ✅ Error handling utilities
 - ✅ Comprehensive testing checklist (300+ test cases)
+
+**UI Modernization (v1.0.3):**
+- ✨ **60% reduction in Add Subscription form height**
+- 📝 Smart collapsible sections with smooth animations
+- 🎯 Compact, modern design (12px padding, 36px icons)
+- 🎨 Unified FormSectionCard styling across all sections
+- 🔽 Animated chevron icons (300ms transitions)
+- 👆 All touch targets maintained >32px for accessibility
+- 📱 Collapsed preview widgets (e.g., color dot when Appearance collapsed)
+- **See:** [`docs/completion/ADD_SUBSCRIPTION_MODERNIZATION.md`](docs/completion/ADD_SUBSCRIPTION_MODERNIZATION.md)
 
 🔮 **Planned (Future Versions)**
 - 🌙 Dark mode support

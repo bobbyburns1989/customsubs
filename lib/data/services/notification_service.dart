@@ -236,8 +236,6 @@ class NotificationService {
     // Cancel existing notifications first
     await cancelNotificationsForSubscription(subscription.id);
 
-    if (!subscription.isActive) return;
-
     final reminders = subscription.reminders;
 
     // Handle trial-specific notifications

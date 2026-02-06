@@ -65,8 +65,12 @@ class SubscriptionRepository {
   }
 
   /// Get all active subscriptions
+  ///
+  /// NOTE: As of v1.0.3, the pause/resume feature was removed.
+  /// This method now returns all subscriptions for backward compatibility.
+  /// Consider renaming to getAll() in future major version.
   List<Subscription> getAllActive() {
-    return _getBox.values.where((sub) => sub.isActive).toList();
+    return _getBox.values.toList();
   }
 
   /// Get subscription by ID
@@ -179,17 +183,6 @@ class SubscriptionRepository {
     await upsert(updated);
   }
 
-  /// Toggle subscription active status
-  Future<void> toggleActive(String subscriptionId) async {
-    final subscription = getById(subscriptionId);
-    if (subscription == null) return;
-
-    final updated = subscription.copyWith(
-      isActive: !subscription.isActive,
-    );
-
-    await upsert(updated);
-  }
 
   /// Advances billing dates for subscriptions that are past due.
   ///
@@ -241,7 +234,7 @@ class SubscriptionRepository {
     final now = DateTime.now();
     final updated = <Subscription>[];
 
-    for (final subscription in getAllActive()) {
+    for (final subscription in getAll()) {
       if (subscription.nextBillingDate.isBefore(now)) {
         // Calculate how many cycles have passed
         var newBillingDate = subscription.nextBillingDate;
@@ -380,7 +373,7 @@ class SubscriptionRepository {
   /// - Use `watchActive()`: When you need live updates (e.g., home screen list)
   /// - Use manual refresh: When updates are triggered by user actions only
   Stream<List<Subscription>> watchActive() {
-    return _getBox.watch().map((_) => getAllActive());
+    return _getBox.watch().map((_) => getAll());
   }
 }
 

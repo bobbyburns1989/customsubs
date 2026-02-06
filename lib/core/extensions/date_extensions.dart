@@ -125,7 +125,7 @@ extension DateTimeExtensions on DateTime {
       return 'Today';
     } else if (difference.inDays == 1) {
       return 'Tomorrow';
-    } else if (difference.inDays < 7) {
+    } else if (difference.inDays < 30) {
       return 'in ${difference.inDays} days';
     } else {
       return DateFormat.MMMd().format(this);

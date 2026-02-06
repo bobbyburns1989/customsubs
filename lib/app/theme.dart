@@ -108,7 +108,7 @@ class AppTheme {
         elevation: AppSizes.elevationNone,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-          side: const BorderSide(color: AppColors.border, width: 1),
+          side: const BorderSide(color: AppColors.border, width: 1.5),
         ),
         margin: const EdgeInsets.symmetric(
           horizontal: AppSizes.base,
@@ -147,7 +147,7 @@ class AppTheme {
             vertical: AppSizes.base,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           elevation: AppSizes.elevationNone,
           textStyle: GoogleFonts.dmSans(
@@ -166,7 +166,7 @@ class AppTheme {
             vertical: AppSizes.base,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           side: const BorderSide(color: AppColors.primary, width: 1.5),
           textStyle: GoogleFonts.dmSans(

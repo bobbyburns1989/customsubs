@@ -75,7 +75,7 @@ lib/
 ├── core/
 │   ├── constants/
 │   │   ├── app_colors.dart         # All color constants
-│   │   ├── app_sizes.dart          # Spacing, radius, elevation constants
+│   │   ├── app_sizes.dart          # Spacing, radius, elevation constants + sectionSpacing
 │   │   └── subscription_templates.dart  # Pre-populated subscription catalog
 │   ├── extensions/
 │   │   ├── date_extensions.dart    # DateTime helpers (nextBillingDate calc, etc.)
@@ -84,8 +84,8 @@ lib/
 │   │   ├── currency_utils.dart     # Exchange rate loading, conversion
 │   │   └── export_utils.dart       # JSON export/import logic
 │   └── widgets/
-│       ├── custom_subs_card.dart   # Reusable styled card
-│       ├── amount_display.dart     # Currency-aware amount widget
+│       ├── standard_card.dart      # Reusable card with consistent styling (16px radius, 1.5px border)
+│       ├── subtle_pressable.dart   # Pressable wrapper with scale animation
 │       └── empty_state.dart        # Reusable empty state widget
 │
 ├── data/
@@ -103,9 +103,7 @@ lib/
 │
 ├── features/
 │   ├── onboarding/
-│   │   ├── onboarding_screen.dart       # 3-page intro walkthrough
-│   │   └── widgets/
-│   │       └── onboarding_page.dart     # Single onboarding page widget
+│   │   └── onboarding_screen.dart       # Single-screen intro with feature cards
 │   │
 │   ├── home/
 │   │   ├── home_screen.dart             # Main screen: summary + upcoming list
@@ -246,27 +244,44 @@ class ReminderConfig {
 
 ### 1. Onboarding (first launch only)
 
-Three pages with smooth PageView transitions. Minimal, visual, and fast.
+Single-screen onboarding with all content visible at once. Minimal, scannable, and fast.
 
-**Page 1 — "Track Everything"**
-- Illustration: Simple icon composition showing subscription logos
-- Headline: "All your subscriptions in one place"
-- Subtitle: "No bank linking. No login. Just you and your bills."
+**Layout Structure:**
 
-**Page 2 — "Never Get Surprised"**
-- Illustration: Bell/notification icon
-- Headline: "Reminders that actually work"
-- Subtitle: "Get notified 7 days, 1 day, and the morning of every charge."
+**Header Section:**
+- CustomSubs logo (centered)
+- Welcome message: "Welcome to CustomSubs"
+- Subheadline: "Your private subscription tracker"
 
-**Page 3 — "Take Back Control"**
-- Illustration: Scissors or cancel icon
-- Headline: "Cancel with confidence"
-- Subtitle: "Step-by-step cancellation guides for every subscription."
-- CTA button: "Get Started" → navigates to Home
+**Features Section (3 cards):**
 
-Store a `hasSeenOnboarding` bool in Hive settings box. Skip onboarding on subsequent launches.
+**Card 1 — "Track Everything"**
+- Icon: Dashboard icon in circular green container
+- Title: "Track Everything"
+- Description: "All your subscriptions in one place. No bank linking. No login."
 
-On "Get Started" tap, also trigger notification permission request (iOS/Android).
+**Card 2 — "Never Miss a Charge"**
+- Icon: Notification bell icon in circular green container
+- Title: "Never Miss a Charge"
+- Description: "Get notified 7 days before, 1 day before, and the morning of every billing date."
+
+**Card 3 — "Cancel with Confidence"**
+- Icon: Exit/cancel icon in circular green container
+- Title: "Cancel with Confidence"
+- Description: "Step-by-step guides to cancel any subscription quickly."
+
+**CTA Section:**
+- Full-width "Get Started" button (primary green)
+- Privacy note: "🔒 100% offline • No account required"
+
+**Animations:**
+- Subtle staggered fade-in animations for each section (1200ms total duration)
+- Each element fades in sequentially with 150ms offset
+
+**Behavior:**
+- Store a `hasSeenOnboarding` bool in Hive settings box. Skip onboarding on subsequent launches.
+- On "Get Started" tap, trigger notification permission request (iOS/Android).
+- Navigate to Home screen after permissions are handled.
 
 ### 2. Home Screen
 
@@ -397,9 +412,12 @@ Full detail view for a single subscription. Accessed by tapping any subscription
 
 Visual breakdown of spending. Accessible from Home quick actions.
 
-**Monthly Total Display:**
-- Large number: total monthly equivalent of all active subs in primary currency
-- Comparison: "Up/down $X from last month" (calculated by tracking historical monthly totals — store a simple monthly snapshot in Hive each time user opens analytics)
+**Yearly Forecast (Hero Metric):**
+- Centered card with green gradient background at the top
+- Large prominent yearly total: "At this rate, you'll spend $X,XXX this year on subscriptions"
+- Simple multiplication of monthly total × 12
+- Shows active subscription count
+- Primary focal point of the screen
 
 **Category Breakdown:**
 - Horizontal bar chart or proportional segments showing spend per category
@@ -409,10 +427,7 @@ Visual breakdown of spending. Accessible from Home quick actions.
 **Top Subscriptions:**
 - Ranked list of most expensive subscriptions (monthly equivalent)
 - Show top 5 with amounts
-
-**Yearly Forecast:**
-- "At this rate, you'll spend $X,XXX this year on subscriptions"
-- Simple multiplication of monthly total × 12
+- Tappable to navigate to subscription detail
 
 **Currency Breakdown (if multi-currency):**
 - Show total spend per currency before conversion
@@ -506,10 +521,13 @@ static const double xl = 24;
 static const double xxl = 32;
 static const double xxxl = 48;
 
+// Semantic spacing (for consistent vertical rhythm)
+static const double sectionSpacing = lg; // 20px between major sections
+
 // Border radius
 static const double radiusSm = 8;
 static const double radiusMd = 12;
-static const double radiusLg = 16;
+static const double radiusLg = 16;  // Standard for all cards
 static const double radiusXl = 20;
 static const double radiusFull = 999;
 
@@ -520,22 +538,38 @@ static const double elevationMd = 2;
 ```
 
 ### Card Style
-All cards should use:
-- White background
-- 1px border (border color from above)
-- BorderRadius of `radiusMd` (12)
-- Padding of `base` (16) inside
+Use the **StandardCard** widget (`lib/core/widgets/standard_card.dart`) for all cards to maintain visual consistency:
+
+```dart
+StandardCard(
+  child: Column(
+    children: [
+      Text('Card content'),
+    ],
+  ),
+)
+```
+
+**StandardCard specifications:**
+- White background (or custom via `backgroundColor`)
+- 1.5px border (AppColors.border)
+- BorderRadius of `radiusLg` (16px) — consistent across all cards
+- Padding of `lg` (20px) inside by default
 - No drop shadow (flat design — elevation via borders, not shadows)
+- Margin defaults to zero (full width in parent)
 
 ### General UI Principles
 - **Light mode only** for now
 - **No bottom navigation bar** — use a single-screen home with drill-down navigation
-- **Floating Action Button** for "Add Subscription" on Home screen (green, circular, + icon)
-- **Cards, not lists** — each subscription is a card, not a bare ListTile
-- **Generous whitespace** — don't crowd elements
+- **Cards, not lists** — each subscription is a card, not a bare ListTile. Use `StandardCard` for consistency
+- **Generous whitespace** — use `sectionSpacing` (20px) between major sections for consistent vertical rhythm
+- **Balanced hierarchy** — avoid top-heavy layouts by using consistent padding/font sizes
+- **Glass morphism for primary cards** — green summary cards use solid color with 92% opacity + subtle white border
 - **Smooth transitions** — use Hero animations between Home tiles and Detail screen
-- **Pull-to-refresh** on Home to recalculate totals and sort
-- **Subtle micro-interactions** — card press animations (slight scale down on tap), smooth page transitions
+- **Pull-to-refresh** — Home and Analytics screens support pull-to-refresh
+- **Subtle micro-interactions** — card press animations (SubtlePressable with 0.99 scale), smooth page transitions
+- **Icon depth** — subscription icons use gradient backgrounds with subtle shadows
+- **Typography hierarchy** — titleLarge (22pt) for major sections, titleMedium (16pt) for card headers, titleSmall (14pt) for sub-headers
 
 ---
 
@@ -682,7 +716,7 @@ Include templates for at minimum: Netflix, Spotify, YouTube Premium, Disney+, Ap
 - [x] Data models + Hive setup + code generation
 - [x] Subscription repository (CRUD)
 - [x] Notification service (schedule, cancel, permissions)
-- [x] Onboarding screen (3 pages + permission request)
+- [x] Onboarding screen (single-screen with feature cards + permission request)
 - [x] Home screen (summary card, upcoming list, empty state, FAB)
 - [x] Add Subscription screen (template picker + custom form)
 - [x] Subscription Detail screen (all info + mark as paid + delete)

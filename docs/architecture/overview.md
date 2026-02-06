@@ -1,7 +1,7 @@
 # CustomSubs Architecture Overview
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: February 5, 2026
 **Relevant to**: Developers
 
 **High-level system architecture and design principles for CustomSubs.**
@@ -112,9 +112,15 @@ lib/
 │
 ├── core/                         # Shared utilities
 │   ├── constants/                # Colors, sizes, templates
+│   │   ├── app_colors.dart       # Color palette
+│   │   ├── app_sizes.dart        # Spacing + sectionSpacing (20px)
+│   │   └── subscription_templates.dart
 │   ├── extensions/               # DateTime, currency helpers
 │   ├── utils/                    # Currency, export utilities
 │   └── widgets/                  # Reusable UI components
+│       ├── standard_card.dart    # Consistent card styling (16px radius, 1.5px border)
+│       ├── subtle_pressable.dart # Micro-interaction wrapper
+│       └── empty_state.dart      # Empty state component
 │
 ├── data/                         # Data layer
 │   ├── models/                   # Domain models + Hive adapters

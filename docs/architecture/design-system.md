@@ -1,7 +1,7 @@
 # CustomSubs Design System
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: February 5, 2026
 **Relevant to**: Developers
 
 **Visual language and component patterns for CustomSubs.**
@@ -240,38 +240,42 @@ AppSizes.lg    // 20px - Comfortable spacing
 AppSizes.xl    // 24px - Section spacing
 AppSizes.xxl   // 32px - Large section gaps
 AppSizes.xxxl  // 48px - Extra large (rare)
+
+// Semantic spacing for consistent vertical rhythm
+AppSizes.sectionSpacing  // 20px (lg) - Between major sections
 ```
 
 **Usage guidelines:**
 - **xs (4px)**: Space between icon and text, chip padding
 - **sm (8px)**: ListTile vertical spacing, tight layouts
 - **md (12px)**: Form field spacing
-- **base (16px)**: Default padding for cards, screens (most common)
-- **lg (20px)**: Space between sections within a card
-- **xl (24px)**: Button padding, large card padding
-- **xxl (32px)**: Space between major sections
-- **xxxl (48px)**: Onboarding, empty states (rare)
+- **base (16px)**: Space between cards in a section
+- **lg (20px)**: Space between sections within a card, card internal padding
+- **sectionSpacing (20px)**: Use this for consistent spacing between major sections (Summary → Quick Actions → Upcoming List)
+- **xl (24px)**: Button padding, screen padding
+- **xxl (32px)**: Onboarding section spacing
+- **xxxl (48px)**: Empty states, hero sections (rare)
+
+**Vertical Rhythm Pattern:**
+- Between sections: `AppSizes.sectionSpacing` (20px)
+- Between items in section: `AppSizes.base` (16px)
+- Inside cards: `AppSizes.lg` padding (20px)
 
 ### Border Radius
 
 **Rounded corners** for modern, friendly feel
 
 ```dart
-AppSizes.radiusSm   // 8px  - Small buttons, chips
-AppSizes.radiusMd   // 12px - Cards, modals (default)
-AppSizes.radiusLg   // 16px - Large cards, bottom sheets
-AppSizes.radiusXl   // 20px - Hero cards
+AppSizes.radiusSm   // 8px  - Small buttons, chips, badges
+AppSizes.radiusMd   // 12px - Input fields, small components
+AppSizes.radiusLg   // 16px - Standard for all cards (CONSISTENT)
+AppSizes.radiusXl   // 20px - Hero cards, special components
 AppSizes.radiusFull // 999px - Fully rounded (avatars, pills)
 ```
 
-**Default card:**
-```dart
-Card(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-  ),
-)
-```
+**Card standard:**
+- **All cards use `radiusLg` (16px)** for visual consistency
+- Use `StandardCard` widget to enforce this automatically
 
 ### Elevation
 
@@ -291,27 +295,57 @@ AppSizes.elevationMd    // 2  - Dialogs, modals
 
 ### Cards
 
-**Standard card pattern** - White background with border
+**Use StandardCard for consistency** - Enforces visual standards
 
 ```dart
-Card(
-  elevation: AppSizes.elevationSm,
-  shape: RoundedRectangleBorder(
-    side: BorderSide(color: AppColors.border, width: 1),
-    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.all(AppSizes.base),
-    child: /* card content */,
+// lib/core/widgets/standard_card.dart
+
+StandardCard(
+  child: Column(
+    children: [
+      Text('Card Title'),
+      Text('Card content'),
+    ],
   ),
 )
 ```
 
+**StandardCard specifications:**
+- Border radius: Always 16px (`radiusLg`)
+- Border: 1.5px solid (`AppColors.border`)
+- Default padding: 20px (`AppSizes.lg`)
+- Default margin: zero (full width)
+- Background: `AppColors.surface` (white) or custom
+- Elevation: None (flat design with border separation)
+
+**Custom padding:**
+```dart
+StandardCard(
+  padding: const EdgeInsets.all(AppSizes.xl),
+  child: Text('Spacious card'),
+)
+```
+
+**Colored background:**
+```dart
+StandardCard(
+  backgroundColor: AppColors.primarySurface,
+  child: Text('Tinted card'),
+)
+```
+
 **Usage:**
-- Summary cards (spending totals)
+- Summary cards (spending totals, yearly forecast)
 - Subscription tiles
-- Section containers
+- Section containers (Category Breakdown, Top Subscriptions)
 - Detail views
+- Settings sections
+
+**Why StandardCard?**
+- Eliminates visual consistency drift
+- Enforces design system standards
+- Single source of truth for card styling
+- Easy to update globally
 
 ### Buttons
 

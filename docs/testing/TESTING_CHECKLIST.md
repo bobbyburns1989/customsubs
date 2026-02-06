@@ -24,21 +24,30 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ### First Launch
 - [ ] App shows onboarding on first launch
-- [ ] Page 1: "Track Everything" displays correctly with icon
-- [ ] Page 2: "Never Get Surprised" displays correctly
-- [ ] Page 3: "Take Back Control" displays correctly with CTA button
-- [ ] PageView swipe navigation works smoothly
-- [ ] "Get Started" button navigates to home screen
+- [ ] Logo displays correctly at top
+- [ ] Welcome message shows: "Welcome to CustomSubs"
+- [ ] All 3 feature cards display correctly:
+  - [ ] "Track Everything" with dashboard icon
+  - [ ] "Never Miss a Charge" with notification icon
+  - [ ] "Cancel with Confidence" with exit icon
+- [ ] Each feature card has icon, title, and description
+- [ ] Staggered fade-in animations play smoothly (1200ms total)
+- [ ] "Get Started" button displays prominently
+- [ ] Privacy note displays: "🔒 100% offline • No account required"
+- [ ] "Get Started" button triggers notification permission request
 - [ ] Notification permission request appears (iOS/Android)
 - [ ] Granting permission works
 - [ ] Denying permission doesn't crash app
+- [ ] Successfully navigates to home screen after onboarding
 - [ ] Onboarding doesn't show again on subsequent launches
 - [ ] `hasSeenOnboarding` flag persists in Hive
 
 ### Edge Cases
-- [ ] Kill app during onboarding → restarts from page 1
-- [ ] Swipe rapidly between pages → no jank or crashes
+- [ ] Kill app during onboarding → restarts onboarding
+- [ ] Screen scrolls properly on small devices (iPhone SE)
 - [ ] Rotate device during onboarding → layout adjusts
+- [ ] Animations don't lag or cause performance issues
+- [ ] Works correctly on Android tablets and iPads
 
 ---
 
@@ -556,7 +565,8 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Hero animation: detail screen → back to home
 - [ ] Pull-to-refresh animation smooth
 - [ ] Button press animations (subtle scale down)
-- [ ] Page transitions in onboarding smooth
+- [ ] Onboarding fade-in animations smooth and staggered
+- [ ] Analytics top subscription press animations work
 
 ### Responsiveness
 - [ ] Works on small screens (iPhone SE)

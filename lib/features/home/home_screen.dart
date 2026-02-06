@@ -172,7 +172,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                       AppSizes.base,
-                      AppSizes.lg,
+                      AppSizes.sectionSpacing,
                       AppSizes.base,
                       AppSizes.sm,
                     ),
@@ -328,14 +328,14 @@ class _SpendingSummaryCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.all(AppSizes.xl),
+      padding: const EdgeInsets.all(AppSizes.lg),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: AppColors.primary.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -345,6 +345,7 @@ class _SpendingSummaryCard extends StatelessWidget {
             style: theme.textTheme.displaySmall?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
+              fontSize: 32,
             ),
           ),
           Text(
@@ -420,25 +421,46 @@ class _SubscriptionTile extends StatelessWidget {
             vertical: AppSizes.xs,
           ),
           child: Padding(
-            padding: const EdgeInsets.all(AppSizes.base),
+            padding: const EdgeInsets.all(AppSizes.lg),
             child: Row(
               children: [
                 // Color indicator + Icon
-                CircleAvatar(
-                  backgroundColor: color.withValues(alpha: 0.2),
-                  child: ServiceIcons.hasCustomIcon(subscription.name)
-                      ? Icon(
-                          ServiceIcons.getIconForService(subscription.name),
-                          color: color,
-                          size: 24,
-                        )
-                      : Text(
-                          subscription.name[0].toUpperCase(),
-                          style: theme.textTheme.titleMedium?.copyWith(
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        color.withValues(alpha: 0.15),
+                        color.withValues(alpha: 0.25),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.12),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: ServiceIcons.hasCustomIcon(subscription.name)
+                        ? Icon(
+                            ServiceIcons.getIconForService(subscription.name),
                             color: color,
-                            fontWeight: FontWeight.bold,
+                            size: 26,
+                          )
+                        : Text(
+                            subscription.name[0].toUpperCase(),
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: color,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
+                  ),
                 ),
                 const SizedBox(width: AppSizes.base),
 
@@ -514,10 +536,21 @@ class _SubscriptionTile extends StatelessWidget {
                             ? AppColors.error
                             : subscription.daysUntilBilling <= 1
                                 ? AppColors.warning
-                                : AppColors.textSecondary,
+                                : AppColors.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    if (subscription.daysUntilBilling > 1 && !subscription.isOverdue)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          subscription.nextBillingDate.toShortFormattedString(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textTertiary,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ),
                     if (subscription.isTrial)
                       Container(
                         margin: const EdgeInsets.only(top: AppSizes.xs),

@@ -7,6 +7,17 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/app/router.dart';
 
+/// Single-screen onboarding that introduces key features.
+///
+/// Shows:
+/// - Welcome message with logo
+/// - 3 key features (tracking, reminders, cancellation)
+/// - Get Started CTA with privacy note
+///
+/// On completion:
+/// - Requests notification permissions
+/// - Marks onboarding as seen
+/// - Navigates to home screen
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -14,13 +25,40 @@ class OnboardingScreen extends ConsumerStatefulWidget {
   ConsumerState<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late List<Animation<double>> _fadeAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize staggered fade-in animations
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    // Create staggered animations for each section
+    _fadeAnimations = List.generate(5, (index) {
+      final start = index * 0.15;
+      final end = start + 0.4;
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _animationController,
+          curve: Interval(start, end, curve: Curves.easeOut),
+        ),
+      );
+    });
+
+    // Start animations
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -40,175 +78,217 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       body: SafeArea(
-        child: Column(
-          children: [
-            // Page indicator
-            Padding(
-              padding: const EdgeInsets.all(AppSizes.base),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  3,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                    margin: const EdgeInsets.symmetric(horizontal: AppSizes.xs),
-                    width: _currentPage == index ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _currentPage == index
-                          ? AppColors.primary
-                          : AppColors.border,
-                      borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-                    ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSizes.xl,
+              vertical: AppSizes.xxl,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Header Section: Logo + Welcome Message
+                FadeTransition(
+                  opacity: _fadeAnimations[0],
+                  child: Column(
+                    children: [
+                      // Logo
+                      Image.asset(
+                        'assets/images/CustomSubsLOGO.png',
+                        width: 220,
+                        height: 88,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(height: AppSizes.xl),
+
+                      // Welcome message
+                      Text(
+                        'Welcome to CustomSubs',
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSizes.md),
+
+                      Text(
+                        'Your private subscription tracker',
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ),
 
-            // Pages
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                children: const [
-                  _OnboardingPage(
-                    showLogo: true,
-                    title: 'Welcome to CustomSubs',
-                    subtitle:
-                        'Track all your subscriptions in one place. No bank linking. No login. Just you and your bills.',
+                const SizedBox(height: AppSizes.xxxl),
+
+                // Feature 1: Track Everything
+                FadeTransition(
+                  opacity: _fadeAnimations[1],
+                  child: const _FeatureCard(
+                    icon: Icons.dashboard_rounded,
+                    title: 'Track Everything',
+                    description:
+                        'All your subscriptions in one place. No bank linking. No login.',
                   ),
-                  _OnboardingPage(
+                ),
+
+                const SizedBox(height: AppSizes.base),
+
+                // Feature 2: Smart Reminders
+                FadeTransition(
+                  opacity: _fadeAnimations[2],
+                  child: const _FeatureCard(
                     icon: Icons.notifications_active_rounded,
-                    title: 'Reminders that\nactually work',
-                    subtitle:
-                        'Get notified 7 days, 1 day, and the morning of every charge.',
+                    title: 'Never Miss a Charge',
+                    description:
+                        'Get notified 7 days before, 1 day before, and the morning of every billing date.',
                   ),
-                  _OnboardingPage(
-                    icon: Icons.cancel_rounded,
-                    title: 'Take back control',
-                    subtitle:
-                        'Step-by-step cancellation guides for every subscription.',
-                  ),
-                ],
-              ),
-            ),
+                ),
 
-            // Bottom buttons
-            Padding(
-              padding: const EdgeInsets.all(AppSizes.xl),
-              child: Column(
-                children: [
-                  if (_currentPage < 2)
-                    Row(
-                      children: [
-                        Expanded(
-                          child: OutlinedButton(
-                            onPressed: _completeOnboarding,
-                            child: const Text('Skip'),
+                const SizedBox(height: AppSizes.base),
+
+                // Feature 3: Easy Cancellation
+                FadeTransition(
+                  opacity: _fadeAnimations[3],
+                  child: const _FeatureCard(
+                    icon: Icons.exit_to_app_rounded,
+                    title: 'Cancel with Confidence',
+                    description:
+                        'Step-by-step guides to cancel any subscription quickly.',
+                  ),
+                ),
+
+                const SizedBox(height: AppSizes.xxxl),
+
+                // CTA Section: Button + Privacy Note
+                FadeTransition(
+                  opacity: _fadeAnimations[4],
+                  child: Column(
+                    children: [
+                      // Get Started Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _completeOnboarding,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: AppSizes.lg,
+                            ),
+                          ),
+                          child: const Text(
+                            'Get Started',
+                            style: TextStyle(fontSize: 16),
                           ),
                         ),
-                        const SizedBox(width: AppSizes.base),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _pageController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                            child: const Text('Next'),
-                          ),
-                        ),
-                      ],
-                    ),
-                  if (_currentPage == 2)
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _completeOnboarding,
-                        child: const Text('Get Started'),
                       ),
-                    ),
-                ],
-              ),
+                      const SizedBox(height: AppSizes.base),
+
+                      // Privacy Note
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            size: 14,
+                            color: AppColors.textTertiary,
+                          ),
+                          const SizedBox(width: AppSizes.xs),
+                          Text(
+                            '100% offline • No account required',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.textTertiary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: AppSizes.base),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _OnboardingPage extends StatelessWidget {
-  final IconData? icon;
-  final bool showLogo;
+/// Feature card component showing an icon, title, and description.
+class _FeatureCard extends StatelessWidget {
+  final IconData icon;
   final String title;
-  final String subtitle;
+  final String description;
 
-  const _OnboardingPage({
-    this.icon,
-    this.showLogo = false,
+  const _FeatureCard({
+    required this.icon,
     required this.title,
-    required this.subtitle,
+    required this.description,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSizes.xl),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSizes.lg),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+        border: Border.all(
+          color: AppColors.border,
+          width: 1.5,
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Logo or Icon
-          if (showLogo)
-            Image.asset(
-              'assets/images/CustomSubsLOGO.png',
-              width: 200,
-              height: 80,
-              fit: BoxFit.contain,
-            )
-          else if (icon != null)
-            Container(
-              width: 120,
-              height: 120,
-              decoration: const BoxDecoration(
-                color: AppColors.primarySurface,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: 60,
-                color: AppColors.primary,
-              ),
+          // Icon Container
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: AppColors.primarySurface,
+              shape: BoxShape.circle,
             ),
-          const SizedBox(height: AppSizes.xxxl),
-
-          // Title
-          Text(
-            title,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.bold,
+            child: Icon(
+              icon,
+              size: 28,
+              color: AppColors.primary,
             ),
-            textAlign: TextAlign.center,
           ),
-          const SizedBox(height: AppSizes.base),
+          const SizedBox(width: AppSizes.base),
 
-          // Subtitle
-          Text(
-            subtitle,
-            style: theme.textTheme.bodyLarge?.copyWith(
-              color: AppColors.textSecondary,
+          // Text Content
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: AppSizes.xs),
+                Text(
+                  description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    height: 1.5,
+                  ),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),

@@ -12,6 +12,9 @@ class AppSizes {
   static const double xxl = 32;
   static const double xxxl = 48;
 
+  // Semantic spacing (for consistent vertical rhythm)
+  static const double sectionSpacing = lg; // 20px between major sections
+
   // Border radius
   static const double radiusSm = 8;
   static const double radiusMd = 12;

@@ -79,8 +79,8 @@ class AddSubscriptionController extends _$AddSubscriptionController {
       category: category,
       colorValue: colorValue,
       reminders: reminders,
-      // Preserve isActive when editing (don't reset paused subscriptions)
-      isActive: isEditing ? existingSubscription.isActive : isActive,
+      // Pause feature removed - always active
+      isActive: true,
       isTrial: isTrial,
       trialEndDate: trialEndDate,
       postTrialAmount: postTrialAmount,

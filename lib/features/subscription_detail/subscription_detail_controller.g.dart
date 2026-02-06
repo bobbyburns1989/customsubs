@@ -7,7 +7,7 @@ part of 'subscription_detail_controller.dart';
 // **************************************************************************
 
 String _$subscriptionDetailControllerHash() =>
-    r'8c60538fb73c37f9ce68c7e2677e4c3101ac0348';
+    r'a112b039461cb87163244c5ac5ab3548bea89abb';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -43,7 +43,6 @@ abstract class _$SubscriptionDetailController
 ///
 /// Provides actions for:
 /// - Toggling paid status
-/// - Toggling active/paused status
 /// - Updating checklist items
 /// - Deleting subscription
 ///
@@ -56,7 +55,6 @@ const subscriptionDetailControllerProvider =
 ///
 /// Provides actions for:
 /// - Toggling paid status
-/// - Toggling active/paused status
 /// - Updating checklist items
 /// - Deleting subscription
 ///
@@ -67,7 +65,6 @@ class SubscriptionDetailControllerFamily
   ///
   /// Provides actions for:
   /// - Toggling paid status
-  /// - Toggling active/paused status
   /// - Updating checklist items
   /// - Deleting subscription
   ///
@@ -78,7 +75,6 @@ class SubscriptionDetailControllerFamily
   ///
   /// Provides actions for:
   /// - Toggling paid status
-  /// - Toggling active/paused status
   /// - Updating checklist items
   /// - Deleting subscription
   ///
@@ -119,7 +115,6 @@ class SubscriptionDetailControllerFamily
 ///
 /// Provides actions for:
 /// - Toggling paid status
-/// - Toggling active/paused status
 /// - Updating checklist items
 /// - Deleting subscription
 ///
@@ -131,7 +126,6 @@ class SubscriptionDetailControllerProvider
   ///
   /// Provides actions for:
   /// - Toggling paid status
-  /// - Toggling active/paused status
   /// - Updating checklist items
   /// - Deleting subscription
   ///

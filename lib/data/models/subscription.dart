@@ -33,6 +33,7 @@ class Subscription extends HiveObject {
   final SubscriptionCategory category;
 
   @HiveField(8)
+  @Deprecated('Pause/resume feature removed in v1.0.3. Field kept for backward compatibility with old backups.')
   final bool isActive;
 
   @HiveField(9)
@@ -86,7 +87,7 @@ class Subscription extends HiveObject {
     required this.nextBillingDate,
     required this.startDate,
     required this.category,
-    this.isActive = true,
+    this.isActive = true, // Always true - pause feature removed
     this.isTrial = false,
     this.trialEndDate,
     this.postTrialAmount,

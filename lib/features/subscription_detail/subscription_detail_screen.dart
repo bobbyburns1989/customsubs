@@ -82,15 +82,21 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
                 const SizedBox(height: AppSizes.base),
 
-                // Quick actions
-                _QuickActionsRow(
-                  subscription: subscription,
-                  onTogglePaid: () => ref
-                      .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                      .togglePaid(),
-                  onToggleActive: () => ref
-                      .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                      .toggleActive(),
+                // Mark as Paid button (full width)
+                SizedBox(
+                  width: double.infinity,
+                  child: SubtlePressable(
+                    onPressed: () => ref
+                        .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
+                        .togglePaid(),
+                    child: OutlinedButton.icon(
+                      onPressed: () {}, // Dummy handler - SubtlePressable handles tap
+                      icon: Icon(
+                        subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
+                      ),
+                      label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
+                    ),
+                  ),
                 ),
 
                 const SizedBox(height: AppSizes.base),
@@ -267,12 +273,6 @@ class _HeaderCard extends StatelessWidget {
               runSpacing: AppSizes.sm,
               alignment: WrapAlignment.center,
               children: [
-                // Active/Paused badge
-                _StatusBadge(
-                  label: subscription.isActive ? 'Active' : 'Paused',
-                  color: subscription.isActive ? AppColors.success : AppColors.inactive,
-                ),
-
                 // Trial badge
                 if (subscription.isTrial)
                   const _StatusBadge(
@@ -332,52 +332,6 @@ class _StatusBadge extends StatelessWidget {
         ),
         child: Text(label),
       ),
-    );
-  }
-}
-
-/// Quick actions row (Mark Paid, Pause/Resume)
-class _QuickActionsRow extends StatelessWidget {
-  final Subscription subscription;
-  final VoidCallback onTogglePaid;
-  final VoidCallback onToggleActive;
-
-  const _QuickActionsRow({
-    required this.subscription,
-    required this.onTogglePaid,
-    required this.onToggleActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: SubtlePressable(
-            onPressed: onTogglePaid,
-            child: OutlinedButton.icon(
-              onPressed: null, // SubtlePressable handles the tap
-              icon: Icon(
-                subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
-              ),
-              label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSizes.base),
-        Expanded(
-          child: SubtlePressable(
-            onPressed: onToggleActive,
-            child: OutlinedButton.icon(
-              onPressed: null, // SubtlePressable handles the tap
-              icon: Icon(
-                subscription.isActive ? Icons.pause_circle_outline : Icons.play_circle_outline,
-              ),
-              label: Text(subscription.isActive ? 'Pause' : 'Resume'),
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

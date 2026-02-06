@@ -11,13 +11,13 @@ class HomeController extends _$HomeController {
   @override
   FutureOr<List<Subscription>> build() async {
     final repository = await ref.watch(subscriptionRepositoryProvider.future);
-    return repository.getAllActive();
+    return repository.getAll();
   }
 
   /// Get upcoming subscriptions sorted by billing date
   ///
   /// Returns only subscriptions billing within the next [days] (default: 30).
-  /// Sorts by paid status first (unpaid first), then by billing date.
+  /// Sorts by active status first (active first), then paid status (unpaid first), then billing date.
   List<Subscription> getUpcomingSubscriptions({int days = 30}) {
     final subs = state.value ?? [];
     final now = DateTime.now();
@@ -29,11 +29,14 @@ class HomeController extends _$HomeController {
              sub.nextBillingDate.isBefore(cutoffDate);
     }).toList();
 
-    // Sort by paid status first (unpaid first), then by billing date
+    // Sort by: paid status → billing date
     filteredSubs.sort((a, b) {
+      // 1. Unpaid before paid
       if (a.isPaid != b.isPaid) {
         return a.isPaid ? 1 : -1;
       }
+
+      // 2. Sort by billing date
       return a.nextBillingDate.compareTo(b.nextBillingDate);
     });
 
@@ -46,6 +49,8 @@ class HomeController extends _$HomeController {
   double calculateMonthlyTotal() {
     final subs = state.value ?? [];
     final primaryCurrency = getPrimaryCurrency();
+
+    // Sum ALL subscriptions
     return subs.fold(0.0, (sum, sub) {
       // Convert subscription's monthly amount to primary currency
       final convertedAmount = CurrencyUtils.convert(
@@ -96,12 +101,6 @@ class HomeController extends _$HomeController {
     await refresh();
   }
 
-  /// Toggle subscription active status
-  Future<void> toggleActive(String subscriptionId) async {
-    final repository = await ref.read(subscriptionRepositoryProvider.future);
-    await repository.toggleActive(subscriptionId);
-    await refresh();
-  }
 
   /// Check if backup reminder should be shown
   ///

@@ -102,8 +102,8 @@ class _ColorPickerItemState extends State<_ColorPickerItem>
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOut,
-              width: 50,
-              height: 50,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: widget.color,
                 shape: BoxShape.circle,

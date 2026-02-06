@@ -13,14 +13,14 @@ part 'analytics_controller.g.dart';
 /// Controller for the Analytics screen.
 ///
 /// Provides spending analytics including:
-/// - Monthly total and yearly forecast
-/// - Month-over-month spending comparison
+/// - Yearly forecast (primary hero metric)
 /// - Category breakdown with percentages
 /// - Top 5 subscriptions by monthly cost
 /// - Multi-currency breakdown
 ///
 /// Automatically saves a monthly snapshot when the analytics screen is opened
-/// (once per month, not on every visit).
+/// (once per month, not on every visit). Monthly snapshots are preserved for
+/// future features but currently not displayed in the UI.
 @riverpod
 class AnalyticsController extends _$AnalyticsController {
   late Box<MonthlySnapshot> _snapshotBox;

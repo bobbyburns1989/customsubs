@@ -9,7 +9,6 @@ part 'subscription_detail_controller.g.dart';
 ///
 /// Provides actions for:
 /// - Toggling paid status
-/// - Toggling active/paused status
 /// - Updating checklist items
 /// - Deleting subscription
 @riverpod
@@ -40,30 +39,6 @@ class SubscriptionDetailController extends _$SubscriptionDetailController {
     state = AsyncValue.data(updated);
   }
 
-  /// Toggle active/paused status
-  Future<void> toggleActive() async {
-    final subscription = state.value;
-    if (subscription == null) return;
-
-    final repository = await ref.read(subscriptionRepositoryProvider.future);
-    final notificationService = await ref.read(notificationServiceProvider.future);
-
-    final updated = subscription.copyWith(
-      isActive: !subscription.isActive,
-    );
-
-    await repository.upsert(updated);
-
-    // Cancel notifications if pausing, reschedule if resuming
-    if (updated.isActive) {
-      await notificationService.scheduleNotificationsForSubscription(updated);
-    } else {
-      await notificationService.cancelNotificationsForSubscription(updated.id);
-    }
-
-    // Refresh state
-    state = AsyncValue.data(updated);
-  }
 
   /// Toggle a checklist item completion
   Future<void> toggleChecklistItem(int index) async {

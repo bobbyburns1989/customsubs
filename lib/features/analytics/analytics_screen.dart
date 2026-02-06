@@ -10,11 +10,14 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 /// Analytics screen showing spending insights and breakdowns.
 ///
 /// Displays:
-/// - Monthly total with month-over-month comparison
-/// - Yearly forecast
+/// - Yearly forecast (hero metric, centered at top)
 /// - Category breakdown with horizontal bar charts
 /// - Top 5 subscriptions by cost
 /// - Multi-currency breakdown (if applicable)
+///
+/// The yearly forecast is the primary focal point, showing annual spending
+/// projection in a prominent green gradient card. This provides stronger
+/// visual impact and clearer hierarchy than showing monthly totals.
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 
@@ -37,7 +40,7 @@ class AnalyticsScreen extends ConsumerWidget {
             return _EmptyState();
           }
 
-          return _AnalyticsContent(analytics: analytics);
+          return _AnalyticsContent(analytics: analytics, ref: ref);
         },
         loading: () => const Center(
           child: CircularProgressIndicator(),
@@ -73,47 +76,38 @@ class AnalyticsScreen extends ConsumerWidget {
 /// Main analytics content with all cards.
 class _AnalyticsContent extends StatelessWidget {
   final AnalyticsData analytics;
+  final WidgetRef ref;
 
-  const _AnalyticsContent({required this.analytics});
+  const _AnalyticsContent({required this.analytics, required this.ref});
 
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
         // Refresh analytics by invalidating the provider
-        // This will recalculate everything
+        ref.invalidate(analyticsControllerProvider);
+        await Future.delayed(const Duration(milliseconds: 300));
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(AppSizes.base),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Monthly Total and Yearly Forecast - Side by Side
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: _MonthlyTotalCard(analytics: analytics),
-                ),
-                const SizedBox(width: AppSizes.md),
-                Expanded(
-                  child: _YearlyForecastCard(analytics: analytics),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSizes.base),
+            // Yearly Forecast - Centered Hero Metric
+            _YearlyForecastCard(analytics: analytics),
+            const SizedBox(height: AppSizes.sectionSpacing),
 
             // Category Breakdown
             if (analytics.categoryBreakdown.isNotEmpty) ...[
               _CategoryBreakdownCard(analytics: analytics),
-              const SizedBox(height: AppSizes.base),
+              const SizedBox(height: AppSizes.sectionSpacing),
             ],
 
             // Top Subscriptions
             if (analytics.topSubscriptions.isNotEmpty) ...[
               _TopSubscriptionsCard(analytics: analytics),
-              const SizedBox(height: AppSizes.base),
+              const SizedBox(height: AppSizes.sectionSpacing),
             ],
 
             // Currency Breakdown (only if multi-currency)
@@ -128,136 +122,7 @@ class _AnalyticsContent extends StatelessWidget {
   }
 }
 
-/// Monthly total card with month-over-month comparison.
-class _MonthlyTotalCard extends StatelessWidget {
-  final AnalyticsData analytics;
-
-  const _MonthlyTotalCard({required this.analytics});
-
-  @override
-  Widget build(BuildContext context) {
-    final currencyFormat = NumberFormat.currency(
-      symbol: _getCurrencySymbol(analytics.primaryCurrency),
-      decimalDigits: 2,
-    );
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        side: const BorderSide(color: AppColors.border),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Monthly Total',
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-
-            // Large monthly amount
-            Text(
-              currencyFormat.format(analytics.monthlyTotal),
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.5,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.xs),
-
-            // Active subscriptions count
-            Text(
-              '${analytics.activeCount} active ${analytics.activeCount == 1 ? 'subscription' : 'subscriptions'}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-            ),
-
-            // Month-over-month change (if available)
-            if (analytics.monthlyChange != null) ...[
-              const SizedBox(height: AppSizes.sm),
-              _MonthlyChangeIndicator(
-                change: analytics.monthlyChange!,
-                currencySymbol: _getCurrencySymbol(analytics.primaryCurrency),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Month-over-month change indicator with color coding.
-class _MonthlyChangeIndicator extends StatelessWidget {
-  final double change;
-  final String currencySymbol;
-
-  const _MonthlyChangeIndicator({
-    required this.change,
-    required this.currencySymbol,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isIncrease = change > 0;
-    final isDecrease = change < 0;
-    final isNoChange = change == 0;
-
-    final color = isIncrease
-        ? AppColors.error // Red for increase (more spending)
-        : isDecrease
-            ? AppColors.success // Green for decrease (less spending)
-            : AppColors.textSecondary;
-
-    final icon = isIncrease
-        ? Icons.arrow_upward
-        : isDecrease
-            ? Icons.arrow_downward
-            : Icons.remove;
-
-    final text = isNoChange
-        ? 'No change from last month'
-        : '${isIncrease ? '+' : ''}$currencySymbol${change.abs().toStringAsFixed(2)} from last month';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.sm,
-        vertical: AppSizes.sm,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: AppSizes.xs),
-          Flexible(
-            child: Text(
-              text,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: color,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11,
-                  ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Yearly forecast card (simple calculation).
+/// Yearly forecast card - Primary hero metric centered at top.
 class _YearlyForecastCard extends StatelessWidget {
   final AnalyticsData analytics;
 
@@ -270,36 +135,61 @@ class _YearlyForecastCard extends StatelessWidget {
       decimalDigits: 2,
     );
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        side: const BorderSide(color: AppColors.border),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.2),
+          width: 1.5,
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.xl,
+          vertical: AppSizes.xl,
+        ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'Yearly Forecast',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
+                    color: Colors.white.withValues(alpha: 0.95),
                   ),
             ),
-            const SizedBox(height: AppSizes.sm),
+            const SizedBox(height: AppSizes.md),
+
+            // Large yearly amount with tabular figures
             Text(
               currencyFormat.format(analytics.yearlyForecast),
+              textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.8,
+                    fontSize: 40,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
             ),
-            const SizedBox(height: AppSizes.xs),
+            const SizedBox(height: AppSizes.md),
+
+            // Subtext
             Text(
               'At current rate',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: Colors.white.withValues(alpha: 0.85),
+                  ),
+            ),
+            const SizedBox(height: AppSizes.sm),
+
+            // Active subscriptions count
+            Text(
+              '${analytics.activeCount} active ${analytics.activeCount == 1 ? 'subscription' : 'subscriptions'}',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
             ),
           ],
@@ -341,7 +231,7 @@ class _CategoryBreakdownCard extends StatelessWidget {
             // Category bars
             ...sortedCategories.map((entry) {
               return Padding(
-                padding: const EdgeInsets.only(bottom: AppSizes.md),
+                padding: const EdgeInsets.only(bottom: AppSizes.lg),
                 child: _CategoryBar(
                   category: entry.key,
                   data: entry.value,
@@ -380,11 +270,18 @@ class _CategoryBar extends StatelessWidget {
         Row(
           children: [
             Container(
-              width: 8,
-              height: 8,
+              width: 10,
+              height: 10,
               decoration: BoxDecoration(
                 color: categoryColor,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: categoryColor.withValues(alpha: 0.3),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
             ),
             const SizedBox(width: AppSizes.md),
@@ -406,11 +303,12 @@ class _CategoryBar extends StatelessWidget {
               '$currencySymbol${data.amount.toStringAsFixed(2)}',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
             ),
           ],
         ),
-        const SizedBox(height: AppSizes.sm),
+        const SizedBox(height: AppSizes.md),
 
         // Horizontal bar
         Row(
@@ -442,15 +340,22 @@ class _CategoryBar extends StatelessWidget {
                           ],
                         ),
                         borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                        boxShadow: [
+                          BoxShadow(
+                            color: categoryColor.withValues(alpha: 0.2),
+                            blurRadius: 6,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: AppSizes.sm),
+                      padding: const EdgeInsets.only(right: AppSizes.md),
                       child: data.percentage > 20 // Only show percentage if bar is wide enough
                           ? Text(
                               '${data.percentage.toStringAsFixed(1)}%',
                               style: const TextStyle(
                                 color: Colors.white,
-                                fontSize: 13,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 shadows: [
                                   Shadow(
@@ -468,7 +373,7 @@ class _CategoryBar extends StatelessWidget {
               ),
             ),
             if (data.percentage <= 20) ...[
-              const SizedBox(width: AppSizes.sm),
+              const SizedBox(width: AppSizes.md),
               Text(
                 '${data.percentage.toStringAsFixed(1)}%',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -515,9 +420,10 @@ class _TopSubscriptionsCard extends StatelessWidget {
             ...analytics.topSubscriptions.asMap().entries.map((entry) {
               final rank = entry.key + 1;
               final subscription = entry.value;
+              final isLast = rank == analytics.topSubscriptions.length;
 
               return Padding(
-                padding: const EdgeInsets.only(bottom: AppSizes.md),
+                padding: EdgeInsets.only(bottom: isLast ? 0 : AppSizes.md),
                 child: _TopSubscriptionTile(
                   rank: rank,
                   subscription: subscription,
@@ -533,7 +439,7 @@ class _TopSubscriptionsCard extends StatelessWidget {
 }
 
 /// Single top subscription tile with rank badge.
-class _TopSubscriptionTile extends ConsumerWidget {
+class _TopSubscriptionTile extends ConsumerStatefulWidget {
   final int rank;
   final TopSubscription subscription;
   final String currencySymbol;
@@ -545,85 +451,101 @@ class _TopSubscriptionTile extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_TopSubscriptionTile> createState() => _TopSubscriptionTileState();
+}
+
+class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
     // Medal colors for top 3
-    final rankColor = rank == 1
+    final rankColor = widget.rank == 1
         ? const Color(0xFFFFD700) // Gold
-        : rank == 2
+        : widget.rank == 2
             ? const Color(0xFFC0C0C0) // Silver
-            : rank == 3
+            : widget.rank == 3
                 ? const Color(0xFFCD7F32) // Bronze
                 : AppColors.textTertiary;
 
-    return InkWell(
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
       onTap: () {
         // Navigate to subscription detail
-        context.push('/subscription/${subscription.id}');
+        context.push('/subscription/${widget.subscription.id}');
       },
-      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: AppSizes.sm,
-          horizontal: AppSizes.sm,
-        ),
-        child: Row(
-          children: [
-            // Rank badge
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: rankColor.withValues(alpha: 0.15),
-                border: Border.all(
-                  color: rankColor.withValues(alpha: 0.3),
-                  width: 2,
-                ),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                '$rank',
-                style: TextStyle(
-                  color: rank <= 3 ? rankColor : AppColors.textPrimary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 17,
-                ),
-              ),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 100),
+        curve: Curves.easeInOut,
+        child: Container(
+          padding: const EdgeInsets.all(AppSizes.md),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+            border: Border.all(
+              color: AppColors.divider,
+              width: 1,
             ),
-            const SizedBox(width: AppSizes.md),
-
-            // Color indicator
-            Container(
-              width: 16,
-              height: 16,
-              decoration: BoxDecoration(
-                color: subscription.color,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 2,
-                ),
-              ),
-            ),
-            const SizedBox(width: AppSizes.md),
-
-            // Subscription name
-            Expanded(
-              child: Text(
-                subscription.name,
-                style: Theme.of(context).textTheme.bodyLarge,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-
-            // Monthly amount
-            Text(
-              '$currencySymbol${subscription.monthlyAmount.toStringAsFixed(2)}/mo',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+          ),
+          child: Row(
+            children: [
+              // Rank badge with subscription color border
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: rankColor.withValues(alpha: 0.15),
+                  border: Border.all(
+                    color: widget.subscription.color,
+                    width: 3,
                   ),
-            ),
-          ],
+                  shape: BoxShape.circle,
+                  boxShadow: widget.rank <= 3
+                      ? [
+                          BoxShadow(
+                            color: rankColor.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            spreadRadius: 1,
+                          ),
+                        ]
+                      : null,
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  '${widget.rank}',
+                  style: TextStyle(
+                    color: widget.rank <= 3 ? rankColor : AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSizes.base),
+
+              // Subscription name
+              Expanded(
+                child: Text(
+                  widget.subscription.name,
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+
+              // Monthly amount
+              Text(
+                '${widget.currencySymbol}${widget.subscription.monthlyAmount.toStringAsFixed(2)}/mo',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontFeatures: const [FontFeature.tabularFigures()],
+                    ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -676,6 +598,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
                       '$currencySymbol${entry.value.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
+                            fontFeatures: const [FontFeature.tabularFigures()],
                           ),
                     ),
                   ],
@@ -700,6 +623,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
+                        fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                 ),
               ],
@@ -728,19 +652,26 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.analytics_outlined,
-              size: 80,
-              color: AppColors.textTertiary.withValues(alpha: 0.5),
+            Container(
+              padding: const EdgeInsets.all(AppSizes.xl),
+              decoration: const BoxDecoration(
+                color: AppColors.primarySurface,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.analytics_outlined,
+                size: 64,
+                color: AppColors.primary.withValues(alpha: 0.6),
+              ),
             ),
-            const SizedBox(height: AppSizes.lg),
+            const SizedBox(height: AppSizes.xl),
             Text(
               'No Analytics Yet',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            const SizedBox(height: AppSizes.sm),
+            const SizedBox(height: AppSizes.md),
             Text(
               'Add your first subscription to see spending insights',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -748,7 +679,7 @@ class _EmptyState extends StatelessWidget {
                   ),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: AppSizes.xl),
+            const SizedBox(height: AppSizes.xxl),
             FilledButton.icon(
               onPressed: () {
                 context.pop();
