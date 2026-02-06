@@ -702,9 +702,29 @@ Include templates for at minimum: Netflix, Spotify, YouTube Premium, Disney+, Ap
 ### Logic
 - Each subscription has `isPaid` (bool) and `lastMarkedPaidDate` (DateTime?)
 - When user taps "Mark as Paid", set `isPaid = true` and `lastMarkedPaidDate = DateTime.now()`
-- When app opens and processes date advancement (nextBillingDate passed), reset `isPaid = false`
-- On the Home screen, paid subscriptions show a subtle green checkmark badge
+- When billing cycle advances (nextBillingDate passed), automatically reset `isPaid = false`
+- On the Home screen, paid subscriptions show a subtle green "Paid" badge (positioned below the billing date on the right)
 - Paid subscriptions sort to the bottom of the upcoming list (unpaid items first)
+
+### Date Advancement & isPaid Reset
+The `isPaid` status is automatically reset when billing dates advance in three scenarios:
+
+1. **App Startup** (`main.dart:90`)
+   - Runs `advanceOverdueBillingDates()` during initialization
+   - Catches up on any missed billing cycles when app hasn't been opened
+
+2. **App Resume from Background** (`home_screen.dart`)
+   - `WidgetsBindingObserver` detects when app returns to foreground
+   - Automatically advances overdue dates via `didChangeAppLifecycleState`
+   - Reschedules notifications for updated subscriptions
+   - Fixes edge case where app is backgrounded overnight across billing date
+
+3. **Pull-to-Refresh** (`home_screen.dart`)
+   - User-triggered refresh also checks for overdue dates
+   - Ensures dates stay current even if app is kept open continuously
+   - Handles edge case for power users who never background the app
+
+**Implementation**: `_advanceOverdueDatesIfNeeded()` in HomeScreen calls `repository.advanceOverdueBillingDates()`, which resets `isPaid: false` for all subscriptions with past billing dates, then reschedules their notifications.
 
 ---
 

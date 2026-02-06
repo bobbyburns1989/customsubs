@@ -12,6 +12,8 @@ import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dart';
 import 'package:custom_subs/app/router.dart';
+import 'package:custom_subs/data/repositories/subscription_repository.dart';
+import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:flutter/material.dart' as material;
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -21,14 +23,55 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    // Register lifecycle observer to detect app resume
+    WidgetsBinding.instance.addObserver(this);
+
     // Check if backup reminder should be shown (after first frame)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkBackupReminder();
     });
+  }
+
+  @override
+  void dispose() {
+    // Clean up lifecycle observer
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // App came back from background - check for overdue dates
+      _advanceOverdueDatesIfNeeded();
+    }
+  }
+
+  /// Advances billing dates that have passed and reschedules notifications.
+  ///
+  /// Called when:
+  /// - App resumes from background (via lifecycle hook)
+  /// - User pulls to refresh
+  Future<void> _advanceOverdueDatesIfNeeded() async {
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    final notificationService = await ref.read(notificationServiceProvider.future);
+
+    // Advance overdue billing dates and reset isPaid for those subscriptions
+    final updatedSubscriptions = await repository.advanceOverdueBillingDates();
+
+    // Re-schedule notifications for subscriptions with advanced dates
+    for (final subscription in updatedSubscriptions) {
+      await notificationService.scheduleNotificationsForSubscription(subscription);
+    }
+
+    // Refresh UI if any dates were advanced
+    if (updatedSubscriptions.isNotEmpty) {
+      ref.read(homeControllerProvider.notifier).refresh();
+    }
   }
 
   Future<void> _checkBackupReminder() async {
@@ -77,7 +120,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           final trialsEndingSoon = homeController.getTrialsEndingSoon();
 
           return RefreshIndicator(
-            onRefresh: () => homeController.refresh(),
+            onRefresh: () async {
+              await _advanceOverdueDatesIfNeeded();
+              await homeController.refresh();
+            },
             child: CustomScrollView(
               slivers: [
                 // Spending Summary Card

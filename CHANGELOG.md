@@ -45,6 +45,19 @@ Fixed critical gesture handling bugs that prevented three essential buttons from
 - **Solution**: Material buttons already provide excellent press feedback through ripple effects. Removed unnecessary SubtlePressable wrappers and used buttons' native `onPressed` handlers directly.
 - **Code Quality**: Removed unused imports from affected files
 
+### Additional Fix (Post-Release)
+- **Fixed "Mark as Paid" status persistence edge case**
+  - **Issue**: `isPaid` status only reset during app startup. If the app stayed open across midnight when a billing date passed, the paid status would incorrectly persist into the new billing cycle.
+  - **Solution**: Added `WidgetsBindingObserver` lifecycle management to HomeScreen to auto-advance overdue billing dates when app resumes from background or user pulls to refresh
+  - **Impact**: Fixes edge case for power users who keep apps open 24/7. Most users already unaffected (iOS/Android kill backgrounded apps regularly)
+  - **Implementation**:
+    - Added lifecycle observer to detect app resume (`didChangeAppLifecycleState`)
+    - Integrated date advancement into pull-to-refresh flow
+    - Auto-reschedules notifications when dates advance
+    - Silently refreshes UI when billing cycles advance
+  - **File Modified**: `lib/features/home/home_screen.dart` (~40 lines added)
+  - **Testing**: Verify with device date changes while app is backgrounded or kept open
+
 ---
 
 ## [1.0.4] - 2026-02-06 (Simplification & Bug Fixes)
