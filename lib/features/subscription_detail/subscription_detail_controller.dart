@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/features/home/home_controller.dart';
 
 part 'subscription_detail_controller.g.dart';
 
@@ -37,6 +38,9 @@ class SubscriptionDetailController extends _$SubscriptionDetailController {
 
     // Refresh state
     state = AsyncValue.data(updated);
+
+    // Invalidate home controller so it refreshes with updated data
+    ref.invalidate(homeControllerProvider);
   }
 
 
@@ -59,6 +63,9 @@ class SubscriptionDetailController extends _$SubscriptionDetailController {
 
     // Refresh state
     state = AsyncValue.data(updated);
+
+    // Invalidate home controller so it refreshes
+    ref.invalidate(homeControllerProvider);
   }
 
   /// Delete subscription

@@ -57,7 +57,7 @@ Core functionality now reliable and trustworthy. Notifications work correctly ac
 ### Delivered Features
 - ✅ **Full Subscription Detail Screen** (734 lines, 7 sub-widgets)
   - Billing info card, cancellation manager, notes display
-  - Quick actions: Mark Paid, Edit, Pause/Resume, Delete
+  - Quick actions: Mark Paid, Edit, Delete
 - ✅ **Subscription Detail Controller** (Riverpod AsyncNotifier)
   - 4 action methods with proper state management
 - ✅ **Settings Provider** with Hive persistence

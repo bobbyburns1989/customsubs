@@ -7,6 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.6] - 2026-02-06 (Critical Button Fixes)
+
+**Build**: 8
+**Status**: ✅ Ready for Release
+**Focus**: Button Interaction Bug Fixes
+
+### Summary
+
+Fixed critical gesture handling bugs that prevented three essential buttons from working. All affected buttons were wrapping Material buttons with SubtlePressable, which caused gesture arena conflicts where the button's empty handler consumed tap events before they reached the intended callback.
+
+---
+
+### Fixed
+- **Fixed "Mark as Paid" button** in subscription detail screen (subscription_detail_screen.dart:85-98)
+  - Button was completely non-responsive when tapped
+  - Removed SubtlePressable wrapper that was blocking gesture events
+  - Button now properly toggles paid status
+- **Fixed "Create Custom" button** in add subscription screen (add_subscription_screen.dart:307-319)
+  - Button did not switch from template picker to custom form
+  - Removed SubtlePressable wrapper
+  - Button now correctly shows custom subscription form
+- **Fixed "Save" button** in add subscription screen (add_subscription_screen.dart:708-723)
+  - Button did not save new or edited subscriptions
+  - Removed SubtlePressable wrapper
+  - Button now properly validates and saves subscriptions
+
+### Improved
+- **Better "Paid" badge positioning** on home screen subscription tiles
+  - Moved badge from inline with name to right side below billing date
+  - Creates cleaner layout with more breathing room for subscription name
+  - Groups status badges (Paid/Trial) together on the right side
+  - Improves visual hierarchy and scannability
+
+### Technical Details
+- **Root Cause**: Flutter's gesture arena gives priority to child gesture detectors. When SubtlePressable (using GestureDetector) wrapped a Material button with a non-null `onPressed` handler, the button's internal gesture detector won the arena and consumed tap events with its empty handler, preventing SubtlePressable's `onTapUp` from ever firing.
+- **Solution**: Material buttons already provide excellent press feedback through ripple effects. Removed unnecessary SubtlePressable wrappers and used buttons' native `onPressed` handlers directly.
+- **Code Quality**: Removed unused imports from affected files
+
+---
+
+## [1.0.4] - 2026-02-06 (Simplification & Bug Fixes)
+
+**Build**: 6
+**Status**: ✅ Ready for Testing
+**Focus**: Feature Removal & Button Fixes
+
+### Summary
+
+Removed redundant pause/resume functionality and fixed greyed-out button issues across the app. The pause feature was deemed unnecessary since users can simply delete subscriptions they don't want to track. This simplification makes the app cleaner and easier to use.
+
+---
+
+### Removed - Pause/Resume Feature
+- **Removed pause/resume functionality** throughout the app
+  - Deleted "Pause/Resume" button from subscription detail screen
+  - Removed "Paused" status badge from detail screen header
+  - Removed "Paused" badge from home screen subscription tiles
+  - Deleted swipe-to-pause action from home screen
+- **Simplified business logic**
+  - `getAllActive()` now returns all subscriptions (no filtering)
+  - Removed `toggleActive()` methods from repository and controllers
+  - Removed active-first sorting from home screen
+  - All subscriptions now receive notifications
+  - Monthly totals and analytics include all subscriptions
+- **Data model changes**
+  - Marked `isActive` field as @Deprecated (kept for backward compatibility)
+  - All new subscriptions default to active
+  - Old backups with paused subscriptions import successfully (treated as active)
+- **UI improvements**
+  - Subscription detail screen now has single full-width "Mark as Paid" button
+  - Cleaner, less cluttered interface
+  - Only relevant status badges shown (Trial, Paid)
+
+### Fixed - Greyed-Out Buttons
+- Fixed "Create Custom" button appearing disabled on add subscription screen
+- Fixed "Add Subscription" button appearing disabled at bottom of form
+- Fixed "Mark as Paid" button appearing disabled on detail screen
+- Issue was caused by SubtlePressable pattern with `onPressed: null`
+- Solution: Changed to dummy handler pattern `onPressed: () {}`
+
+### Files Modified (10 total)
+1. `lib/features/add_subscription/add_subscription_screen.dart` - Button fixes
+2. `lib/data/repositories/subscription_repository.dart` - Simplified filtering
+3. `lib/features/home/home_controller.dart` - Removed filtering/sorting
+4. `lib/features/subscription_detail/subscription_detail_controller.dart` - Removed toggle method
+5. `lib/data/services/notification_service.dart` - Removed isActive check
+6. `lib/features/subscription_detail/subscription_detail_screen.dart` - UI simplification
+7. `lib/features/home/home_screen.dart` - Removed paused badge
+8. `lib/data/models/subscription.dart` - Deprecated isActive field
+9. `lib/features/add_subscription/add_subscription_controller.dart` - Always active
+10. `CLAUDE.md` - Updated documentation
+
+### Technical Details
+- **Lines removed**: ~150 (dead code elimination)
+- **Lines modified**: ~30
+- **Backward compatible**: Yes - old backups work seamlessly
+- **Data migration required**: No
+- **Breaking changes**: None
+
+### Benefits
+- **Simpler UX**: One less feature to understand
+- **Cleaner codebase**: Less complexity to maintain
+- **Better notifications**: All subscriptions get reminders
+- **Accurate analytics**: All subscriptions counted in totals
+
+---
+
 ## [1.0.3] - 2026-02-05 (UI Modernization & Refinement)
 
 **Build**: 5
@@ -192,7 +299,6 @@ CustomSubs MVP is complete! All core features are implemented, tested through st
 #### Phase 2: Data Safety & Management ✅
 - **Subscription Detail Screen** with full management interface
   - Mark as Paid functionality with visual badges
-  - Pause/Resume subscriptions
   - Edit and Delete with confirmation
   - Complete billing info display
 - **Cancellation Manager**

@@ -17,7 +17,6 @@ import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/styled_date_field.dart';
-import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -305,18 +304,14 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
               const SizedBox(height: AppSizes.md),
 
               // Create custom button
-              SubtlePressable(
-                scale: 0.985,
+              OutlinedButton.icon(
                 onPressed: () {
                   setState(() {
                     _showTemplates = false;
                   });
                 },
-                child: OutlinedButton.icon(
-                  onPressed: () {}, // Dummy handler - SubtlePressable handles tap
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create Custom'),
-                ),
+                icon: const Icon(Icons.add),
+                label: const Text('Create Custom'),
               ),
               const SizedBox(height: AppSizes.xl),
             ],
@@ -709,19 +704,15 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
               const SizedBox(height: AppSizes.xxl),
 
-              // Save Button (with SubtlePressable)
-              SubtlePressable(
-                scale: 0.985,
+              // Save Button
+              ElevatedButton(
                 onPressed: _save,
-                child: ElevatedButton(
-                  onPressed: () {}, // Dummy handler - SubtlePressable handles tap
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSizes.base),
-                    child: Text(
-                      widget.subscriptionId == null
-                          ? 'Add Subscription'
-                          : 'Update Subscription',
-                    ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.base),
+                  child: Text(
+                    widget.subscriptionId == null
+                        ? 'Add Subscription'
+                        : 'Update Subscription',
                   ),
                 ),
               ),

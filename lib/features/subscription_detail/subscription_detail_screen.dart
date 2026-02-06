@@ -7,7 +7,6 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/utils/service_icons.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
-import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_controller.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/data/models/subscription.dart';
@@ -85,17 +84,14 @@ class SubscriptionDetailScreen extends ConsumerWidget {
                 // Mark as Paid button (full width)
                 SizedBox(
                   width: double.infinity,
-                  child: SubtlePressable(
+                  child: OutlinedButton.icon(
                     onPressed: () => ref
                         .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
                         .togglePaid(),
-                    child: OutlinedButton.icon(
-                      onPressed: () {}, // Dummy handler - SubtlePressable handles tap
-                      icon: Icon(
-                        subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
-                      ),
-                      label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
+                    icon: Icon(
+                      subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
                     ),
+                    label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
                   ),
                 ),
 

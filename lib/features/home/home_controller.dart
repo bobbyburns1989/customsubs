@@ -83,7 +83,7 @@ class HomeController extends _$HomeController {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final repository = await ref.read(subscriptionRepositoryProvider.future);
-      return repository.getAllActive();
+      return repository.getAll();
     });
   }
 

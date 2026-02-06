@@ -185,16 +185,13 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Large icon or first-letter avatar
 - [ ] Name displays prominently
 - [ ] Amount + cycle below name
-- [ ] Status badge: "Active" (green), "Paused" (gray), "Trial" (yellow)
+- [ ] Status badge: "Trial" (yellow), "Paid" (green) when applicable
 
 ### Quick Actions
-- [ ] "Mark as Paid" button toggles paid status
+- [ ] "Mark as Paid" button (full width) toggles paid status
 - [ ] Marking paid → green checkmark appears on home
-- [ ] "Edit" button → Add/Edit screen with pre-filled data
-- [ ] "Pause/Resume" toggle works
-- [ ] Pausing → subscription becomes inactive (grayed out on home)
-- [ ] Resuming → subscription becomes active again
-- [ ] "Delete" button shows confirmation dialog
+- [ ] "Edit" button (top bar) → Add/Edit screen with pre-filled data
+- [ ] "Delete" button (top bar) shows confirmation dialog
 - [ ] Confirming delete removes subscription and navigates back
 
 ### Billing Info Card
@@ -222,7 +219,6 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Edit and save → changes reflected immediately
 - [ ] Edit and cancel → no changes applied
 - [ ] Delete → navigates back to home (doesn't crash)
-- [ ] Pause/Resume rapidly → state updates correctly
 - [ ] Mark paid repeatedly → toggles correctly
 - [ ] Hero animation from home → detail is smooth
 

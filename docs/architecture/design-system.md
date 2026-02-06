@@ -97,7 +97,7 @@ AppColors.success  // #16A34A - Green (same as primary)
 AppColors.warning  // #F59E0B - Amber 500
 AppColors.error    // #EF4444 - Red 500
 AppColors.trial    // #F59E0B - Amber 500 (trial badges)
-AppColors.inactive // #94A3B8 - Slate 400 (paused subscriptions)
+AppColors.inactive // #94A3B8 - Slate 400 (disabled/muted UI elements)
 ```
 
 **Usage:**
@@ -105,7 +105,7 @@ AppColors.inactive // #94A3B8 - Slate 400 (paused subscriptions)
 - Warning: Trial ending soon, attention needed
 - Error: Validation errors, failed operations
 - Trial: Free trial badges
-- Inactive: Paused/disabled subscriptions
+- Inactive: Disabled/muted UI elements
 
 ### Subscription Colors
 

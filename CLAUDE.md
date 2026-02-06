@@ -176,7 +176,7 @@ class Subscription extends HiveObject {
   @HiveField(5) final DateTime nextBillingDate;
   @HiveField(6) final DateTime startDate;        // When user first subscribed
   @HiveField(7) final SubscriptionCategory category;
-  @HiveField(8) final bool isActive;
+  @HiveField(8) final bool isActive; // DEPRECATED: Always true as of v1.0.3
   @HiveField(9) final bool isTrial;              // FREE TRIAL MODE
   @HiveField(10) final DateTime? trialEndDate;   // When trial converts to paid
   @HiveField(11) final double? postTrialAmount;  // Amount after trial ends
@@ -315,7 +315,7 @@ The main screen the user sees every day. It must communicate three things instan
   - "Paid" badge if user marked it paid for this cycle
   - If it's a trial: yellow "Trial ends in X days" badge
 - Tapping a tile → Subscription Detail screen
-- Swipe left to reveal "Pause" (toggle inactive) and "Delete" actions
+- Swipe left to reveal "Delete" action
 
 **Attention Section (conditional):**
 - Only shows if there are items needing attention
@@ -379,13 +379,12 @@ Full detail view for a single subscription. Accessed by tapping any subscription
 - Subscription color as background accent
 - Large icon (template icon or first-letter avatar)
 - Name, amount, cycle
-- Status badge: Active (green), Paused (gray), Trial (yellow)
+- Status badge: Trial (yellow), Paid (green)
 
-**Quick Actions Row:**
-- "Mark as Paid" button — toggles paid status for current billing cycle. Resets automatically when nextBillingDate advances.
-- "Edit" button → Add/Edit screen in edit mode
-- "Pause/Resume" toggle
-- "Delete" button (with confirmation dialog)
+**Quick Actions:**
+- "Mark as Paid" button — full-width button that toggles paid status for current billing cycle. Resets automatically when nextBillingDate advances.
+- "Edit" button → Add/Edit screen in edit mode (top bar)
+- "Delete" button (top bar, with confirmation dialog)
 
 **Billing Info Card:**
 - Next billing date with countdown ("in 12 days")
@@ -740,7 +739,7 @@ Include templates for at minimum: Netflix, Spotify, YouTube Premium, Disney+, Ap
 - [x] Monthly spending snapshot storage
 - [x] Hero animations between Home and Detail
 - [x] Pull-to-refresh on Home
-- [x] Swipe actions on subscription tiles (pause, delete)
+- [x] Swipe actions on subscription tiles (delete)
 - [x] Micro-interactions (tap animations, transitions)
 
 ---

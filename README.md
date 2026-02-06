@@ -38,7 +38,6 @@ CustomSubs is a mobile application designed to help you track and manage your su
 **Subscription Management:**
 - 📊 **Full subscription detail screen** with complete management
 - ✅ Mark as Paid functionality with visual badges
-- ⏸️ Pause/Resume subscriptions
 - 🗑️ Delete with confirmation and notification cleanup
 - 📱 Interactive cancellation checklists with progress tracking
 - 🌐 Launch cancel URLs and phone numbers directly

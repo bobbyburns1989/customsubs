@@ -469,39 +469,10 @@ class _SubscriptionTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              subscription.name,
-                              style: theme.textTheme.titleMedium,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          AnimatedOpacity(
-                            opacity: subscription.isPaid ? 1.0 : 0.0,
-                            duration: const Duration(milliseconds: 250),
-                            curve: Curves.easeOut,
-                            child: Container(
-                              margin: const EdgeInsets.only(left: AppSizes.sm),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSizes.sm,
-                                vertical: AppSizes.xs,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppColors.success.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                              ),
-                              child: Text(
-                                'Paid',
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.success,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        subscription.name,
+                        style: theme.textTheme.titleMedium,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: AppSizes.xs),
                       Row(
@@ -548,6 +519,30 @@ class _SubscriptionTile extends StatelessWidget {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: AppColors.textTertiary,
                             fontSize: 11,
+                          ),
+                        ),
+                      ),
+                    if (subscription.isPaid)
+                      AnimatedOpacity(
+                        opacity: subscription.isPaid ? 1.0 : 0.0,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOut,
+                        child: Container(
+                          margin: const EdgeInsets.only(top: AppSizes.xs),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSizes.sm,
+                            vertical: AppSizes.xs,
+                          ),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppSizes.radiusSm),
+                          ),
+                          child: Text(
+                            'Paid',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: AppColors.success,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
