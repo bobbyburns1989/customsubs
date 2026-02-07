@@ -12,9 +12,7 @@ import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_controller.dart';
 import 'package:custom_subs/features/add_subscription/widgets/template_grid_item.dart';
-import 'package:custom_subs/features/add_subscription/widgets/color_picker_widget.dart';
 import 'package:custom_subs/features/add_subscription/widgets/reminder_config_widget.dart';
-import 'package:custom_subs/features/add_subscription/widgets/subscription_preview_card.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
@@ -46,7 +44,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   SubscriptionCategory _category = SubscriptionCategory.entertainment;
   DateTime _nextBillingDate = DateTime.now().add(const Duration(days: 30));
   DateTime _startDate = DateTime.now();
-  int _colorValue = AppColors.subscriptionColors[0].toARGB32();
+  int? _colorValue; // Will be auto-assigned or loaded from existing/template
   ReminderConfig _reminders = ReminderConfig();
 
   bool _isTrial = false;
@@ -137,7 +135,15 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       return;
     }
 
+    // Capture BuildContext and Navigator before async operations
+    final navigator = Navigator.of(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final isEditing = widget.subscriptionId != null;
+
     try {
+      // Auto-assign color if not already set (from template or existing subscription)
+      final colorValue = _colorValue ?? await _getNextAutoColor();
+
       final controller =
           ref.read(addSubscriptionControllerProvider(widget.subscriptionId).notifier);
 
@@ -149,7 +155,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
         nextBillingDate: _nextBillingDate,
         startDate: _startDate,
         category: _category,
-        colorValue: _colorValue,
+        colorValue: colorValue,
         reminders: _reminders,
         isTrial: _isTrial,
         trialEndDate: _trialEndDate,
@@ -169,63 +175,37 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             : _notesController.text.trim(),
       );
 
-      if (mounted) {
-        await HapticUtils.medium(); // Save success feedback
+      if (!mounted) return;
 
-        // Invalidate home controller to refresh the list
-        ref.invalidate(homeControllerProvider);
+      await HapticUtils.medium(); // Save success feedback
 
-        SnackBarUtils.show(
-          context,
-          SnackBarUtils.success(
-            widget.subscriptionId == null
-                ? 'Subscription added!'
-                : 'Subscription updated!',
-          ),
-        );
-        context.pop();
-      }
+      // Invalidate home controller to refresh the list
+      ref.invalidate(homeControllerProvider);
+
+      scaffoldMessenger.showSnackBar(
+        SnackBarUtils.success(
+          isEditing
+              ? 'Subscription updated!'
+              : 'Subscription added!',
+        ),
+      );
+      navigator.pop();
     } catch (e) {
-      if (mounted) {
-        SnackBarUtils.show(
-          context,
-          SnackBarUtils.error('Error: $e'),
-        );
-      }
+      if (!mounted) return;
+
+      scaffoldMessenger.showSnackBar(
+        SnackBarUtils.error('Error: $e'),
+      );
     }
   }
 
-  /// Builds the collapsed preview for the Appearance section
-  /// Shows the selected color dot with "Tap to customize" text
-  Widget _buildColorPreview() {
-    final theme = Theme.of(context);
-
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSizes.sm),
-      child: Row(
-        children: [
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: Color(_colorValue),
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: AppColors.border,
-                width: 2,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSizes.sm),
-          Text(
-            'Tap to customize',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textTertiary,
-            ),
-          ),
-        ],
-      ),
-    );
+  /// Auto-assigns a color by cycling through the color palette
+  /// based on the current number of subscriptions
+  Future<int> _getNextAutoColor() async {
+    final subscriptions = await ref.read(homeControllerProvider.future);
+    final subscriptionCount = subscriptions.length;
+    final colorIndex = subscriptionCount % AppColors.subscriptionColors.length;
+    return AppColors.subscriptionColors[colorIndex].toARGB32();
   }
 
   @override
@@ -364,7 +344,6 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                         }
                         return null;
                       },
-                      onChanged: (_) => setState(() {}), // Refresh preview
                     ),
                     const SizedBox(height: AppSizes.md),
 
@@ -395,7 +374,6 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                               }
                               return null;
                             },
-                            onChanged: (_) => setState(() {}), // Refresh preview
                           ),
                         ),
                         const SizedBox(width: AppSizes.lg),
@@ -480,38 +458,6 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                           });
                         }
                       },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSizes.md),
-
-              // Appearance Card (collapsed by default with color preview)
-              FormSectionCard(
-                title: 'Appearance',
-                subtitle: 'Choose a color for your subscription',
-                icon: Icons.palette_outlined,
-                isCollapsible: true,
-                initiallyExpanded: false,
-                collapsedPreview: _buildColorPreview(),
-                child: Column(
-                  children: [
-                    ColorPickerWidget(
-                      selectedColorValue: _colorValue,
-                      onColorSelected: (color) {
-                        setState(() {
-                          _colorValue = color;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: AppSizes.md),
-                    // Subscription Preview
-                    SubscriptionPreviewCard(
-                      name: _nameController.text,
-                      amount: double.tryParse(_amountController.text),
-                      currencyCode: _currencyCode,
-                      cycle: _cycle,
-                      colorValue: _colorValue,
                     ),
                   ],
                 ),

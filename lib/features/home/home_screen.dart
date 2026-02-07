@@ -423,13 +423,6 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/new_app_icon.png',
-              width: 250,
-              height: 250,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: AppSizes.xxxl),
             Text(
               'No subscriptions yet',
               style: theme.textTheme.headlineSmall,

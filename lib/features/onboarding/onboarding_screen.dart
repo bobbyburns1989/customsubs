@@ -11,7 +11,7 @@ import 'package:custom_subs/core/utils/haptic_utils.dart';
 /// Single-screen onboarding that introduces key features.
 ///
 /// Shows:
-/// - Welcome message with logo
+/// - Welcome message
 /// - 3 key features (tracking, reminders, cancellation)
 /// - Get Started CTA with privacy note
 ///
@@ -86,27 +86,50 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSizes.xl,
-              vertical: AppSizes.xxl,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Header Section: Logo + Welcome Message
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.xl,
+                  vertical: AppSizes.xl,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                // Header Section: Welcome Message
                 FadeTransition(
                   opacity: _fadeAnimations[0],
                   child: Column(
                     children: [
-                      // Logo
-                      Image.asset(
-                        'assets/images/new_app_icon.png',
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.contain,
+                      // Logo with enhanced presentation
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withOpacity(0.08),
+                              blurRadius: 24,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                          child: Image.asset(
+                            'assets/images/new_app_icon.png',
+                            width: 140,
+                            height: 140,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: AppSizes.xl),
+                      const SizedBox(height: AppSizes.lg),
 
                       // Welcome message
                       Text(
@@ -129,7 +152,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.xxxl),
+                const SizedBox(height: AppSizes.xxl),
 
                 // Feature 1: Track Everything
                 FadeTransition(
@@ -168,7 +191,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.xxxl),
+                const SizedBox(height: AppSizes.xxl),
 
                 // CTA Section: Button + Privacy Note
                 FadeTransition(
@@ -220,6 +243,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             ),
           ),
         ),
+          ),
+        ),
       ),
     );
   }
@@ -243,7 +268,7 @@ class _FeatureCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSizes.lg),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
