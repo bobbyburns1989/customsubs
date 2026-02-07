@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
@@ -17,6 +19,7 @@ import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/styled_date_field.dart';
+import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -102,7 +105,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     super.dispose();
   }
 
-  void _selectTemplate(SubscriptionTemplate template) {
+  Future<void> _selectTemplate(SubscriptionTemplate template) async {
+    await HapticUtils.light(); // Template selection feedback
     setState(() {
       _nameController.text = template.name;
       _amountController.text = template.defaultAmount.toString();
@@ -126,8 +130,9 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
 
     if (amount <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount')),
+      SnackBarUtils.show(
+        context,
+        SnackBarUtils.warning('Please enter a valid amount'),
       );
       return;
     }
@@ -165,22 +170,26 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       );
 
       if (mounted) {
+        await HapticUtils.medium(); // Save success feedback
+
         // Invalidate home controller to refresh the list
         ref.invalidate(homeControllerProvider);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(widget.subscriptionId == null
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.success(
+            widget.subscriptionId == null
                 ? 'Subscription added!'
-                : 'Subscription updated!'),
+                : 'Subscription updated!',
           ),
         );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.error('Error: $e'),
         );
       }
     }
@@ -231,7 +240,12 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             : 'Edit Subscription'),
         leading: IconButton(
           icon: const Icon(Icons.close),
-          onPressed: () => context.pop(),
+          onPressed: () async {
+            await HapticUtils.light();
+            if (context.mounted) {
+              context.pop();
+            }
+          },
         ),
         actions: [
           TextButton(
@@ -298,14 +312,26 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.9,
+                    crossAxisSpacing: AppSizes.sm,
+                    mainAxisSpacing: AppSizes.sm,
+                  ),
+                  itemCount: 8, // 8 skeleton items
+                  itemBuilder: (context, index) => const SkeletonTemplateItem(),
+                ),
                 error: (_, __) => const Text('Error loading templates'),
               ),
               const SizedBox(height: AppSizes.md),
 
               // Create custom button
               OutlinedButton.icon(
-                onPressed: () {
+                onPressed: () async {
+                  await HapticUtils.light();
                   setState(() {
                     _showTemplates = false;
                   });

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 /// Currency picker dialog.
 ///
@@ -98,7 +99,12 @@ class _CurrencyPickerDialogState extends State<CurrencyPickerDialog> {
                       const Spacer(),
                       IconButton(
                         icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () async {
+                          await HapticUtils.light();
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
                       ),
                     ],
                   ),
@@ -163,7 +169,12 @@ class _CurrencyPickerDialogState extends State<CurrencyPickerDialog> {
                         return _CurrencyTile(
                           code: code,
                           isSelected: isSelected,
-                          onTap: () => Navigator.of(context).pop(code),
+                          onTap: () async {
+                            await HapticUtils.light(); // Currency selection feedback
+                            if (context.mounted) {
+                              Navigator.of(context).pop(code);
+                            }
+                          },
                         );
                       },
                     ),

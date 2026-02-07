@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/core/utils/service_icons.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
+import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dart';
 import 'package:custom_subs/app/router.dart';
@@ -23,7 +25,11 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends ConsumerState<HomeScreen>
+    with WidgetsBindingObserver, TickerProviderStateMixin {
+  AnimationController? _listAnimationController;
+  List<Animation<double>>? _tileAnimations;
+
   @override
   void initState() {
     super.initState();
@@ -36,8 +42,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
     });
   }
 
+  void _initializeListAnimations(int itemCount) {
+    _listAnimationController?.dispose();
+
+    _listAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300 + (itemCount * 50).clamp(0, 300)),
+    );
+
+    _tileAnimations = List.generate(itemCount, (index) {
+      final start = (index * 0.1).clamp(0.0, 0.6);
+      final end = (start + 0.4).clamp(0.0, 1.0);
+
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _listAnimationController!,
+          curve: Interval(start, end, curve: Curves.easeOut),
+        ),
+      );
+    });
+
+    _listAnimationController!.forward();
+  }
+
   @override
   void dispose() {
+    _listAnimationController?.dispose();
     // Clean up lifecycle observer
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
@@ -100,7 +130,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.push(AppRouter.settings),
+            onPressed: () async {
+              await HapticUtils.light();
+              if (context.mounted) {
+                context.push(AppRouter.settings);
+              }
+            },
           ),
         ],
       ),
@@ -121,6 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
 
           return RefreshIndicator(
             onRefresh: () async {
+              await HapticUtils.heavy(); // Pull-to-refresh completion
               await _advanceOverdueDatesIfNeeded();
               await homeController.refresh();
             },
@@ -149,7 +185,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
-                            onPressed: () => context.push(AppRouter.addSubscription),
+                            onPressed: () async {
+                              await HapticUtils.medium();
+                              if (context.mounted) {
+                                context.push(AppRouter.addSubscription);
+                              }
+                            },
                             icon: const Icon(Icons.add),
                             label: const Text('Add New'),
                           ),
@@ -157,7 +198,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                         const SizedBox(width: AppSizes.base),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: () => context.push(AppRouter.analytics),
+                            onPressed: () async {
+                              await HapticUtils.medium();
+                              if (context.mounted) {
+                                context.push(AppRouter.analytics);
+                              }
+                            },
                             icon: const Icon(Icons.analytics_outlined),
                             label: const Text('Analytics'),
                           ),
@@ -238,12 +284,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                   ),
                 ),
 
-                // Upcoming Subscriptions List
+                // Upcoming Subscriptions List with staggered fade-in
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
                       final subscription = upcoming[index];
-                      return _SubscriptionTile(
+
+                      // Initialize animations on first build
+                      if (_tileAnimations == null || _tileAnimations!.length != upcoming.length) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            _initializeListAnimations(upcoming.length);
+                          }
+                        });
+                      }
+
+                      final tile = _SubscriptionTile(
                         subscription: subscription,
                         onTap: () {
                           context.push('${AppRouter.subscriptionDetail}/${subscription.id}');
@@ -258,6 +314,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
                           _showDeleteDialog(context, subscription, homeController);
                         },
                       );
+
+                      // Wrap in FadeTransition if animations ready
+                      if (_tileAnimations != null && index < _tileAnimations!.length) {
+                        return FadeTransition(
+                          opacity: _tileAnimations![index],
+                          child: tile,
+                        );
+                      }
+
+                      return tile;
                     },
                     childCount: upcoming.length,
                   ),
@@ -271,7 +337,39 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with WidgetsBindingObse
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => CustomScrollView(
+          slivers: [
+            // Skeleton spending summary
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(AppSizes.base),
+                child: SkeletonBox(width: double.infinity, height: 120, borderRadius: AppSizes.radiusLg),
+              ),
+            ),
+
+            // Skeleton quick actions
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSizes.base, vertical: AppSizes.sm),
+                child: Row(
+                  children: [
+                    Expanded(child: SkeletonBox(height: 48)),
+                    SizedBox(width: AppSizes.base),
+                    Expanded(child: SkeletonBox(height: 48)),
+                  ],
+                ),
+              ),
+            ),
+
+            // Skeleton subscription tiles (4 tiles)
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) => const SkeletonSubscriptionTile(),
+                childCount: 4,
+              ),
+            ),
+          ],
+        ),
         error: (error, stack) => Center(
           child: Text('Error: $error'),
         ),
@@ -326,9 +424,9 @@ class _EmptyState extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/images/CustomSubsLOGO.png',
+              'assets/images/new_app_icon.png',
               width: 250,
-              height: 100,
+              height: 250,
               fit: BoxFit.contain,
             ),
             const SizedBox(height: AppSizes.xxxl),
@@ -347,7 +445,10 @@ class _EmptyState extends StatelessWidget {
             ),
             const SizedBox(height: AppSizes.xxl),
             ElevatedButton.icon(
-              onPressed: onAddPressed,
+              onPressed: () async {
+                await HapticUtils.medium();
+                onAddPressed();
+              },
               icon: const Icon(Icons.add),
               label: const Text('Add Subscription'),
             ),
@@ -447,19 +548,24 @@ class _SubscriptionTile extends StatelessWidget {
       ),
       confirmDismiss: (direction) async {
         if (direction == DismissDirection.startToEnd) {
+          await HapticUtils.medium(); // Mark as paid feedback
           onMarkPaid();
           return false;
         } else {
           return true;
         }
       },
-      onDismissed: (direction) {
+      onDismissed: (direction) async {
         if (direction == DismissDirection.endToStart) {
+          await HapticUtils.heavy(); // Destructive action
           onDelete();
         }
       },
       child: SubtlePressable(
-        onPressed: onTap,
+        onPressed: () async {
+          await HapticUtils.light(); // Navigation feedback
+          onTap();
+        },
         scale: 0.99, // Extra subtle 1% scale for cards
         child: Card(
           margin: const EdgeInsets.symmetric(
@@ -470,42 +576,45 @@ class _SubscriptionTile extends StatelessWidget {
             padding: const EdgeInsets.all(AppSizes.lg),
             child: Row(
               children: [
-                // Color indicator + Icon
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        color.withValues(alpha: 0.15),
-                        color.withValues(alpha: 0.25),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.12),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                // Color indicator + Icon with Hero animation
+                Hero(
+                  tag: 'subscription-icon-${subscription.id}',
+                  child: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          color.withValues(alpha: 0.15),
+                          color.withValues(alpha: 0.25),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: ServiceIcons.hasCustomIcon(subscription.name)
-                        ? Icon(
-                            ServiceIcons.getIconForService(subscription.name),
-                            color: color,
-                            size: 26,
-                          )
-                        : Text(
-                            subscription.name[0].toUpperCase(),
-                            style: theme.textTheme.titleMedium?.copyWith(
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Center(
+                      child: ServiceIcons.hasCustomIcon(subscription.name)
+                          ? Icon(
+                              ServiceIcons.getIconForService(subscription.name),
                               color: color,
-                              fontWeight: FontWeight.bold,
+                              size: 26,
+                            )
+                          : Text(
+                              subscription.name[0].toUpperCase(),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: color,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSizes.base),

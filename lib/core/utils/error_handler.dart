@@ -7,6 +7,7 @@ library;
 
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
 
 /// Custom exception types for better error categorization
 class StorageException implements Exception {
@@ -92,13 +93,9 @@ class ErrorHandler {
 
       if (context != null && context.mounted && showSnackbar) {
         final message = getUserMessage(error, context: errorContext);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-          ),
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.error(message),
         );
       }
 
@@ -122,13 +119,9 @@ class ErrorHandler {
 
       if (context != null && context.mounted && showSnackbar) {
         final message = getUserMessage(error, context: errorContext);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 4),
-          ),
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.error(message),
         );
       }
 

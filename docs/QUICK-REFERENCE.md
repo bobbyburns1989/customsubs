@@ -1,7 +1,7 @@
 # Quick Reference
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: February 7, 2026
 **Relevant to**: Developers
 
 **Fast lookup for common tasks and patterns in CustomSubs.**
@@ -328,6 +328,210 @@ AnimatedContainer(
 
 ---
 
+## 📳 Haptic Feedback
+
+**Added in v1.0.6** - Comprehensive tactile feedback for all interactions
+
+```dart
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+
+// Light haptic (10-20ms) - Navigation, icon buttons, taps
+await HapticUtils.light();
+
+// Medium haptic (30-40ms) - Primary buttons, toggles, state changes
+await HapticUtils.medium();
+
+// Heavy haptic (50ms) - Delete, destructive actions, pull-to-refresh
+await HapticUtils.heavy();
+
+// Selection haptic - Checkboxes, radio buttons, switches
+await HapticUtils.selection();
+```
+
+### Usage Examples
+
+```dart
+// Navigation button
+IconButton(
+  icon: Icon(Icons.arrow_back),
+  onPressed: () async {
+    await HapticUtils.light();
+    context.pop();
+  },
+)
+
+// Primary action button
+ElevatedButton(
+  onPressed: () async {
+    await HapticUtils.medium();
+    await saveData();
+  },
+  child: Text('Save'),
+)
+
+// Delete action
+onPressed: () async {
+  await HapticUtils.heavy();
+  await deleteItem();
+}
+
+// Checkbox
+Checkbox(
+  value: isChecked,
+  onChanged: (value) async {
+    await HapticUtils.selection();
+    setState(() => isChecked = value);
+  },
+)
+
+// Pull-to-refresh
+RefreshIndicator(
+  onRefresh: () async {
+    await HapticUtils.heavy();
+    await refreshData();
+  },
+  child: ListView(...),
+)
+```
+
+**Guidelines:**
+- Light: Navigation, list taps, icon buttons
+- Medium: Primary buttons, save actions, mark as paid
+- Heavy: Delete, pull-to-refresh, destructive actions
+- Selection: Checkboxes, switches, toggles
+- Always use `await` to ensure haptic fires before action
+- Haptics require physical device (don't work in simulators)
+
+---
+
+## 🎨 Modern SnackBars
+
+**Added in v1.0.6** - Aesthetic, floating snackbars with UNDO support
+
+```dart
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
+
+// Success snackbar (green, checkmark, 2s duration)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.success('Subscription added!'),
+);
+
+// Error snackbar (red, error icon, 4s duration)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.error('Failed to save data'),
+);
+
+// Warning snackbar (amber, warning icon, 3s duration)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.warning('Please enter a valid amount'),
+);
+
+// Info snackbar (grey, info icon, 3s duration)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.info('Data restored'),
+);
+```
+
+### With UNDO Action
+
+```dart
+// Success with undo
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.success(
+    'Subscription deleted',
+    onUndo: () async {
+      await HapticUtils.medium();
+      await restoreSubscription();
+    },
+  ),
+);
+```
+
+**Features:**
+- Floating behavior with 16px border radius (matches StandardCard)
+- Material icons for visual feedback
+- Color-coded: green (success), red (error), amber (warning), grey (info)
+- Optional UNDO action with white text button
+- Consistent with app design system
+
+---
+
+## ↩️ Undo Service
+
+**Added in v1.0.6** - 5-second memory cache for quick restoration
+
+```dart
+import 'package:custom_subs/data/services/undo_service.dart';
+
+final undoService = UndoService();
+
+// Cache before deletion
+undoService.cacheDeletedSubscription(subscription);
+
+// Retrieve within 5 seconds
+final cached = undoService.getDeletedSubscription();
+if (cached != null) {
+  // Restore subscription
+  await repository.upsert(cached);
+}
+```
+
+### Supported Operations
+
+**1. Subscription Deletion**
+```dart
+// Before delete
+undoService.cacheDeletedSubscription(subscription);
+
+// In UNDO callback
+final cached = undoService.getDeletedSubscription();
+if (cached != null) {
+  await repository.upsert(cached);
+  await notificationService.scheduleNotificationsForSubscription(cached);
+}
+```
+
+**2. Currency Change**
+```dart
+// Before change
+undoService.cacheCurrencyChange(previousCurrency);
+
+// In UNDO callback
+final previous = undoService.getPreviousCurrency();
+if (previous != null) {
+  await settingsRepository.setPrimaryCurrency(previous);
+}
+```
+
+**3. Reminder Time Change**
+```dart
+// Before change
+undoService.cacheReminderTimeChange(previousTime);
+
+// In UNDO callback
+final previous = undoService.getPreviousReminderTime();
+if (previous != null) {
+  await settingsRepository.setDefaultReminderTime(
+    previous.hour,
+    previous.minute,
+  );
+}
+```
+
+**Guidelines:**
+- Cache expires after 5 seconds
+- Singleton pattern (one instance across app)
+- Returns null if expired or not cached
+- Always check for null before restoring
+- Use with SnackBarUtils.success() for best UX
+
+---
+
 ## 📅 Date Extensions
 
 ```dart
@@ -415,18 +619,25 @@ Future<void> _save() async {
   setState(() => _isSaving = true);
 
   try {
+    await HapticUtils.medium(); // Save action feedback
+
     // Save logic
     final repo = await ref.read(repositoryProvider.future);
     await repo.upsert(item);
 
     if (mounted) {
-      Navigator.pop(context);
+      SnackBarUtils.show(
+        context,
+        SnackBarUtils.success('Saved successfully!'),
+      );
+      context.pop();
     }
   } catch (e) {
     if (mounted) {
       setState(() => _isSaving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+      SnackBarUtils.show(
+        context,
+        SnackBarUtils.error('Error: $e'),
       );
     }
   }
@@ -468,10 +679,73 @@ Center(
 )
 ```
 
-### Loading Spinner
+### Skeleton Loading States
 
 ```dart
-Center(child: CircularProgressIndicator())
+import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
+
+// Base skeleton box
+SkeletonBox(
+  width: 120,
+  height: 16,
+  borderRadius: AppSizes.radiusSm,
+)
+
+// Pre-built skeleton tiles
+const SkeletonSubscriptionTile()  // Matches subscription list item
+const SkeletonCategoryBar()       // Matches analytics category bar
+const SkeletonTemplateItem()      // Matches template grid item
+
+// Usage in AsyncValue loading state
+loading: () => ListView(
+  children: [
+    const SkeletonSubscriptionTile(),
+    const SkeletonSubscriptionTile(),
+    const SkeletonSubscriptionTile(),
+  ],
+)
+```
+
+### Hero Animations
+
+```dart
+// Wrap icons/widgets for shared element transitions
+Hero(
+  tag: 'subscription-icon-${subscription.id}',  // Must be unique
+  child: Container(
+    width: 48,
+    height: 48,
+    decoration: BoxDecoration(shape: BoxShape.circle),
+    child: Icon(Icons.star),
+  ),
+)
+
+// Destination screen uses same tag
+Hero(
+  tag: 'subscription-icon-${subscription.id}',  // Same tag!
+  child: Container(
+    width: 80,
+    height: 80,
+    // Different size/shape - animates automatically
+  ),
+)
+```
+
+### Interactive Donut Chart
+
+```dart
+import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart';
+
+CategoryDonutChart(
+  categoryBreakdown: analytics.categoryBreakdown,  // Map<Category, CategoryData>
+  currencySymbol: '\$',
+)
+
+// Features:
+// - Touch interaction (sections expand on tap)
+// - Animated legend with highlighting
+// - Shows subscription count badges
+// - 250ms smooth animations
 ```
 
 ### Pull to Refresh
@@ -479,6 +753,7 @@ Center(child: CircularProgressIndicator())
 ```dart
 RefreshIndicator(
   onRefresh: () async {
+    await HapticUtils.heavy(); // Pull-to-refresh feedback
     await ref.read(controllerProvider.notifier).refresh();
   },
   child: ListView(...),
@@ -542,6 +817,9 @@ dart run build_runner build --delete-conflicting-outputs
 | **Router** | `lib/app/router.dart` |
 | **Currency Utils** | `lib/core/utils/currency_utils.dart` |
 | **Service Icons** | `lib/core/utils/service_icons.dart` |
+| **Haptic Utils** | `lib/core/utils/haptic_utils.dart` |
+| **SnackBar Utils** | `lib/core/utils/snackbar_utils.dart` |
+| **Undo Service** | `lib/data/services/undo_service.dart` |
 | **Date Extensions** | `lib/core/extensions/date_extensions.dart` |
 | **Notification Service** | `lib/data/services/notification_service.dart` |
 | **Subscription Repository** | `lib/data/repositories/subscription_repository.dart` |

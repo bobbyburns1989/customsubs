@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 /// Backup reminder dialog shown after user adds their 3rd subscription.
 ///
@@ -68,7 +69,8 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
           const SizedBox(height: AppSizes.lg),
           CheckboxListTile(
             value: _dontShowAgain,
-            onChanged: (value) {
+            onChanged: (value) async {
+              await HapticUtils.selection(); // Checkbox feedback
               setState(() {
                 _dontShowAgain = value ?? false;
               });
@@ -85,7 +87,12 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context, _dontShowAgain),
+          onPressed: () async {
+            await HapticUtils.light(); // Button tap feedback
+            if (context.mounted) {
+              Navigator.pop(context, _dontShowAgain);
+            }
+          },
           child: const Text('Got it'),
         ),
       ],

@@ -28,6 +28,16 @@ This folder contains detailed completion reports for each development phase, doc
 | [PHASE_2_COLLAPSIBLE_SECTIONS.md](PHASE_2_COLLAPSIBLE_SECTIONS.md) | Collapsible sections (40% reduction) | ✅ Complete |
 | [PHASE_3_COMPACT_DESIGN.md](PHASE_3_COMPACT_DESIGN.md) | Compact design (60% total reduction) | ✅ Complete |
 
+### Polish & Animations (v1.0.6+)
+
+| Document | Focus | Status |
+|----------|-------|--------|
+| [HAPTICS_AND_SNACKBARS.md](HAPTICS_AND_SNACKBARS.md) | System-wide haptics & modern snackbars | ✅ Complete |
+| [MICRO_ANIMATIONS_EXTENDED.md](MICRO_ANIMATIONS_EXTENDED.md) | Extended micro-interactions | ✅ Complete |
+| [ONBOARDING_CONSOLIDATION.md](ONBOARDING_CONSOLIDATION.md) | Single-screen onboarding redesign | ✅ Complete |
+| [ANALYTICS_YEARLY_FOCUS.md](ANALYTICS_YEARLY_FOCUS.md) | Analytics yearly focus improvements | ✅ Complete |
+| [POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | **Skeleton loading, Hero animations, Donut chart** | ✅ Complete |
+
 ---
 
 ## 🎯 Purpose
@@ -48,4 +58,4 @@ These documents serve as:
 
 ---
 
-**Last Updated**: February 5, 2026
+**Last Updated**: February 7, 2026

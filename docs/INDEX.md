@@ -1,8 +1,8 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: February 4, 2026
-**Version**: 1.0.0 MVP
-**Status**: ✅ 95% Complete - Production-Ready
+**Last Updated**: February 7, 2026
+**Version**: 1.0.6+8
+**Status**: ✅ 98% Complete - Production-Ready
 
 Welcome to the CustomSubs documentation! This index helps you find exactly what you need.
 
@@ -59,6 +59,8 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 | [completion/PHASE_2_COMPLETE.md](completion/PHASE_2_COMPLETE.md) | Data safety | ✅ Complete |
 | [completion/PHASE_3_COMPLETE.md](completion/PHASE_3_COMPLETE.md) | Analytics | ✅ Complete |
 | [completion/PHASE_4_5_COMPLETE.md](completion/PHASE_4_5_COMPLETE.md) | Quality & testing | ✅ Complete |
+| [completion/HAPTICS_AND_SNACKBARS.md](completion/HAPTICS_AND_SNACKBARS.md) | Haptics & snackbars | ✅ Complete |
+| [completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | Skeleton loading, Hero animations, Donut chart | ✅ Complete |
 
 ### For App Store Submission
 
@@ -126,7 +128,12 @@ docs/
 │   ├── PHASE_3_COMPLETE.md (analytics)
 │   ├── PHASE_4_5_COMPLETE.md (quality & testing)
 │   ├── PRE_TESTING_COMPLETE.md (verification)
-│   └── ANALYTICS_AESTHETIC_IMPROVEMENTS.md
+│   ├── ANALYTICS_AESTHETIC_IMPROVEMENTS.md
+│   ├── HAPTICS_AND_SNACKBARS.md (haptics & snackbars)
+│   ├── MICRO_ANIMATIONS_EXTENDED.md (micro-interactions)
+│   ├── ONBOARDING_CONSOLIDATION.md (onboarding redesign)
+│   ├── ANALYTICS_YEARLY_FOCUS.md (analytics improvements)
+│   └── POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md (polish features)
 │
 ├── testing/ ← All testing documentation
 │   ├── READY_FOR_TESTING.md (quick start)
@@ -238,6 +245,12 @@ If you only read 10 documents, read these:
 ### Design System
 - [architecture/design-system.md](architecture/design-system.md) - Colors, typography, spacing
 - [design/TYPOGRAPHY_QUICK_REFERENCE.md](design/TYPOGRAPHY_QUICK_REFERENCE.md) - Font usage
+- [design/MICRO_ANIMATIONS.md](design/MICRO_ANIMATIONS.md) - Animation principles
+
+### Polish & Animations
+- [completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) - Skeleton loading, Hero animations, Donut chart
+- [completion/HAPTICS_AND_SNACKBARS.md](completion/HAPTICS_AND_SNACKBARS.md) - System-wide haptic feedback
+- [completion/MICRO_ANIMATIONS_EXTENDED.md](completion/MICRO_ANIMATIONS_EXTENDED.md) - Extended micro-interactions
 
 ### Testing
 - [testing/](testing/) - All testing documentation
@@ -300,7 +313,7 @@ Brief 1-2 sentence description.
 | Category | Count | Status |
 |----------|-------|--------|
 | Root Docs | 4 | ✅ Complete |
-| Completion Docs | 7 | ✅ Complete |
+| Completion Docs | 12 | ✅ Complete |
 | Testing Docs | 3 | ✅ Complete |
 | Architecture Docs | 4 | ✅ Complete |
 | Decision Records (ADRs) | 3 | ✅ Complete |
@@ -310,15 +323,15 @@ Brief 1-2 sentence description.
 | App Store Docs | 1 | ✅ Complete |
 | Archived Docs | 4 | 📦 Archived |
 | Future Docs | 1 | 🔜 Planned |
-| **TOTAL** | **35** | **95% Complete** |
+| **TOTAL** | **40** | **98% Complete** |
 
 ---
 
 ## 🎉 Quick Facts
 
-- **Total Documentation**: 35 files, ~10,000 lines
+- **Total Documentation**: 40 files, ~12,000 lines
 - **Test Coverage**: 300+ test cases documented
-- **Phase Summaries**: 7 completion documents
+- **Phase Summaries**: 12 completion documents
 - **Implementation Guides**: 4 detailed how-tos
 - **Architectural Decisions**: 3 ADRs documented
 - **Overall Quality**: Professional-grade documentation ✅
@@ -348,6 +361,6 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ---
 
-**Last Updated**: February 4, 2026
+**Last Updated**: February 7, 2026
 **Maintained By**: Project Documentation System
 **Feedback**: Update this file or create issues

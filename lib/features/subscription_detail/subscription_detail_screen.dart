@@ -6,10 +6,17 @@ import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/utils/service_icons.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
+import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_controller.dart';
+import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/data/services/undo_service.dart';
+import 'package:custom_subs/data/repositories/subscription_repository.dart';
+import 'package:custom_subs/data/services/notification_service.dart';
 
 /// Subscription Detail Screen
 ///
@@ -51,20 +58,35 @@ class SubscriptionDetailScreen extends ConsumerWidget {
             title: const Text('Details'),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
-              onPressed: () => context.pop(),
+              onPressed: () async {
+                await HapticUtils.light();
+                if (context.mounted) {
+                  context.pop();
+                }
+              },
             ),
             actions: [
               // Edit button
               IconButton(
                 icon: const Icon(Icons.edit_outlined),
-                onPressed: () => context.push(
-                  '${AppRouter.addSubscription}?id=${subscription.id}',
-                ),
+                onPressed: () async {
+                  await HapticUtils.light();
+                  if (context.mounted) {
+                    context.push(
+                      '${AppRouter.addSubscription}?id=${subscription.id}',
+                    );
+                  }
+                },
               ),
               // Delete button
               IconButton(
                 icon: const Icon(Icons.delete_outline),
-                onPressed: () => _showDeleteConfirmation(context, ref),
+                onPressed: () async {
+                  await HapticUtils.light();
+                  if (context.mounted) {
+                    _showDeleteConfirmation(context, ref);
+                  }
+                },
               ),
             ],
           ),
@@ -85,9 +107,12 @@ class SubscriptionDetailScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: () => ref
-                        .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                        .togglePaid(),
+                    onPressed: () async {
+                      await HapticUtils.medium();
+                      ref
+                          .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
+                          .togglePaid();
+                    },
                     icon: Icon(
                       subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
                     ),
@@ -131,8 +156,57 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           ),
         );
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      loading: () => Scaffold(
+        appBar: AppBar(
+          title: const Text('Details'),
+          leading: const BackButton(),
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSizes.base),
+          child: Column(
+            children: [
+              // Skeleton header card
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: Column(
+                    children: [
+                      SkeletonBox(width: 80, height: 80, borderRadius: AppSizes.radiusLg),
+                      SizedBox(height: AppSizes.base),
+                      SkeletonBox(width: 120, height: 24),
+                      SizedBox(height: AppSizes.sm),
+                      SkeletonBox(width: 100, height: 18),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSizes.base),
+              const SkeletonBox(height: 48), // Mark as paid button
+              const SizedBox(height: AppSizes.base),
+              // Billing info card
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSizes.base),
+                  child: Column(
+                    children: List.generate(
+                      4,
+                      (index) => const Padding(
+                        padding: EdgeInsets.only(bottom: AppSizes.md),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SkeletonBox(width: 80, height: 14),
+                            SkeletonBox(width: 100, height: 14),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       error: (error, stack) => Scaffold(
         body: Center(
@@ -173,18 +247,64 @@ class SubscriptionDetailScreen extends ConsumerWidget {
               backgroundColor: AppColors.error,
             ),
             onPressed: () async {
+              await HapticUtils.heavy(); // Destructive action haptic
+
+              // Cache subscription before deleting for UNDO functionality
+              final controller = ref.read(
+                subscriptionDetailControllerProvider(subscriptionId).notifier,
+              );
+              final currentSubscription = await ref.read(
+                subscriptionDetailControllerProvider(subscriptionId).future,
+              );
+
+              if (currentSubscription != null) {
+                final undoService = UndoService();
+                undoService.cacheDeletedSubscription(currentSubscription);
+              }
+
               // Delete subscription
-              await ref
-                  .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                  .deleteSubscription();
+              await controller.deleteSubscription();
 
               if (context.mounted) {
                 Navigator.of(context).pop(); // Close dialog
                 context.pop(); // Go back to home
 
-                // Show confirmation
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Subscription deleted')),
+                // Show success snackbar with UNDO
+                SnackBarUtils.show(
+                  context,
+                  SnackBarUtils.success(
+                    'Subscription deleted',
+                    onUndo: () async {
+                      await HapticUtils.medium();
+                      final undoService = UndoService();
+                      final cached = undoService.getDeletedSubscription();
+
+                      if (cached != null) {
+                        // Restore subscription to database
+                        final repository = await ref.read(
+                          subscriptionRepositoryProvider.future,
+                        );
+                        await repository.upsert(cached);
+
+                        // Re-schedule notifications
+                        final notificationService = await ref.read(
+                          notificationServiceProvider.future,
+                        );
+                        await notificationService
+                            .scheduleNotificationsForSubscription(cached);
+
+                        // Refresh home screen to show restored subscription
+                        ref.invalidate(homeControllerProvider);
+
+                        if (context.mounted) {
+                          SnackBarUtils.show(
+                            context,
+                            SnackBarUtils.info('Subscription restored'),
+                          );
+                        }
+                      }
+                    },
+                  ),
                 );
               }
             },
@@ -215,28 +335,31 @@ class _HeaderCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSizes.lg),
         child: Column(
           children: [
-            // Icon
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: subscriptionColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-              ),
-              child: Center(
-                child: subscription.iconName != null
-                    ? Icon(
-                        ServiceIcons.getIconForService(subscription.iconName!),
-                        size: 40,
-                        color: subscriptionColor,
-                      )
-                    : Text(
-                        subscription.name.substring(0, 1).toUpperCase(),
-                        style: theme.textTheme.headlineLarge?.copyWith(
+            // Icon with Hero animation
+            Hero(
+              tag: 'subscription-icon-${subscription.id}',
+              child: Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: subscriptionColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+                ),
+                child: Center(
+                  child: subscription.iconName != null
+                      ? Icon(
+                          ServiceIcons.getIconForService(subscription.iconName!),
+                          size: 40,
                           color: subscriptionColor,
-                          fontWeight: FontWeight.bold,
+                        )
+                      : Text(
+                          subscription.name.substring(0, 1).toUpperCase(),
+                          style: theme.textTheme.headlineLarge?.copyWith(
+                            color: subscriptionColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
+                ),
               ),
             ),
 
@@ -528,7 +651,10 @@ class _CancellationCard extends StatelessWidget {
               ...List.generate(subscription.cancelChecklist.length, (index) {
                 return CheckboxListTile(
                   value: subscription.checklistCompleted[index],
-                  onChanged: (_) => onToggleChecklistItem(index),
+                  onChanged: (_) async {
+                    await HapticUtils.selection();
+                    onToggleChecklistItem(index);
+                  },
                   title: Text(subscription.cancelChecklist[index]),
                   contentPadding: EdgeInsets.zero,
                   controlAffinity: ListTileControlAffinity.leading,

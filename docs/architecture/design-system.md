@@ -1,7 +1,7 @@
 # CustomSubs Design System
 
 **Status**: ✅ Complete
-**Last Updated**: February 5, 2026
+**Last Updated**: February 7, 2026
 **Relevant to**: Developers
 
 **Visual language and component patterns for CustomSubs.**
@@ -663,6 +663,161 @@ Text(currencyFormat.format(15.99))  // "$15.99"
 
 ---
 
+## Haptic Feedback
+
+**Added in v1.0.6** - Comprehensive tactile feedback for all interactions
+
+### Haptic Utility
+
+All haptic feedback is centralized in `lib/core/utils/haptic_utils.dart`:
+
+```dart
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+
+// Light haptic (10-20ms)
+await HapticUtils.light();
+
+// Medium haptic (30-40ms)
+await HapticUtils.medium();
+
+// Heavy haptic (50ms)
+await HapticUtils.heavy();
+
+// Selection haptic
+await HapticUtils.selection();
+```
+
+### Haptic Guidelines
+
+**When to use each intensity:**
+
+| Intensity | Duration | Usage |
+|-----------|----------|-------|
+| **Light** | 10-20ms | Navigation buttons, icon buttons, list taps, color/currency selection |
+| **Medium** | 30-40ms | Primary action buttons (Save, Get Started), toggles, state changes |
+| **Heavy** | 50ms | Delete actions, destructive operations, pull-to-refresh |
+| **Selection** | N/A | Checkboxes, switches, radio buttons |
+
+### Usage Pattern
+
+Always `await` haptics before actions to ensure immediate feedback:
+
+```dart
+IconButton(
+  icon: Icon(Icons.arrow_back),
+  onPressed: () async {
+    await HapticUtils.light();  // Fire first
+    context.pop();              // Then act
+  },
+)
+```
+
+### Design Philosophy
+
+- **Subtle over obvious**: Haptics enhance but don't distract
+- **Consistency**: Same intensity for same action types across app
+- **Professional**: Finance app requires professional, not playful feel
+- **User control**: Respects device haptic settings
+- **Testing requirement**: Haptics only work on physical devices (not simulators)
+
+---
+
+## Snackbar System
+
+**Added in v1.0.6** - Modern, aesthetic feedback with UNDO support
+
+### Snackbar Utility
+
+All snackbars use `lib/core/utils/snackbar_utils.dart`:
+
+```dart
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
+
+// Success (green, 2s)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.success('Subscription added!'),
+);
+
+// Error (red, 4s)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.error('Failed to save'),
+);
+
+// Warning (amber, 3s)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.warning('Invalid amount'),
+);
+
+// Info (grey, 3s)
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.info('Data restored'),
+);
+```
+
+### Snackbar with UNDO
+
+```dart
+SnackBarUtils.show(
+  context,
+  SnackBarUtils.success(
+    'Subscription deleted',
+    onUndo: () async {
+      await HapticUtils.medium();
+      await restoreSubscription();
+    },
+  ),
+);
+```
+
+### Design Specifications
+
+- **Behavior**: Floating (not fixed to bottom)
+- **Border Radius**: 16px (matches StandardCard via `AppSizes.radiusLg`)
+- **Margins**: 16px all sides
+- **Icons**: Material icons (check_circle, error, warning, info)
+- **Typography**: 14px white text for visibility
+- **Colors**:
+  - Success: `AppColors.success` (#16A34A)
+  - Error: `AppColors.error` (#EF4444)
+  - Warning: `AppColors.warning` (#F59E0B)
+  - Info: `AppColors.textSecondary` (#64748B)
+
+### UNDO Service
+
+**5-second memory cache** at `lib/data/services/undo_service.dart`:
+
+```dart
+import 'package:custom_subs/data/services/undo_service.dart';
+
+final undoService = UndoService();
+
+// Cache before deletion
+undoService.cacheDeletedSubscription(subscription);
+
+// Retrieve within 5 seconds
+final cached = undoService.getDeletedSubscription();
+if (cached != null) {
+  await repository.upsert(cached);
+}
+```
+
+**Supported UNDO operations:**
+1. Subscription deletion (with notification restoration)
+2. Primary currency change
+3. Reminder time change
+
+**Guidelines:**
+- Cache expires after 5 seconds
+- Always check for null before restoring
+- Use with `SnackBarUtils.success()` for best UX
+- Include medium haptic on UNDO action
+
+---
+
 ## Layout Principles
 
 ### 1. Generous Whitespace
@@ -772,6 +927,9 @@ IconButton(
 - `lib/app/theme.dart` - Complete Material3 theme
 - `lib/core/extensions/date_extensions.dart` - Date formatting
 - `lib/core/utils/currency_utils.dart` - Currency conversion
+- `lib/core/utils/haptic_utils.dart` - Haptic feedback
+- `lib/core/utils/snackbar_utils.dart` - Modern snackbars
+- `lib/data/services/undo_service.dart` - UNDO functionality
 
 ---
 

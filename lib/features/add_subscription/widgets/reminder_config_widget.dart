@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 class ReminderConfigWidget extends StatelessWidget {
   final ReminderConfig config;
@@ -43,7 +44,8 @@ class ReminderConfigWidget extends StatelessWidget {
         SwitchListTile(
           title: const Text('Remind on billing day'),
           value: config.remindOnBillingDay,
-          onChanged: (value) {
+          onChanged: (value) async {
+            await HapticUtils.selection(); // Switch toggle feedback
             onChanged(config.copyWith(remindOnBillingDay: value));
           },
           contentPadding: EdgeInsets.zero,
@@ -58,6 +60,7 @@ class ReminderConfigWidget extends StatelessWidget {
           ),
           trailing: const Icon(Icons.access_time),
           onTap: () async {
+            await HapticUtils.light(); // Time picker tap feedback
             final time = await showTimePicker(
               context: context,
               initialTime: TimeOfDay(
@@ -67,6 +70,7 @@ class ReminderConfigWidget extends StatelessWidget {
             );
 
             if (time != null) {
+              await HapticUtils.medium(); // Time changed feedback
               onChanged(config.copyWith(
                 reminderHour: time.hour,
                 reminderMinute: time.minute,
@@ -109,8 +113,9 @@ class ReminderConfigWidget extends StatelessWidget {
               : '$days day${days == 1 ? '' : 's'} before'),
         );
       }).toList(),
-      onChanged: (newValue) {
+      onChanged: (newValue) async {
         if (newValue != null) {
+          await HapticUtils.light(); // Dropdown selection feedback
           onChanged(newValue);
         }
       },

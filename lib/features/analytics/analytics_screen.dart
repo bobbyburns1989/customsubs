@@ -6,6 +6,9 @@ import 'package:custom_subs/features/analytics/analytics_controller.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
+import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart';
 
 /// Analytics screen showing spending insights and breakdowns.
 ///
@@ -30,7 +33,12 @@ class AnalyticsScreen extends ConsumerWidget {
         title: const Text('Analytics'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () async {
+            await HapticUtils.light();
+            if (context.mounted) {
+              context.pop();
+            }
+          },
         ),
       ),
       body: analyticsAsync.when(
@@ -42,8 +50,36 @@ class AnalyticsScreen extends ConsumerWidget {
 
           return _AnalyticsContent(analytics: analytics, ref: ref);
         },
-        loading: () => const Center(
-          child: CircularProgressIndicator(),
+        loading: () => SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSizes.base),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Skeleton yearly forecast
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
+                child: const SkeletonBox(width: double.infinity, height: 180, borderRadius: AppSizes.radiusLg),
+              ),
+              const SizedBox(height: AppSizes.sectionSpacing),
+
+              // Skeleton category breakdown card
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSizes.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonBox(width: 150, height: 18),
+                      SizedBox(height: AppSizes.base),
+                      SkeletonCategoryBar(),
+                      SkeletonCategoryBar(),
+                      SkeletonCategoryBar(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         error: (error, stack) => Center(
           child: Column(
@@ -84,6 +120,7 @@ class _AnalyticsContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () async {
+        await HapticUtils.heavy(); // Pull-to-refresh haptic
         // Refresh analytics by invalidating the provider
         ref.invalidate(analyticsControllerProvider);
         await Future.delayed(const Duration(milliseconds: 300));
@@ -207,8 +244,6 @@ class _CategoryBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final sortedCategories = analytics.categoriesSortedByAmount;
-
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -227,164 +262,13 @@ class _CategoryBreakdownCard extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: AppSizes.base),
-
-            // Category bars
-            ...sortedCategories.map((entry) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSizes.lg),
-                child: _CategoryBar(
-                  category: entry.key,
-                  data: entry.value,
-                  currencySymbol: _getCurrencySymbol(analytics.primaryCurrency),
-                ),
-              );
-            }),
+            CategoryDonutChart(
+              categoryBreakdown: analytics.categoryBreakdown,
+              currencySymbol: _getCurrencySymbol(analytics.primaryCurrency),
+            ),
           ],
         ),
       ),
-    );
-  }
-}
-
-/// Single category bar with label, bar, amount, and percentage.
-class _CategoryBar extends StatelessWidget {
-  final SubscriptionCategory category;
-  final CategoryData data;
-  final String currencySymbol;
-
-  const _CategoryBar({
-    required this.category,
-    required this.data,
-    required this.currencySymbol,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final categoryName = _getCategoryDisplayName(category);
-    final categoryColor = _getCategoryColor(category);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Category name and count
-        Row(
-          children: [
-            Container(
-              width: 10,
-              height: 10,
-              decoration: BoxDecoration(
-                color: categoryColor,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: categoryColor.withValues(alpha: 0.3),
-                    blurRadius: 4,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: AppSizes.md),
-            Text(
-              categoryName,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(width: AppSizes.sm),
-            Text(
-              '(${data.count})',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
-                  ),
-            ),
-            const Spacer(),
-            Text(
-              '$currencySymbol${data.amount.toStringAsFixed(2)}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSizes.md),
-
-        // Horizontal bar
-        Row(
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  // Background bar (full width, light gray)
-                  Container(
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: AppColors.divider,
-                      borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                    ),
-                  ),
-
-                  // Foreground bar (percentage width, colored)
-                  FractionallySizedBox(
-                    widthFactor: data.percentage / 100,
-                    child: Container(
-                      height: 32,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            categoryColor,
-                            categoryColor.withValues(alpha: 0.85),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                        boxShadow: [
-                          BoxShadow(
-                            color: categoryColor.withValues(alpha: 0.2),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: AppSizes.md),
-                      child: data.percentage > 20 // Only show percentage if bar is wide enough
-                          ? Text(
-                              '${data.percentage.toStringAsFixed(1)}%',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                shadows: [
-                                  Shadow(
-                                    color: Colors.black26,
-                                    offset: Offset(0, 1),
-                                    blurRadius: 2,
-                                  ),
-                                ],
-                              ),
-                            )
-                          : null,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (data.percentage <= 20) ...[
-              const SizedBox(width: AppSizes.md),
-              Text(
-                '${data.percentage.toStringAsFixed(1)}%',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-            ],
-          ],
-        ),
-      ],
     );
   }
 }
@@ -472,9 +356,12 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
       onTapCancel: () => setState(() => _isPressed = false),
-      onTap: () {
+      onTap: () async {
+        await HapticUtils.light(); // Navigation feedback
         // Navigate to subscription detail
-        context.push('/subscription/${widget.subscription.id}');
+        if (context.mounted) {
+          context.push('/subscription/${widget.subscription.id}');
+        }
       },
       child: AnimatedScale(
         scale: _isPressed ? 0.98 : 1.0,
@@ -492,34 +379,37 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
           ),
           child: Row(
             children: [
-              // Rank badge with subscription color border
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: rankColor.withValues(alpha: 0.15),
-                  border: Border.all(
-                    color: widget.subscription.color,
-                    width: 3,
+              // Rank badge with subscription color border and Hero animation
+              Hero(
+                tag: 'subscription-icon-${widget.subscription.id}',
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: rankColor.withValues(alpha: 0.15),
+                    border: Border.all(
+                      color: widget.subscription.color,
+                      width: 3,
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: widget.rank <= 3
+                        ? [
+                            BoxShadow(
+                              color: rankColor.withValues(alpha: 0.3),
+                              blurRadius: 8,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                        : null,
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: widget.rank <= 3
-                      ? [
-                          BoxShadow(
-                            color: rankColor.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            spreadRadius: 1,
-                          ),
-                        ]
-                      : null,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '${widget.rank}',
-                  style: TextStyle(
-                    color: widget.rank <= 3 ? rankColor : AppColors.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                  alignment: Alignment.center,
+                  child: Text(
+                    '${widget.rank}',
+                    style: TextStyle(
+                      color: widget.rank <= 3 ? rankColor : AppColors.textPrimary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
                   ),
                 ),
               ),

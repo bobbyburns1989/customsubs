@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 class ColorPickerWidget extends StatelessWidget {
   final int selectedColorValue;
@@ -85,7 +86,8 @@ class _ColorPickerItemState extends State<_ColorPickerItem>
     super.dispose();
   }
 
-  void _handleTap() {
+  void _handleTap() async {
+    await HapticUtils.light(); // Color selection feedback
     widget.onTap();
     _controller.forward(from: 0.0); // Play pulse animation
   }

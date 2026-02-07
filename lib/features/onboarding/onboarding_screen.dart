@@ -6,6 +6,7 @@ import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/app/router.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 /// Single-screen onboarding that introduces key features.
 ///
@@ -63,6 +64,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   }
 
   Future<void> _completeOnboarding() async {
+    await HapticUtils.medium(); // Primary action feedback
+
     // Request notification permissions
     final notificationService = await ref.read(notificationServiceProvider.future);
     await notificationService.requestPermissions();
@@ -98,9 +101,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     children: [
                       // Logo
                       Image.asset(
-                        'assets/images/CustomSubsLOGO.png',
-                        width: 220,
-                        height: 88,
+                        'assets/images/new_app_icon.png',
+                        width: 200,
+                        height: 200,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(height: AppSizes.xl),
@@ -194,7 +197,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.lock_outline,
                             size: 14,
                             color: AppColors.textTertiary,
@@ -256,7 +259,7 @@ class _FeatureCard extends StatelessWidget {
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primarySurface,
               shape: BoxShape.circle,
             ),

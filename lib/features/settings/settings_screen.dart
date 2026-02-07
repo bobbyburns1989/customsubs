@@ -5,9 +5,12 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/data/services/backup_service.dart';
+import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
 
@@ -23,7 +26,12 @@ class SettingsScreen extends ConsumerWidget {
         title: const Text('Settings'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () async {
+            await HapticUtils.light();
+            if (context.mounted) {
+              context.pop();
+            }
+          },
         ),
       ),
       body: ListView(
@@ -38,6 +46,8 @@ class SettingsScreen extends ConsumerWidget {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
+              await HapticUtils.light(); // ListTile tap feedback
+
               final selected = await showDialog<String>(
                 context: context,
                 builder: (context) => CurrencyPickerDialog(
@@ -46,13 +56,34 @@ class SettingsScreen extends ConsumerWidget {
               );
 
               if (selected != null && selected != primaryCurrency) {
-                await ref.read(settingsRepositoryProvider.notifier).setPrimaryCurrency(selected);
+                await HapticUtils.medium(); // Setting changed feedback
+
+                // Cache previous currency for UNDO
+                final undoService = UndoService();
+                undoService.cacheCurrencyChange(primaryCurrency);
+
+                await ref.read(settingsRepositoryProvider.notifier)
+                    .setPrimaryCurrency(selected);
 
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Primary currency changed to $selected'),
-                      duration: const Duration(seconds: 2),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.success(
+                      'Currency changed to $selected',
+                      onUndo: () async {
+                        await HapticUtils.medium();
+                        final previous = undoService.getPreviousCurrency();
+                        if (previous != null) {
+                          await ref.read(settingsRepositoryProvider.notifier)
+                              .setPrimaryCurrency(previous);
+                          if (context.mounted) {
+                            SnackBarUtils.show(
+                              context,
+                              SnackBarUtils.info('Currency restored to $previous'),
+                            );
+                          }
+                        }
+                      },
                     ),
                   );
                 }
@@ -81,21 +112,42 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
+                  await HapticUtils.light(); // ListTile tap feedback
+
                   final time = await showTimePicker(
                     context: context,
                     initialTime: defaultReminderTime,
                   );
 
                   if (time != null) {
-                    await ref.read(settingsRepositoryProvider.notifier).setDefaultReminderTime(time.hour, time.minute);
+                    await HapticUtils.medium(); // Setting changed feedback
+
+                    // Cache previous time for UNDO
+                    final undoService = UndoService();
+                    undoService.cacheReminderTimeChange(defaultReminderTime);
+
+                    await ref.read(settingsRepositoryProvider.notifier)
+                        .setDefaultReminderTime(time.hour, time.minute);
 
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Default reminder time set to ${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}',
-                          ),
-                          duration: const Duration(seconds: 2),
+                      SnackBarUtils.show(
+                        context,
+                        SnackBarUtils.success(
+                          'Reminder time updated',
+                          onUndo: () async {
+                            await HapticUtils.medium();
+                            final previous = undoService.getPreviousReminderTime();
+                            if (previous != null) {
+                              await ref.read(settingsRepositoryProvider.notifier)
+                                  .setDefaultReminderTime(previous.hour, previous.minute);
+                              if (context.mounted) {
+                                SnackBarUtils.show(
+                                  context,
+                                  SnackBarUtils.info('Reminder time restored'),
+                                );
+                              }
+                            }
+                          },
                         ),
                       );
                     }
@@ -114,15 +166,14 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Test Notification'),
             subtitle: const Text('Send a test notification now'),
             onTap: () async {
+              await HapticUtils.medium(); // Action trigger feedback
               final notificationService = await ref.read(notificationServiceProvider.future);
               await notificationService.showTestNotification();
 
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Test notification sent!'),
-                    duration: Duration(seconds: 2),
-                  ),
+                SnackBarUtils.show(
+                  context,
+                  SnackBarUtils.success('Test notification sent!'),
                 );
               }
             },
@@ -178,14 +229,14 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Export Backup'),
             subtitle: const Text('Save your subscriptions to a file'),
             onTap: () async {
+              await HapticUtils.medium(); // Action trigger feedback
+
               try {
                 // Show loading indicator
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Preparing backup...'),
-                      duration: Duration(seconds: 1),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.info('Preparing backup...'),
                   );
                 }
 
@@ -193,21 +244,16 @@ class SettingsScreen extends ConsumerWidget {
                 await ref.read(exportBackupProvider.future);
 
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Backup exported successfully!'),
-                      duration: Duration(seconds: 2),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.success('Backup exported successfully!'),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to export backup: $e'),
-                      backgroundColor: AppColors.error,
-                      duration: const Duration(seconds: 3),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.error('Failed to export backup: $e'),
                   );
                 }
               }
@@ -218,7 +264,8 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Import Backup'),
             subtitle: const Text('Restore subscriptions from a file'),
             onTap: () async {
-              try {
+              await HapticUtils.medium(); // Action trigger feedback
+              try{
                 // Import backup
                 final result = await ref.read(importBackupProvider.future);
 
@@ -255,22 +302,16 @@ class SettingsScreen extends ConsumerWidget {
                 }
               } on BackupException catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(e.message),
-                      backgroundColor: AppColors.error,
-                      duration: const Duration(seconds: 3),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.error(e.message),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to import backup: $e'),
-                      backgroundColor: AppColors.error,
-                      duration: const Duration(seconds: 3),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.error('Failed to import backup: $e'),
                   );
                 }
               }
@@ -284,6 +325,7 @@ class SettingsScreen extends ConsumerWidget {
             ),
             subtitle: const Text('Permanently delete all subscriptions'),
             onTap: () async {
+              await HapticUtils.light(); // ListTile tap feedback
               // First confirmation
               final confirmed = await showDialog<bool>(
                 context: context,
@@ -347,11 +389,9 @@ class SettingsScreen extends ConsumerWidget {
                         if (textController.text == 'DELETE') {
                           Navigator.pop(context, true);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please type DELETE to confirm'),
-                              duration: Duration(seconds: 2),
-                            ),
+                          SnackBarUtils.show(
+                            context,
+                            SnackBarUtils.warning('Please type DELETE to confirm'),
                           );
                         }
                       },
@@ -368,6 +408,7 @@ class SettingsScreen extends ConsumerWidget {
 
               // Delete all data
               try {
+                await HapticUtils.heavy(); // Destructive action haptic
                 final repository = await ref.read(subscriptionRepositoryProvider.future);
                 final notificationService = await ref.read(notificationServiceProvider.future);
 
@@ -378,11 +419,9 @@ class SettingsScreen extends ConsumerWidget {
                 await repository.deleteAll();
 
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('All data deleted successfully'),
-                      duration: Duration(seconds: 2),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.warning('All data deleted successfully'),
                   );
 
                   // Pop back to home
@@ -390,12 +429,9 @@ class SettingsScreen extends ConsumerWidget {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete data: $e'),
-                      backgroundColor: AppColors.error,
-                      duration: const Duration(seconds: 3),
-                    ),
+                  SnackBarUtils.show(
+                    context,
+                    SnackBarUtils.error('Failed to delete data: $e'),
                   );
                 }
               }
