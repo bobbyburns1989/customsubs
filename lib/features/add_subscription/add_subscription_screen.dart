@@ -14,6 +14,7 @@ import 'package:custom_subs/features/add_subscription/widgets/reminder_config_wi
 import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
 import 'package:custom_subs/features/add_subscription/widgets/subscription_details_section.dart';
 import 'package:custom_subs/features/add_subscription/widgets/trial_section.dart';
+import 'package:custom_subs/features/add_subscription/widgets/cancellation_section.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
@@ -381,93 +382,12 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
               const SizedBox(height: AppSizes.md),
 
               // Cancellation Info Section
-              FormSectionCard(
-                title: 'Cancellation Info',
-                subtitle: 'How to cancel this subscription',
-                icon: Icons.exit_to_app_outlined,
-                isCollapsible: true,
-                initiallyExpanded: false,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: _cancelUrlController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cancellation URL',
-                        hintText: 'https://...',
-                      ),
-                      keyboardType: TextInputType.url,
-                    ),
-                    const SizedBox(height: AppSizes.md),
-                    TextFormField(
-                      controller: _cancelPhoneController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cancellation Phone',
-                        hintText: '+1 (555) 123-4567',
-                      ),
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: AppSizes.md),
-                    TextFormField(
-                      controller: _cancelNotesController,
-                      decoration: const InputDecoration(
-                        labelText: 'Cancellation Notes',
-                        hintText: 'How to cancel...',
-                      ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: AppSizes.md),
-
-                    // Cancellation Checklist
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Cancellation Steps',
-                          style: theme.textTheme.titleSmall,
-                        ),
-                        TextButton.icon(
-                          onPressed: () {
-                            setState(() {
-                              _cancelChecklist.add('');
-                            });
-                          },
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add Step'),
-                        ),
-                      ],
-                    ),
-                    ..._cancelChecklist.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                initialValue: entry.value,
-                                decoration: InputDecoration(
-                                  labelText: 'Step ${index + 1}',
-                                  hintText: 'Enter step...',
-                                ),
-                                onChanged: (value) {
-                                  _cancelChecklist[index] = value;
-                                },
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () {
-                                setState(() {
-                                  _cancelChecklist.removeAt(index);
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      );
-                    }),
-                  ],
-                ),
+              CancellationSection(
+                cancelUrlController: _cancelUrlController,
+                cancelPhoneController: _cancelPhoneController,
+                cancelNotesController: _cancelNotesController,
+                cancelChecklist: _cancelChecklist,
+                onChecklistChanged: (newList) => setState(() => _cancelChecklist = newList),
               ),
 
               const SizedBox(height: AppSizes.md),
