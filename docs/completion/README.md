@@ -38,6 +38,12 @@ This folder contains detailed completion reports for each development phase, doc
 | [ANALYTICS_YEARLY_FOCUS.md](ANALYTICS_YEARLY_FOCUS.md) | Analytics yearly focus improvements | ✅ Complete |
 | [POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | **Skeleton loading, Hero animations, Donut chart** | ✅ Complete |
 
+### Code Quality & Refactoring
+
+| Document | Focus | Status |
+|----------|-------|--------|
+| [ADD_SUBSCRIPTION_REFACTORING.md](ADD_SUBSCRIPTION_REFACTORING.md) | **Form refactoring: 698→393 lines, 57 tests** | ✅ Complete |
+
 ---
 
 ## 🎯 Purpose
@@ -58,4 +64,4 @@ These documents serve as:
 
 ---
 
-**Last Updated**: February 7, 2026
+**Last Updated**: February 9, 2026
