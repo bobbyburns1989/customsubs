@@ -13,6 +13,7 @@ import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_controller.dart';
 import 'package:custom_subs/features/add_subscription/widgets/template_grid_item.dart';
 import 'package:custom_subs/features/add_subscription/widgets/reminder_config_widget.dart';
+import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
@@ -658,20 +659,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
               const SizedBox(height: AppSizes.md),
 
               // General Notes
-              FormSectionCard(
-                title: 'Notes',
-                subtitle: 'Add any additional notes',
-                icon: Icons.note_outlined,
-                isCollapsible: true,
-                initiallyExpanded: false,
-                child: TextFormField(
-                  controller: _notesController,
-                  decoration: const InputDecoration(
-                    labelText: 'General Notes',
-                    hintText: 'Add any additional notes...',
-                  ),
-                  maxLines: 4,
-                ),
+              NotesSection(
+                notesController: _notesController,
               ),
 
               const SizedBox(height: AppSizes.xxl),
