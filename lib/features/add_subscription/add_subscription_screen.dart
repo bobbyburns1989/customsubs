@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
-import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
