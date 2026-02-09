@@ -9,6 +9,7 @@ import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_controller.dart';
+import 'package:custom_subs/features/add_subscription/models/subscription_form_state.dart';
 import 'package:custom_subs/features/add_subscription/widgets/template_grid_item.dart';
 import 'package:custom_subs/features/add_subscription/widgets/reminder_config_widget.dart';
 import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
@@ -32,13 +33,7 @@ class AddSubscriptionScreen extends ConsumerStatefulWidget {
 
 class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _amountController = TextEditingController();
-  final _cancelUrlController = TextEditingController();
-  final _cancelPhoneController = TextEditingController();
-  final _cancelNotesController = TextEditingController();
-  final _notesController = TextEditingController();
-  final _searchController = TextEditingController();
+  late final SubscriptionFormState _formState;
 
   String _currencyCode = 'USD';
   SubscriptionCycle _cycle = SubscriptionCycle.monthly;
@@ -59,6 +54,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   @override
   void initState() {
     super.initState();
+    _formState = SubscriptionFormState();
     _loadExistingSubscription();
   }
 
@@ -69,8 +65,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
       if (subscription != null && mounted) {
         setState(() {
-          _nameController.text = subscription.name;
-          _amountController.text = subscription.amount.toString();
+          _formState.loadFromSubscription(subscription);
           _currencyCode = subscription.currencyCode;
           _cycle = subscription.cycle;
           _category = subscription.category;
@@ -81,10 +76,6 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
           _isTrial = subscription.isTrial;
           _trialEndDate = subscription.trialEndDate;
           _postTrialAmount = subscription.postTrialAmount;
-          _cancelUrlController.text = subscription.cancelUrl ?? '';
-          _cancelPhoneController.text = subscription.cancelPhone ?? '';
-          _cancelNotesController.text = subscription.cancelNotes ?? '';
-          _notesController.text = subscription.notes ?? '';
           _cancelChecklist = List.from(subscription.cancelChecklist);
           _showTemplates = false;
         });
@@ -94,28 +85,18 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _amountController.dispose();
-    _cancelUrlController.dispose();
-    _cancelPhoneController.dispose();
-    _cancelNotesController.dispose();
-    _notesController.dispose();
-    _searchController.dispose();
+    _formState.dispose();
     super.dispose();
   }
 
   Future<void> _selectTemplate(SubscriptionTemplate template) async {
     await HapticUtils.light(); // Template selection feedback
     setState(() {
-      _nameController.text = template.name;
-      _amountController.text = template.defaultAmount.toString();
+      _formState.loadFromTemplate(template);
       _currencyCode = template.defaultCurrency;
       _cycle = template.defaultCycle;
       _category = template.category;
       _colorValue = template.color;
-      if (template.cancelUrl != null) {
-        _cancelUrlController.text = template.cancelUrl!;
-      }
       _showTemplates = false;
     });
   }
@@ -125,13 +106,10 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       return;
     }
 
-    final name = _nameController.text.trim();
-    final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
-
-    if (amount <= 0) {
+    if (!_formState.validate()) {
       SnackBarUtils.show(
         context,
-        SnackBarUtils.warning('Please enter a valid amount'),
+        SnackBarUtils.warning('Please enter valid data'),
       );
       return;
     }
@@ -148,9 +126,11 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       final controller =
           ref.read(addSubscriptionControllerProvider(widget.subscriptionId).notifier);
 
+      final formData = _formState.toFormData();
+
       await controller.saveSubscription(
-        name: name,
-        amount: amount,
+        name: formData.name,
+        amount: formData.amount,
         currencyCode: _currencyCode,
         cycle: _cycle,
         nextBillingDate: _nextBillingDate,
@@ -161,19 +141,11 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
         isTrial: _isTrial,
         trialEndDate: _trialEndDate,
         postTrialAmount: _postTrialAmount,
-        cancelUrl: _cancelUrlController.text.trim().isEmpty
-            ? null
-            : _cancelUrlController.text.trim(),
-        cancelPhone: _cancelPhoneController.text.trim().isEmpty
-            ? null
-            : _cancelPhoneController.text.trim(),
-        cancelNotes: _cancelNotesController.text.trim().isEmpty
-            ? null
-            : _cancelNotesController.text.trim(),
+        cancelUrl: formData.cancelUrl,
+        cancelPhone: formData.cancelPhone,
+        cancelNotes: formData.cancelNotes,
         cancelChecklist: _cancelChecklist,
-        notes: _notesController.text.trim().isEmpty
-            ? null
-            : _notesController.text.trim(),
+        notes: formData.notes,
       );
 
       if (!mounted) return;
@@ -250,7 +222,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
               // Search bar
               TextField(
-                controller: _searchController,
+                controller: _formState.searchController,
                 decoration: const InputDecoration(
                   hintText: 'Search services...',
                   prefixIcon: Icon(Icons.search),
@@ -327,8 +299,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             if (!_showTemplates || widget.subscriptionId != null) ...[
               // Subscription Details Card (always expanded - required fields)
               SubscriptionDetailsSection(
-                nameController: _nameController,
-                amountController: _amountController,
+                nameController: _formState.nameController,
+                amountController: _formState.amountController,
                 currencyCode: _currencyCode,
                 cycle: _cycle,
                 nextBillingDate: _nextBillingDate,
@@ -383,9 +355,9 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
               // Cancellation Info Section
               CancellationSection(
-                cancelUrlController: _cancelUrlController,
-                cancelPhoneController: _cancelPhoneController,
-                cancelNotesController: _cancelNotesController,
+                cancelUrlController: _formState.cancelUrlController,
+                cancelPhoneController: _formState.cancelPhoneController,
+                cancelNotesController: _formState.cancelNotesController,
                 cancelChecklist: _cancelChecklist,
                 onChecklistChanged: (newList) => setState(() => _cancelChecklist = newList),
               ),
@@ -394,7 +366,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
               // General Notes
               NotesSection(
-                notesController: _notesController,
+                notesController: _formState.notesController,
               ),
 
               const SizedBox(height: AppSizes.xxl),
