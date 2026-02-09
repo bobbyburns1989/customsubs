@@ -13,10 +13,10 @@ import 'package:custom_subs/features/add_subscription/widgets/template_grid_item
 import 'package:custom_subs/features/add_subscription/widgets/reminder_config_widget.dart';
 import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
 import 'package:custom_subs/features/add_subscription/widgets/subscription_details_section.dart';
+import 'package:custom_subs/features/add_subscription/widgets/trial_section.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
-import 'package:custom_subs/core/widgets/styled_date_field.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
@@ -340,86 +340,26 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
               const SizedBox(height: AppSizes.md),
 
               // Free Trial Card (collapsed by default)
-              FormSectionCard(
-                title: 'Free Trial',
-                subtitle: 'Track trial period and conversion date',
-                icon: Icons.timer_outlined,
-                isCollapsible: true,
-                initiallyExpanded: false,
-                child: Column(
-                  children: [
-                    // Trial Toggle
-                    SwitchListTile(
-                      title: const Text('This is a free trial'),
-                      subtitle: const Text(
-                          'Enable if subscription is currently in trial period'),
-                      value: _isTrial,
-                      onChanged: (value) {
-                        setState(() {
-                          _isTrial = value;
-                          if (!value) {
-                            _trialEndDate = null;
-                            _postTrialAmount = null;
-                          }
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
-
-                    // Trial Fields (animated)
-                    AnimatedSize(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: _isTrial
-                          ? Column(
-                              children: [
-                                const SizedBox(height: AppSizes.md),
-                                // Trial End Date
-                                if (_trialEndDate != null)
-                                  StyledDateField(
-                                    label: 'Trial End Date',
-                                    value: _trialEndDate!,
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now()
-                                        .add(const Duration(days: 365)),
-                                    onChanged: (date) {
-                                      setState(() {
-                                        _trialEndDate = date;
-                                      });
-                                    },
-                                  )
-                                else
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      setState(() {
-                                        _trialEndDate = DateTime.now()
-                                            .add(const Duration(days: 7));
-                                      });
-                                    },
-                                    icon: const Icon(Icons.calendar_today),
-                                    label: const Text('Set Trial End Date'),
-                                  ),
-                                const SizedBox(height: AppSizes.md),
-                                // Post-Trial Amount
-                                TextFormField(
-                                  decoration: const InputDecoration(
-                                    labelText: 'Amount after trial',
-                                    hintText: '0.00',
-                                  ),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                          decimal: true),
-                                  initialValue: _postTrialAmount?.toString(),
-                                  onChanged: (value) {
-                                    _postTrialAmount = double.tryParse(value);
-                                  },
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
-                    ),
-                  ],
-                ),
+              TrialSection(
+                isTrial: _isTrial,
+                trialEndDate: _trialEndDate,
+                postTrialAmount: _postTrialAmount,
+                onTrialChanged: (value) {
+                  setState(() {
+                    _isTrial = value;
+                    if (!value) {
+                      _trialEndDate = null;
+                      _postTrialAmount = null;
+                    }
+                  });
+                },
+                onTrialEndDateChanged: (value) => setState(() => _trialEndDate = value),
+                onPostTrialAmountChanged: (value) => setState(() => _postTrialAmount = value),
+                onSetTrialEndDate: () {
+                  setState(() {
+                    _trialEndDate = DateTime.now().add(const Duration(days: 7));
+                  });
+                },
               ),
               const SizedBox(height: AppSizes.md),
 
