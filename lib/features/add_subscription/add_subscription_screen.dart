@@ -14,6 +14,7 @@ import 'package:custom_subs/features/add_subscription/add_subscription_controlle
 import 'package:custom_subs/features/add_subscription/widgets/template_grid_item.dart';
 import 'package:custom_subs/features/add_subscription/widgets/reminder_config_widget.dart';
 import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
+import 'package:custom_subs/features/add_subscription/widgets/subscription_details_section.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
@@ -326,142 +327,17 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             // Main Form
             if (!_showTemplates || widget.subscriptionId != null) ...[
               // Subscription Details Card (always expanded - required fields)
-              FormSectionCard(
-                title: 'Subscription Details',
-                icon: Icons.edit_outlined,
-                isCollapsible: false,
-                child: Column(
-                  children: [
-                    // Name
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name *',
-                        hintText: 'Netflix, Spotify, etc.',
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Please enter a name';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: AppSizes.md),
-
-                    // Amount and Currency
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 3,
-                          child: TextFormField(
-                            controller: _amountController,
-                            decoration: const InputDecoration(
-                              labelText: 'Amount *',
-                              hintText: '0.00',
-                            ),
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d+\.?\d{0,2}')),
-                            ],
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Required';
-                              }
-                              final amount = double.tryParse(value);
-                              if (amount == null || amount <= 0) {
-                                return 'Invalid amount';
-                              }
-                              return null;
-                            },
-                          ),
-                        ),
-                        const SizedBox(width: AppSizes.lg),
-                        Expanded(
-                          flex: 2,
-                          child: DropdownButtonFormField<String>(
-                            value: _currencyCode,
-                            decoration: const InputDecoration(
-                              labelText: 'Currency',
-                            ),
-                            items: CurrencyUtils.getSupportedCurrencies()
-                                .map((code) => DropdownMenuItem(
-                                      value: code,
-                                      child: Text(code),
-                                    ))
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                setState(() {
-                                  _currencyCode = value;
-                                });
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSizes.md),
-
-                    // Billing Cycle
-                    DropdownButtonFormField<SubscriptionCycle>(
-                      value: _cycle,
-                      decoration: const InputDecoration(
-                        labelText: 'Billing Cycle *',
-                      ),
-                      items: SubscriptionCycle.values
-                          .map((cycle) => DropdownMenuItem(
-                                value: cycle,
-                                child: Text(cycle.displayName),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _cycle = value;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: AppSizes.md),
-
-                    // Next Billing Date (StyledDateField)
-                    StyledDateField(
-                      label: 'Next Billing Date *',
-                      value: _nextBillingDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 3650)),
-                      onChanged: (date) {
-                        setState(() {
-                          _nextBillingDate = date;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: AppSizes.md),
-
-                    // Category
-                    DropdownButtonFormField<SubscriptionCategory>(
-                      value: _category,
-                      decoration: const InputDecoration(
-                        labelText: 'Category *',
-                      ),
-                      items: SubscriptionCategory.values
-                          .map((cat) => DropdownMenuItem(
-                                value: cat,
-                                child: Text('${cat.icon} ${cat.displayName}'),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            _category = value;
-                          });
-                        }
-                      },
-                    ),
-                  ],
-                ),
+              SubscriptionDetailsSection(
+                nameController: _nameController,
+                amountController: _amountController,
+                currencyCode: _currencyCode,
+                cycle: _cycle,
+                nextBillingDate: _nextBillingDate,
+                category: _category,
+                onCurrencyChanged: (value) => setState(() => _currencyCode = value),
+                onCycleChanged: (value) => setState(() => _cycle = value),
+                onNextBillingDateChanged: (value) => setState(() => _nextBillingDate = value),
+                onCategoryChanged: (value) => setState(() => _category = value),
               ),
               const SizedBox(height: AppSizes.md),
 
