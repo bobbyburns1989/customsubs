@@ -49,6 +49,8 @@ Simplified the Analytics screen by removing the Monthly Total card and making th
 │    At current rate          │  (centered subtext)
 │                             │
 │  X active subscriptions     │  (centered count)
+│                             │
+│  That's $X.XX per day      │  (daily breakdown - added Feb 9, 2026)
 └─────────────────────────────┘
 ```
 

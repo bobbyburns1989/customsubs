@@ -110,19 +110,84 @@ class AnalyticsScreen extends ConsumerWidget {
 }
 
 /// Main analytics content with all cards.
-class _AnalyticsContent extends StatelessWidget {
+class _AnalyticsContent extends StatefulWidget {
   final AnalyticsData analytics;
   final WidgetRef ref;
 
   const _AnalyticsContent({required this.analytics, required this.ref});
 
   @override
+  State<_AnalyticsContent> createState() => _AnalyticsContentState();
+}
+
+class _AnalyticsContentState extends State<_AnalyticsContent>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late List<Animation<double>> _fadeAnimations;
+  late List<Animation<Offset>> _slideAnimations;
+  bool _hasAnimated = false; // Prevent re-animation on pull-to-refresh
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // 4 cards: Forecast, Category, Top Subs, Currency
+    _fadeAnimations = List.generate(4, (index) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,        // Start time
+            (index * 0.15) + 0.4, // End time
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    _slideAnimations = List.generate(4, (index) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.15), // Start 15% below
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,
+            (index * 0.15) + 0.4,
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    // Only animate on first mount
+    if (!_hasAnimated) {
+      _controller.forward();
+      _hasAnimated = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    int cardIndex = 0;
+
     return RefreshIndicator(
       onRefresh: () async {
         await HapticUtils.heavy(); // Pull-to-refresh haptic
         // Refresh analytics by invalidating the provider
-        ref.invalidate(analyticsControllerProvider);
+        widget.ref.invalidate(analyticsControllerProvider);
         await Future.delayed(const Duration(milliseconds: 300));
       },
       child: SingleChildScrollView(
@@ -131,25 +196,49 @@ class _AnalyticsContent extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Yearly Forecast - Centered Hero Metric
-            _YearlyForecastCard(analytics: analytics),
+            // Card 0: Yearly Forecast - Centered Hero Metric (always present)
+            SlideTransition(
+              position: _slideAnimations[cardIndex],
+              child: FadeTransition(
+                opacity: _fadeAnimations[cardIndex++],
+                child: _YearlyForecastCard(analytics: widget.analytics),
+              ),
+            ),
             const SizedBox(height: AppSizes.sectionSpacing),
 
-            // Category Breakdown
-            if (analytics.categoryBreakdown.isNotEmpty) ...[
-              _CategoryBreakdownCard(analytics: analytics),
+            // Card 1: Category Breakdown (conditional)
+            if (widget.analytics.categoryBreakdown.isNotEmpty) ...[
+              SlideTransition(
+                position: _slideAnimations[cardIndex],
+                child: FadeTransition(
+                  opacity: _fadeAnimations[cardIndex++],
+                  child: _CategoryBreakdownCard(analytics: widget.analytics),
+                ),
+              ),
               const SizedBox(height: AppSizes.sectionSpacing),
             ],
 
-            // Top Subscriptions
-            if (analytics.topSubscriptions.isNotEmpty) ...[
-              _TopSubscriptionsCard(analytics: analytics),
+            // Card 2: Top Subscriptions (conditional)
+            if (widget.analytics.topSubscriptions.isNotEmpty) ...[
+              SlideTransition(
+                position: _slideAnimations[cardIndex],
+                child: FadeTransition(
+                  opacity: _fadeAnimations[cardIndex++],
+                  child: _TopSubscriptionsCard(analytics: widget.analytics),
+                ),
+              ),
               const SizedBox(height: AppSizes.sectionSpacing),
             ],
 
-            // Currency Breakdown (only if multi-currency)
-            if (analytics.hasMultipleCurrencies) ...[
-              _CurrencyBreakdownCard(analytics: analytics),
+            // Card 3: Currency Breakdown (conditional)
+            if (widget.analytics.hasMultipleCurrencies) ...[
+              SlideTransition(
+                position: _slideAnimations[cardIndex],
+                child: FadeTransition(
+                  opacity: _fadeAnimations[cardIndex++],
+                  child: _CurrencyBreakdownCard(analytics: widget.analytics),
+                ),
+              ),
               const SizedBox(height: AppSizes.base),
             ],
           ],
@@ -160,15 +249,37 @@ class _AnalyticsContent extends StatelessWidget {
 }
 
 /// Yearly forecast card - Primary hero metric centered at top.
-class _YearlyForecastCard extends StatelessWidget {
+class _YearlyForecastCard extends StatefulWidget {
   final AnalyticsData analytics;
 
   const _YearlyForecastCard({required this.analytics});
 
   @override
+  State<_YearlyForecastCard> createState() => _YearlyForecastCardState();
+}
+
+class _YearlyForecastCardState extends State<_YearlyForecastCard> {
+  double _displayValue = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayValue = 0.0; // Start from 0 for initial animation
+  }
+
+  @override
+  void didUpdateWidget(_YearlyForecastCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update if value actually changed (prevents re-animation on rebuild)
+    if (oldWidget.analytics.yearlyForecast != widget.analytics.yearlyForecast) {
+      _displayValue = oldWidget.analytics.yearlyForecast;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(
-      symbol: _getCurrencySymbol(analytics.primaryCurrency),
+      symbol: _getCurrencySymbol(widget.analytics.primaryCurrency),
       decimalDigits: 2,
     );
 
@@ -199,17 +310,24 @@ class _YearlyForecastCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSizes.md),
 
-            // Large yearly amount with tabular figures
-            Text(
-              currencyFormat.format(analytics.yearlyForecast),
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.8,
-                    fontSize: 40,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
+            // Large yearly amount with tabular figures - Animated
+            TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 800),
+              tween: Tween(begin: _displayValue, end: widget.analytics.yearlyForecast),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedValue, child) {
+                return Text(
+                  currencyFormat.format(animatedValue),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.8,
+                        fontSize: 40,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                );
+              },
             ),
             const SizedBox(height: AppSizes.md),
 
@@ -224,9 +342,19 @@ class _YearlyForecastCard extends StatelessWidget {
 
             // Active subscriptions count
             Text(
-              '${analytics.activeCount} active ${analytics.activeCount == 1 ? 'subscription' : 'subscriptions'}',
+              '${widget.analytics.activeCount} active ${widget.analytics.activeCount == 1 ? 'subscription' : 'subscriptions'}',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white.withValues(alpha: 0.85),
+                  ),
+            ),
+            const SizedBox(height: AppSizes.sm),
+
+            // Daily cost breakdown
+            Text(
+              'That\'s ${currencyFormat.format(widget.analytics.yearlyForecast / 365)} per day',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontFeatures: const [FontFeature.tabularFigures()],
                   ),
             ),
           ],

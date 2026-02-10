@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
@@ -59,7 +60,12 @@ class BackupService {
   ///
   /// Creates a temporary JSON file and opens the share sheet,
   /// allowing users to save to Files, email, AirDrop, cloud storage, etc.
-  Future<void> exportAndShare(List<Subscription> subscriptions) async {
+  ///
+  /// [sharePositionOrigin] is required for iOS/iPadOS to position the share sheet popover.
+  Future<void> exportAndShare(
+    List<Subscription> subscriptions, {
+    Rect? sharePositionOrigin,
+  }) async {
     try {
       // Generate JSON
       final jsonContent = await exportToJson(subscriptions);
@@ -70,11 +76,12 @@ class BackupService {
       final file = File('${directory.path}/$fileName');
       await file.writeAsString(jsonContent);
 
-      // Share file
+      // Share file with position origin for iOS
       final result = await Share.shareXFiles(
         [XFile(file.path)],
         subject: 'CustomSubs Backup - ${DateTime.now().toString().split(' ')[0]}',
         text: 'CustomSubs subscription backup file',
+        sharePositionOrigin: sharePositionOrigin,
       );
 
       // Clean up temporary file after sharing
@@ -250,6 +257,7 @@ Future<void> exportBackup(Ref ref) async {
   final repository = await ref.read(subscriptionRepositoryProvider.future);
   final subscriptions = repository.getAllActive();
 
+  // Note: sharePositionOrigin should be passed when calling exportAndShare directly
   await backupService.exportAndShare(subscriptions);
 
   // Update last backup date in settings

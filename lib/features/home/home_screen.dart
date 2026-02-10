@@ -452,7 +452,7 @@ class _EmptyState extends StatelessWidget {
   }
 }
 
-class _SpendingSummaryCard extends StatelessWidget {
+class _SpendingSummaryCard extends StatefulWidget {
   final double monthlyTotal;
   final int activeCount;
   final String currency;
@@ -462,6 +462,28 @@ class _SpendingSummaryCard extends StatelessWidget {
     required this.activeCount,
     required this.currency,
   });
+
+  @override
+  State<_SpendingSummaryCard> createState() => _SpendingSummaryCardState();
+}
+
+class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
+  double _displayValue = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayValue = 0.0; // Start from 0 for initial animation
+  }
+
+  @override
+  void didUpdateWidget(_SpendingSummaryCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update if value actually changed (prevents re-animation on rebuild)
+    if (oldWidget.monthlyTotal != widget.monthlyTotal) {
+      _displayValue = oldWidget.monthlyTotal;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -480,13 +502,20 @@ class _SpendingSummaryCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            CurrencyUtils.formatAmount(monthlyTotal, currency),
-            style: theme.textTheme.displaySmall?.copyWith(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 32,
-            ),
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 800),
+            tween: Tween(begin: _displayValue, end: widget.monthlyTotal),
+            curve: Curves.easeOutCubic,
+            builder: (context, animatedValue, child) {
+              return Text(
+                CurrencyUtils.formatAmount(animatedValue, widget.currency),
+                style: theme.textTheme.displaySmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 32,
+                ),
+              );
+            },
           ),
           Text(
             '/month',
@@ -496,7 +525,7 @@ class _SpendingSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSizes.sm),
           Text(
-            '$activeCount active subscription${activeCount == 1 ? '' : 's'}',
+            '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
             ),

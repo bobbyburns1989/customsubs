@@ -1,6 +1,6 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: February 7, 2026
+**Last Updated**: February 9, 2026
 **Version**: 1.0.6+8
 **Status**: ✅ 98% Complete - Production-Ready
 
@@ -60,6 +60,7 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 | [completion/PHASE_3_COMPLETE.md](completion/PHASE_3_COMPLETE.md) | Analytics | ✅ Complete |
 | [completion/PHASE_4_5_COMPLETE.md](completion/PHASE_4_5_COMPLETE.md) | Quality & testing | ✅ Complete |
 | [completion/HAPTICS_AND_SNACKBARS.md](completion/HAPTICS_AND_SNACKBARS.md) | Haptics & snackbars | ✅ Complete |
+| [completion/ANALYTICS_DAILY_COST_BREAKDOWN.md](completion/ANALYTICS_DAILY_COST_BREAKDOWN.md) | Daily cost in analytics | ✅ Complete |
 | [completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | Skeleton loading, Hero animations, Donut chart | ✅ Complete |
 
 ### For App Store Submission

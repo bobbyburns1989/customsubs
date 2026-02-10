@@ -224,39 +224,60 @@ class SettingsScreen extends ConsumerWidget {
               );
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.upload_file),
-            title: const Text('Export Backup'),
-            subtitle: const Text('Save your subscriptions to a file'),
-            onTap: () async {
-              await HapticUtils.medium(); // Action trigger feedback
+          Builder(
+            builder: (context) {
+              return ListTile(
+                leading: const Icon(Icons.upload_file),
+                title: const Text('Export Backup'),
+                subtitle: const Text('Save your subscriptions to a file'),
+                onTap: () async {
+                  await HapticUtils.medium(); // Action trigger feedback
 
-              try {
-                // Show loading indicator
-                if (context.mounted) {
-                  SnackBarUtils.show(
-                    context,
-                    SnackBarUtils.info('Preparing backup...'),
-                  );
-                }
+                  // Calculate share position origin for iOS before async gap
+                  final box = context.findRenderObject() as RenderBox?;
+                  final sharePositionOrigin = box != null
+                      ? box.localToGlobal(Offset.zero) & box.size
+                      : null;
 
-                // Export backup
-                await ref.read(exportBackupProvider.future);
+                  try {
+                    // Show loading indicator
+                    if (context.mounted) {
+                      SnackBarUtils.show(
+                        context,
+                        SnackBarUtils.info('Preparing backup...'),
+                      );
+                    }
 
-                if (context.mounted) {
-                  SnackBarUtils.show(
-                    context,
-                    SnackBarUtils.success('Backup exported successfully!'),
-                  );
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  SnackBarUtils.show(
-                    context,
-                    SnackBarUtils.error('Failed to export backup: $e'),
-                  );
-                }
-              }
+                    // Export backup with position origin - call service directly
+                    final backupService = await ref.read(backupServiceProvider.future);
+                    final repository = await ref.read(subscriptionRepositoryProvider.future);
+                    final subscriptions = repository.getAllActive();
+
+                    await backupService.exportAndShare(
+                      subscriptions,
+                      sharePositionOrigin: sharePositionOrigin,
+                    );
+
+                    // Update last backup date
+                    await ref.read(settingsRepositoryProvider.notifier)
+                        .setLastBackupDate(DateTime.now());
+
+                    if (context.mounted) {
+                      SnackBarUtils.show(
+                        context,
+                        SnackBarUtils.success('Backup exported successfully!'),
+                      );
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      SnackBarUtils.show(
+                        context,
+                        SnackBarUtils.error('Failed to export backup: $e'),
+                      );
+                    }
+                  }
+                },
+              );
             },
           ),
           ListTile(

@@ -95,8 +95,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
             child: Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.xl,
-                  vertical: AppSizes.xl,
+                  horizontal: AppSizes.lg,
+                  vertical: AppSizes.base,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -123,13 +123,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                           child: Image.asset(
                             'assets/images/new_app_icon.png',
-                            width: 140,
-                            height: 140,
+                            width: 110,
+                            height: 110,
                             fit: BoxFit.contain,
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSizes.lg),
+                      const SizedBox(height: AppSizes.md),
 
                       // Welcome message
                       Text(
@@ -139,7 +139,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSizes.md),
+                      const SizedBox(height: AppSizes.sm),
 
                       Text(
                         'Your private subscription tracker',
@@ -152,7 +152,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.xxl),
+                const SizedBox(height: AppSizes.lg),
 
                 // Feature 1: Track Everything
                 FadeTransition(
@@ -165,7 +165,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.base),
+                const SizedBox(height: AppSizes.sm),
 
                 // Feature 2: Smart Reminders
                 FadeTransition(
@@ -178,7 +178,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.base),
+                const SizedBox(height: AppSizes.sm),
 
                 // Feature 3: Easy Cancellation
                 FadeTransition(
@@ -191,7 +191,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                   ),
                 ),
 
-                const SizedBox(height: AppSizes.xxl),
+                const SizedBox(height: AppSizes.lg),
 
                 // CTA Section: Button + Privacy Note
                 FadeTransition(
@@ -205,7 +205,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           onPressed: _completeOnboarding,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
-                              vertical: AppSizes.lg,
+                              vertical: AppSizes.base,
                             ),
                           ),
                           child: const Text(
@@ -214,7 +214,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           ),
                         ),
                       ),
-                      const SizedBox(height: AppSizes.base),
+                      const SizedBox(height: AppSizes.md),
 
                       // Privacy Note
                       Row(
@@ -237,8 +237,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                     ],
                   ),
                 ),
-
-                const SizedBox(height: AppSizes.base),
               ],
             ),
           ),
@@ -268,7 +266,7 @@ class _FeatureCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
@@ -282,19 +280,19 @@ class _FeatureCard extends StatelessWidget {
         children: [
           // Icon Container
           Container(
-            width: 56,
-            height: 56,
+            width: 48,
+            height: 48,
             decoration: const BoxDecoration(
               color: AppColors.primarySurface,
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              size: 28,
+              size: 24,
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(width: AppSizes.base),
+          const SizedBox(width: AppSizes.md),
 
           // Text Content
           Expanded(
@@ -312,7 +310,7 @@ class _FeatureCard extends StatelessWidget {
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
-                    height: 1.5,
+                    height: 1.4,
                   ),
                 ),
               ],

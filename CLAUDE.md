@@ -13,6 +13,7 @@
 | Task | Documentation |
 |------|--------------|
 | **Notifications (CRITICAL)** | [`docs/guides/working-with-notifications.md`](docs/guides/working-with-notifications.md) |
+| **Animations & Polish** | [`docs/design/MICRO_ANIMATIONS.md`](docs/design/MICRO_ANIMATIONS.md) |
 | Adding a new feature | [`docs/guides/adding-a-feature.md`](docs/guides/adding-a-feature.md) |
 | State management patterns | [`docs/architecture/state-management.md`](docs/architecture/state-management.md) |
 | Forms and validation | [`docs/guides/forms-and-validation.md`](docs/guides/forms-and-validation.md) |
@@ -125,10 +126,15 @@ lib/
 │   │
 │   ├── subscription_detail/
 │   │   ├── subscription_detail_screen.dart    # Full detail view + cancel tools
+│   │   ├── subscription_detail_controller.dart
 │   │   └── widgets/
-│   │       ├── cancellation_card.dart         # Cancel URL + checklist + notes
-│   │       ├── billing_history_card.dart      # Visual billing timeline
-│   │       └── detail_action_buttons.dart
+│   │       ├── header_card.dart               # Icon, name, amount, status badges
+│   │       ├── billing_info_card.dart         # Billing cycle, dates, trial info
+│   │       ├── cancellation_card.dart         # Cancel URL + phone + checklist
+│   │       ├── notes_card.dart                # User notes display
+│   │       ├── reminder_info_card.dart        # Reminder settings display
+│   │       ├── info_row.dart                  # Reusable label-value row
+│   │       └── status_badge.dart              # Animated status badge
 │   │
 │   ├── cancellation/
 │   │   ├── cancellation_checklist_screen.dart  # Step-by-step cancel flow
@@ -415,6 +421,7 @@ Visual breakdown of spending. Accessible from Home quick actions.
 - Centered card with green gradient background at the top
 - Large prominent yearly total: "At this rate, you'll spend $X,XXX this year on subscriptions"
 - Simple multiplication of monthly total × 12
+- Daily cost breakdown: "That's $X.XX per day" beneath subscription count for psychological impact
 - Shows active subscription count
 - Primary focal point of the screen
 

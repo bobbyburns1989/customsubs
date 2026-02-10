@@ -1,28 +1,35 @@
 # Micro-Animations Guide
 
-**Status**: ✅ Complete (Extended)
-**Last Updated**: February 4, 2026 (Evening Session)
+**Status**: ✅ Complete (Premium Polish Update)
+**Last Updated**: February 9, 2026
 **Relevant to**: Developers
-**Version:** 1.0
+**Version:** 2.0
 
 ---
 
 ## 📚 Overview
 
-This document describes the subtle micro-animations implemented in CustomSubs. These animations are **intentionally barely perceptible** - users won't consciously notice them, but they make the app feel more polished, responsive, and alive.
+This document describes the subtle micro-animations implemented in CustomSubs. These animations are **intentionally balanced** - users notice premium polish without being distracted by excessive motion.
 
 ### Design Philosophy
 
-**Subtle over Showy**
-- All animations are under 300ms
+**Subtle over Showy (for micro-interactions)**
+- Micro-animations complete under 300ms
 - Scale changes are minimal (1-2%)
 - No bounces, no complex curves
 - Users should *feel* quality, not *see* animations
 
+**Premium Polish (for value animations & entrances)**
+- Number counters animate smoothly (800ms)
+- Card entrances use staggered fade + slide (600ms)
+- Create sense of depth and intentional design
+- Enhance perception of app quality
+
 **Purpose:**
 - ✅ Provide tactile feedback
 - ✅ Smooth state transitions
-- ✅ Make UI feel responsive
+- ✅ Draw attention to important metrics
+- ✅ Create visual hierarchy through motion
 - ❌ NOT for entertainment or decoration
 
 ---
@@ -206,6 +213,199 @@ AnimatedContainer(
 
 ---
 
+### 7. Animated Number Counters ⭐⭐⭐⭐⭐ (NEW)
+
+**What:** Currency amounts smoothly count up from 0 or transition from old → new value
+**Duration:** 800ms
+**Curve:** `Curves.easeOutCubic`
+
+**Implementation:**
+```dart
+class _SpendingSummaryCard extends StatefulWidget {
+  final double monthlyTotal;
+  // ... other props
+}
+
+class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
+  double _displayValue = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayValue = 0.0; // Start from 0 for initial animation
+  }
+
+  @override
+  void didUpdateWidget(_SpendingSummaryCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Only update if value actually changed (prevents re-animation on rebuild)
+    if (oldWidget.monthlyTotal != widget.monthlyTotal) {
+      _displayValue = oldWidget.monthlyTotal;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 800),
+      tween: Tween(begin: _displayValue, end: widget.monthlyTotal),
+      curve: Curves.easeOutCubic,
+      builder: (context, animatedValue, child) {
+        return Text(
+          CurrencyUtils.formatAmount(animatedValue, widget.currency),
+          style: /* ... existing style ... */,
+        );
+      },
+    );
+  }
+}
+```
+
+**Applied to:**
+- ✅ Home screen spending summary card (monthly total)
+- ✅ Analytics screen yearly forecast card (yearly amount)
+
+**Why it works:**
+- Draws attention to the most important metric on each screen
+- Creates a premium feel similar to banking apps (Mint, YNAB)
+- 0 → value animation on first load feels welcoming
+- old → new transition on refresh provides satisfying visual feedback
+- Smart value tracking prevents re-animation on same value
+
+**Behavior:**
+- **Initial load:** Animates from 0 → actual value (smooth entrance)
+- **Pull-to-refresh:** Animates from old value → new value (smooth transition)
+- **Same value rebuild:** No animation (via `didUpdateWidget` check)
+- **Formatting preserved:** Currency symbol, decimals, commas maintained throughout
+
+---
+
+### 8. Staggered Card Entrance Animations ⭐⭐⭐⭐⭐ (NEW)
+
+**What:** Cards sequentially fade in + slide up when screen first loads
+**Duration:** 600ms total (staggered)
+**Curve:** `Curves.easeOut`
+**Stagger interval:** 0.15 (Analytics), 0.1 (Detail)
+
+**Implementation:**
+```dart
+class _AnalyticsContentState extends State<_AnalyticsContent>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late List<Animation<double>> _fadeAnimations;
+  late List<Animation<Offset>> _slideAnimations;
+  bool _hasAnimated = false; // Prevent re-animation on pull-to-refresh
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // 4 cards: Forecast, Category, Top Subs, Currency
+    _fadeAnimations = List.generate(4, (index) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,        // Start time
+            (index * 0.15) + 0.4, // End time
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    _slideAnimations = List.generate(4, (index) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.15), // Start 15% below
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,
+            (index * 0.15) + 0.4,
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    // Only animate on first mount
+    if (!_hasAnimated) {
+      _controller.forward();
+      _hasAnimated = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    int cardIndex = 0;
+
+    return Column(
+      children: [
+        // Card 0: Always present
+        SlideTransition(
+          position: _slideAnimations[cardIndex],
+          child: FadeTransition(
+            opacity: _fadeAnimations[cardIndex++],
+            child: _YearlyForecastCard(analytics: widget.analytics),
+          ),
+        ),
+
+        // Card 1: Conditional
+        if (widget.analytics.categoryBreakdown.isNotEmpty)
+          SlideTransition(
+            position: _slideAnimations[cardIndex],
+            child: FadeTransition(
+              opacity: _fadeAnimations[cardIndex++],
+              child: _CategoryBreakdownCard(analytics: widget.analytics),
+            ),
+          ),
+
+        // More cards...
+      ],
+    );
+  }
+}
+```
+
+**Applied to:**
+- ✅ Analytics screen (4 cards: Forecast, Category, Top Subs, Currency)
+- ✅ Subscription detail screen (6 cards: Header, Mark Paid, Billing, Cancellation, Notes, Reminders)
+
+**Why it works:**
+- Creates visual hierarchy - guides user's eye down the page
+- Makes screens feel intentionally designed rather than just "appearing"
+- Adds depth perception through sequential motion
+- Matches existing onboarding and home list animation patterns
+- **Smart behavior:** Only animates on first mount, NOT on pull-to-refresh
+
+**Behavior:**
+- **Initial screen load:** All cards animate in sequence (top → bottom)
+- **Pull-to-refresh:** No re-animation (cards stay visible)
+- **Conditional cards:** Only existing cards animate (dynamic `cardIndex++`)
+- **Navigation:** Forward animation only, no reverse on back
+- **Hero preservation:** Existing Hero animations remain intact (Hero widget not wrapped)
+
+**Technical notes:**
+- Uses `AnimationController` + `TickerProviderStateMixin` (consistent with existing patterns)
+- Uses `Interval` curve for staggered timing
+- Combines `FadeTransition` + `SlideTransition` for depth
+- `_hasAnimated` flag prevents re-animation on data refresh
+
+---
+
 ## 📐 Animation Specifications
 
 ### Timing Guidelines
@@ -213,11 +413,15 @@ AnimatedContainer(
 | Duration | Use Case | Example |
 |----------|----------|---------|
 | **50-100ms** | Press feedback | Button scale |
-| **150-250ms** | State transitions | Badge fade |
+| **150-250ms** | State transitions | Badge fade, color pulse |
 | **250-300ms** | UI transitions | Page indicators |
-| **300-400ms** | Complex transitions | NOT USED (too slow) |
+| **600ms** | Entrance animations | Staggered card fade + slide |
+| **800ms** | Value animations | Number counter transitions |
 
-**Rule:** Micro-animations must complete in under 300ms.
+**Rules:**
+- **Micro-interactions:** Complete in under 300ms
+- **Entrance animations:** 600ms for staggered sequences
+- **Value transitions:** 800ms for smooth number counting
 
 ---
 
@@ -226,11 +430,12 @@ AnimatedContainer(
 | Curve | Use Case | Feel |
 |-------|----------|------|
 | `Curves.easeInOut` | Symmetric animations | Button press, page indicators |
-| `Curves.easeOut` | Fade out, exit | Badge fade out |
+| `Curves.easeOut` | Exit animations, fade out | Badge fade, card slide-in, staggered entrances |
+| `Curves.easeOutCubic` | Smooth deceleration | Number counters (premium feel) |
 | `Curves.easeIn` | Fade in, enter | Badge fade in |
 | `Curves.linear` | NOT USED | Too mechanical |
 
-**Rule:** Use ease curves for natural feel. Never use linear.
+**Rule:** Use ease curves for natural feel. Never use linear. `easeOutCubic` for premium value animations.
 
 ---
 
@@ -315,6 +520,165 @@ AnimatedContainer(
 
 ---
 
+### Pattern 4: TweenAnimationBuilder for Value Transitions (NEW)
+
+**Use for:** Animated number counters, smooth value changes
+
+```dart
+class _MyCard extends StatefulWidget {
+  final double value;
+  // ... constructor
+}
+
+class _MyCardState extends State<_MyCard> {
+  double _displayValue = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _displayValue = 0.0; // Start from 0 for initial animation
+  }
+
+  @override
+  void didUpdateWidget(_MyCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Track previous value for smooth old → new transitions
+    if (oldWidget.value != widget.value) {
+      _displayValue = oldWidget.value;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 800),
+      tween: Tween(begin: _displayValue, end: widget.value),
+      curve: Curves.easeOutCubic,
+      builder: (context, animatedValue, child) {
+        return Text(
+          '\$${animatedValue.toStringAsFixed(2)}',
+          style: Theme.of(context).textTheme.displayLarge,
+        );
+      },
+    );
+  }
+}
+```
+
+**Key points:**
+- Convert to StatefulWidget to track previous value
+- Use `didUpdateWidget` to detect actual value changes
+- 800ms duration with `easeOutCubic` for premium feel
+- Prevents re-animation when value unchanged
+- Perfect for currency, percentages, scores
+
+---
+
+### Pattern 5: Staggered Card Entrance Animations (NEW)
+
+**Use for:** Sequential card/tile animations on screen entry
+
+```dart
+class _MyScreenState extends State<MyScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late List<Animation<double>> _fadeAnimations;
+  late List<Animation<Offset>> _slideAnimations;
+  bool _hasAnimated = false; // Prevent re-animation
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // Generate animations for N cards
+    final cardCount = 4;
+    _fadeAnimations = List.generate(cardCount, (index) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,        // Stagger start
+            (index * 0.15) + 0.4, // Animation duration
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    _slideAnimations = List.generate(cardCount, (index) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.15), // Start 15% below
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.15,
+            (index * 0.15) + 0.4,
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    // Only animate on first mount
+    if (!_hasAnimated) {
+      _controller.forward();
+      _hasAnimated = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    int cardIndex = 0;
+
+    return Column(
+      children: [
+        // Wrap each card with SlideTransition + FadeTransition
+        SlideTransition(
+          position: _slideAnimations[cardIndex],
+          child: FadeTransition(
+            opacity: _fadeAnimations[cardIndex++],
+            child: MyCard(),
+          ),
+        ),
+
+        // For conditional cards, cardIndex++ only increments if card exists
+        if (condition)
+          SlideTransition(
+            position: _slideAnimations[cardIndex],
+            child: FadeTransition(
+              opacity: _fadeAnimations[cardIndex++],
+              child: MyConditionalCard(),
+            ),
+          ),
+      ],
+    );
+  }
+}
+```
+
+**Key points:**
+- Use `AnimationController` + `TickerProviderStateMixin`
+- Create separate fade and slide animations with `Interval` curve
+- Use `_hasAnimated` flag to prevent re-animation on pull-to-refresh
+- Dynamic `cardIndex++` handles conditional cards elegantly
+- Stagger interval: 0.15 for 4 cards, 0.1 for 6+ cards
+- Combine `SlideTransition` + `FadeTransition` for depth
+
+---
+
 ## ✅ Animation Checklist
 
 ### When Adding New Animations
@@ -343,7 +707,7 @@ All animations must:
 ### Created:
 - `lib/core/widgets/subtle_pressable.dart` - Reusable button press animation
 
-### Modified:
+### Modified (Micro-interactions):
 - `lib/features/onboarding/onboarding_screen.dart`
   - Line 54: Added AnimatedContainer for page indicators
   - Lines 112-138: Added SubtlePressable to buttons
@@ -355,12 +719,14 @@ All animations must:
   - Lines 233-241: Wrapped FAB with _AnimatedFAB
   - Lines 396-556: Wrapped subscription cards with SubtlePressable (0.99 scale)
   - Line 468: AnimatedOpacity for paid badge
+  - **Lines 455-533:** Converted _SpendingSummaryCard to StatefulWidget with TweenAnimationBuilder (800ms number counter)
 
 - `lib/features/subscription_detail/subscription_detail_screen.dart`
   - Line 11: Added import for subtle_pressable
   - Lines 283-291: Added AnimatedOpacity to paid badge
   - Lines 301-331: Converted _StatusBadge to use AnimatedContainer + AnimatedDefaultTextStyle
   - Lines 334-372: Wrapped action buttons with SubtlePressable
+  - **Lines 28-254:** Converted to ConsumerStatefulWidget with AnimationController for staggered card entrance (6 cards)
 
 - `lib/features/add_subscription/widgets/color_picker_widget.dart`
   - Lines 23-96: Created _ColorPickerItem stateful widget with pulse animation
@@ -370,6 +736,11 @@ All animations must:
 - `lib/features/add_subscription/widgets/template_grid_item.dart`
   - Line 5: Added import for subtle_pressable
   - Lines 17-79: Wrapped Card with SubtlePressable (0.985 scale)
+
+### Modified (Premium Polish - NEW):
+- `lib/features/analytics/analytics_screen.dart`
+  - **Lines 163-261:** Converted _YearlyForecastCard to StatefulWidget with TweenAnimationBuilder (800ms number counter)
+  - **Lines 113-244:** Converted _AnalyticsContent to StatefulWidget with AnimationController for staggered card entrance (4 cards)
 
 ---
 
@@ -530,9 +901,9 @@ AnimatedContainer(
 
 ## Summary
 
-**CustomSubs micro-animations:**
+**CustomSubs Animation System:**
 
-✅ **6 animations implemented**
+### ✅ **Micro-Interactions (6 animations)**
 1. Button press feedback (2% scale, 100ms)
 2. Page indicator smooth width (300ms)
 3. Badge fade in/out (250ms)
@@ -540,23 +911,39 @@ AnimatedContainer(
 5. Status badge color transitions (200ms)
 6. Color picker selection pulse (150ms + 200ms border fade)
 
-**Additional implementations:**
+**Additional micro-interactions:**
 - ✅ FAB press feedback (2% scale, custom wrapper)
 - ✅ Template grid item press (1.5% scale)
 - ✅ Subscription detail action buttons (2% scale)
+
+### ✅ **Premium Polish Animations (2 animations - NEW)**
+7. **Animated Number Counters** (800ms, easeOutCubic)
+   - Home screen spending summary (monthly total)
+   - Analytics screen yearly forecast
+   - Smooth 0 → value on initial load
+   - Smooth old → new on refresh
+
+8. **Staggered Card Entrance** (600ms, easeOut)
+   - Analytics screen (4 cards with 0.15 interval)
+   - Subscription detail screen (6 cards with 0.1 interval)
+   - Fade + slide combination for depth
+   - Only animates on first mount (smart behavior)
 
 **Result:**
 - App feels highly responsive and polished
 - State changes feel smooth and natural
 - All interactive elements provide tactile feedback
+- **Premium financial app feel** - number animations create trust and quality perception
+- **Intentional design** - staggered entrances create visual hierarchy
 - Professional polish without any distraction
 - Consistent animation language across all screens
 
-**Total implementation time:** ~90 minutes
+**Total implementation time:** ~3.5 hours (90 min micro + 2 hours premium polish)
 **Performance impact:** Negligible (60fps maintained)
-**User perception:** Significant improvement in app quality
+**User perception:** **Significant** improvement - app now feels like a premium $4.99 app
 
 ---
 
-**Status:** ✅ Micro-animations complete and documented
-**Next:** Optional - add list entrance animations, form field focus transitions
+**Status:** ✅ Complete animation system (v2.0)
+**Patterns:** 5 reusable patterns documented (SubtlePressable, AnimatedOpacity, AnimatedContainer, TweenAnimationBuilder, Staggered Entrances)
+**Next:** Optional - form field focus transitions, list item entrance animations

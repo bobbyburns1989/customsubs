@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
-import 'package:custom_subs/core/utils/currency_utils.dart';
-import 'package:custom_subs/core/utils/service_icons.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
-import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_controller.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/app/router.dart';
-import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/features/subscription_detail/widgets/notes_card.dart';
+import 'package:custom_subs/features/subscription_detail/widgets/header_card.dart';
+import 'package:custom_subs/features/subscription_detail/widgets/billing_info_card.dart';
+import 'package:custom_subs/features/subscription_detail/widgets/cancellation_card.dart';
+import 'package:custom_subs/features/subscription_detail/widgets/reminder_info_card.dart';
 
 /// Subscription Detail Screen
 ///
@@ -25,7 +25,7 @@ import 'package:custom_subs/data/services/notification_service.dart';
 /// - Mark as paid / Resume / Pause
 /// - Access cancellation information
 /// - Edit or delete subscription
-class SubscriptionDetailScreen extends ConsumerWidget {
+class SubscriptionDetailScreen extends ConsumerStatefulWidget {
   final String subscriptionId;
 
   const SubscriptionDetailScreen({
@@ -34,8 +34,70 @@ class SubscriptionDetailScreen extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final controller = ref.watch(subscriptionDetailControllerProvider(subscriptionId));
+  ConsumerState<SubscriptionDetailScreen> createState() =>
+      _SubscriptionDetailScreenState();
+}
+
+class _SubscriptionDetailScreenState
+    extends ConsumerState<SubscriptionDetailScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late List<Animation<double>> _fadeAnimations;
+  late List<Animation<Offset>> _slideAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    // Generate animations for up to 6 cards (max possible)
+    _fadeAnimations = List.generate(6, (index) {
+      return Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.1,
+            (index * 0.1) + 0.4,
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    _slideAnimations = List.generate(6, (index) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.15),
+        end: Offset.zero,
+      ).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(
+            index * 0.1,
+            (index * 0.1) + 0.4,
+            curve: Curves.easeOut,
+          ),
+        ),
+      );
+    });
+
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = ref.watch(
+      subscriptionDetailControllerProvider(widget.subscriptionId),
+    );
 
     return controller.when(
       data: (subscription) {
@@ -52,6 +114,7 @@ class SubscriptionDetailScreen extends ConsumerWidget {
         }
 
         final subscriptionColor = Color(subscription.colorValue);
+        int cardIndex = 0;
 
         return Scaffold(
           appBar: AppBar(
@@ -95,60 +158,102 @@ class SubscriptionDetailScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Header with icon, name, status
-                _HeaderCard(
-                  subscription: subscription,
-                  subscriptionColor: subscriptionColor,
-                ),
-
-                const SizedBox(height: AppSizes.base),
-
-                // Mark as Paid button (full width)
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      await HapticUtils.medium();
-                      ref
-                          .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                          .togglePaid();
-                    },
-                    icon: Icon(
-                      subscription.isPaid ? Icons.check_circle : Icons.check_circle_outline,
+                // Card 0: Header with icon, name, status (always present)
+                SlideTransition(
+                  position: _slideAnimations[cardIndex],
+                  child: FadeTransition(
+                    opacity: _fadeAnimations[cardIndex++],
+                    child: HeaderCard(
+                      subscription: subscription,
+                      subscriptionColor: subscriptionColor,
                     ),
-                    label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
                   ),
                 ),
 
                 const SizedBox(height: AppSizes.base),
 
-                // Billing info card
-                _BillingInfoCard(subscription: subscription),
+                // Card 1: Mark as Paid button (always present)
+                SlideTransition(
+                  position: _slideAnimations[cardIndex],
+                  child: FadeTransition(
+                    opacity: _fadeAnimations[cardIndex++],
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () async {
+                          await HapticUtils.medium();
+                          ref
+                              .read(subscriptionDetailControllerProvider(
+                                      widget.subscriptionId)
+                                  .notifier)
+                              .togglePaid();
+                        },
+                        icon: Icon(
+                          subscription.isPaid
+                              ? Icons.check_circle
+                              : Icons.check_circle_outline,
+                        ),
+                        label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
+                      ),
+                    ),
+                  ),
+                ),
 
                 const SizedBox(height: AppSizes.base),
 
-                // Cancellation info (if exists)
+                // Card 2: Billing info card (always present)
+                SlideTransition(
+                  position: _slideAnimations[cardIndex],
+                  child: FadeTransition(
+                    opacity: _fadeAnimations[cardIndex++],
+                    child: BillingInfoCard(subscription: subscription),
+                  ),
+                ),
+
+                const SizedBox(height: AppSizes.base),
+
+                // Card 3: Cancellation info (conditional)
                 if (subscription.cancelUrl != null ||
                     subscription.cancelPhone != null ||
                     subscription.cancelNotes != null ||
                     subscription.cancelChecklist.isNotEmpty)
-                  _CancellationCard(
-                    subscription: subscription,
-                    onToggleChecklistItem: (index) => ref
-                        .read(subscriptionDetailControllerProvider(subscriptionId).notifier)
-                        .toggleChecklistItem(index),
+                  SlideTransition(
+                    position: _slideAnimations[cardIndex],
+                    child: FadeTransition(
+                      opacity: _fadeAnimations[cardIndex++],
+                      child: CancellationCard(
+                        subscription: subscription,
+                        onToggleChecklistItem: (index) => ref
+                            .read(subscriptionDetailControllerProvider(
+                                    widget.subscriptionId)
+                                .notifier)
+                            .toggleChecklistItem(index),
+                      ),
+                    ),
                   ),
 
                 const SizedBox(height: AppSizes.base),
 
-                // Notes card (if exists)
+                // Card 4: Notes card (conditional)
                 if (subscription.notes != null && subscription.notes!.isNotEmpty)
-                  _NotesCard(notes: subscription.notes!),
+                  SlideTransition(
+                    position: _slideAnimations[cardIndex],
+                    child: FadeTransition(
+                      opacity: _fadeAnimations[cardIndex++],
+                      child: NotesCard(notes: subscription.notes!),
+                    ),
+                  ),
 
                 const SizedBox(height: AppSizes.base),
 
-                // Reminder info
-                _ReminderInfoCard(subscription: subscription),
+                // Card 5: Reminder info (always present)
+                SlideTransition(
+                  position: _slideAnimations[cardIndex],
+                  child: FadeTransition(
+                    opacity: _fadeAnimations[cardIndex++],
+                    child: ReminderInfoCard(subscription: subscription),
+                  ),
+                ),
 
                 const SizedBox(height: AppSizes.xxl),
               ],
@@ -251,10 +356,10 @@ class SubscriptionDetailScreen extends ConsumerWidget {
 
               // Cache subscription before deleting for UNDO functionality
               final controller = ref.read(
-                subscriptionDetailControllerProvider(subscriptionId).notifier,
+                subscriptionDetailControllerProvider(widget.subscriptionId).notifier,
               );
               final currentSubscription = await ref.read(
-                subscriptionDetailControllerProvider(subscriptionId).future,
+                subscriptionDetailControllerProvider(widget.subscriptionId).future,
               );
 
               if (currentSubscription != null) {
@@ -312,513 +417,6 @@ class SubscriptionDetailScreen extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// Header card with icon, name, and status badge
-class _HeaderCard extends StatelessWidget {
-  final Subscription subscription;
-  final Color subscriptionColor;
-
-  const _HeaderCard({
-    required this.subscription,
-    required this.subscriptionColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.lg),
-        child: Column(
-          children: [
-            // Icon with Hero animation
-            Hero(
-              tag: 'subscription-icon-${subscription.id}',
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: subscriptionColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                ),
-                child: Center(
-                  child: subscription.iconName != null
-                      ? Icon(
-                          ServiceIcons.getIconForService(subscription.iconName!),
-                          size: 40,
-                          color: subscriptionColor,
-                        )
-                      : Text(
-                          subscription.name.substring(0, 1).toUpperCase(),
-                          style: theme.textTheme.headlineLarge?.copyWith(
-                            color: subscriptionColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.base),
-
-            // Name
-            Text(
-              subscription.name,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-
-            const SizedBox(height: AppSizes.sm),
-
-            // Amount + Cycle
-            Text(
-              '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.shortName}',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.base),
-
-            // Status badges
-            Wrap(
-              spacing: AppSizes.sm,
-              runSpacing: AppSizes.sm,
-              alignment: WrapAlignment.center,
-              children: [
-                // Trial badge
-                if (subscription.isTrial)
-                  const _StatusBadge(
-                    label: 'Trial',
-                    color: AppColors.trial,
-                  ),
-
-                // Paid badge with fade animation
-                AnimatedOpacity(
-                  opacity: subscription.isPaid ? 1.0 : 0.0,
-                  duration: const Duration(milliseconds: 250),
-                  curve: Curves.easeOut,
-                  child: const _StatusBadge(
-                    label: 'Paid',
-                    color: AppColors.success,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Status badge widget with smooth color transitions
-class _StatusBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-
-  const _StatusBadge({
-    required this.label,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSizes.base,
-        vertical: AppSizes.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-      ),
-      child: AnimatedDefaultTextStyle(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-        child: Text(label),
-      ),
-    );
-  }
-}
-
-/// Billing information card
-class _BillingInfoCard extends StatelessWidget {
-  final Subscription subscription;
-
-  const _BillingInfoCard({required this.subscription});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Billing Information',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.base),
-
-            // Next billing date
-            _InfoRow(
-              label: 'Next Billing',
-              value: subscription.nextBillingDate.toFormattedString(),
-              highlight: subscription.nextBillingDate.toShortRelativeString(),
-            ),
-
-            const Divider(height: AppSizes.lg),
-
-            // Billing cycle
-            _InfoRow(
-              label: 'Billing Cycle',
-              value: subscription.cycle.displayName,
-            ),
-
-            const Divider(height: AppSizes.lg),
-
-            // Amount
-            _InfoRow(
-              label: 'Amount',
-              value: CurrencyUtils.formatAmount(
-                subscription.amount,
-                subscription.currencyCode,
-              ),
-            ),
-
-            const Divider(height: AppSizes.lg),
-
-            // Start date
-            _InfoRow(
-              label: 'Started',
-              value: subscription.startDate.toFormattedString(),
-            ),
-
-            // Trial info (if applicable)
-            if (subscription.isTrial) ...[
-              const Divider(height: AppSizes.lg),
-              _InfoRow(
-                label: 'Trial Ends',
-                value: subscription.trialEndDate?.toFormattedString() ?? 'Unknown',
-                highlight: subscription.trialEndDate?.toShortRelativeString(),
-              ),
-              if (subscription.postTrialAmount != null) ...[
-                const SizedBox(height: AppSizes.sm),
-                Text(
-                  'Then ${CurrencyUtils.formatAmount(subscription.postTrialAmount!, subscription.currencyCode)}/${subscription.cycle.shortName}',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Cancellation information card
-class _CancellationCard extends StatelessWidget {
-  final Subscription subscription;
-  final Function(int) onToggleChecklistItem;
-
-  const _CancellationCard({
-    required this.subscription,
-    required this.onToggleChecklistItem,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'How to Cancel',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.base),
-
-            // Cancel URL button
-            if (subscription.cancelUrl != null) ...[
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: () async {
-                    final url = Uri.parse(subscription.cancelUrl!);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url, mode: LaunchMode.externalApplication);
-                    }
-                  },
-                  icon: const Icon(Icons.open_in_new),
-                  label: const Text('Open Cancellation Page'),
-                ),
-              ),
-              const SizedBox(height: AppSizes.base),
-            ],
-
-            // Phone number button
-            if (subscription.cancelPhone != null) ...[
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    final url = Uri.parse('tel:${subscription.cancelPhone!}');
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url);
-                    }
-                  },
-                  icon: const Icon(Icons.phone),
-                  label: Text('Call ${subscription.cancelPhone!}'),
-                ),
-              ),
-              const SizedBox(height: AppSizes.base),
-            ],
-
-            // Cancellation notes
-            if (subscription.cancelNotes != null && subscription.cancelNotes!.isNotEmpty) ...[
-              Container(
-                padding: const EdgeInsets.all(AppSizes.base),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                ),
-                child: Text(
-                  subscription.cancelNotes!,
-                  style: theme.textTheme.bodyMedium,
-                ),
-              ),
-              const SizedBox(height: AppSizes.base),
-            ],
-
-            // Checklist
-            if (subscription.cancelChecklist.isNotEmpty) ...[
-              Text(
-                'Cancellation Steps',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: AppSizes.sm),
-
-              // Progress indicator
-              LinearProgressIndicator(
-                value: subscription.checklistCompleted.where((c) => c).length /
-                    subscription.cancelChecklist.length,
-                backgroundColor: AppColors.border,
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
-              ),
-              const SizedBox(height: AppSizes.xs),
-              Text(
-                '${subscription.checklistCompleted.where((c) => c).length} of ${subscription.cancelChecklist.length} complete',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-
-              const SizedBox(height: AppSizes.base),
-
-              // Checklist items
-              ...List.generate(subscription.cancelChecklist.length, (index) {
-                return CheckboxListTile(
-                  value: subscription.checklistCompleted[index],
-                  onChanged: (_) async {
-                    await HapticUtils.selection();
-                    onToggleChecklistItem(index);
-                  },
-                  title: Text(subscription.cancelChecklist[index]),
-                  contentPadding: EdgeInsets.zero,
-                  controlAffinity: ListTileControlAffinity.leading,
-                );
-              }),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Notes card
-class _NotesCard extends StatelessWidget {
-  final String notes;
-
-  const _NotesCard({required this.notes});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Notes',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSizes.base),
-            Text(
-              notes,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Reminder information card
-class _ReminderInfoCard extends StatelessWidget {
-  final Subscription subscription;
-
-  const _ReminderInfoCard({required this.subscription});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final reminders = subscription.reminders;
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.base),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Reminder Settings',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: AppSizes.base),
-
-            if (reminders.firstReminderDays > 0)
-              _InfoRow(
-                label: 'First Reminder',
-                value: '${reminders.firstReminderDays} days before',
-              ),
-
-            if (reminders.secondReminderDays > 0) ...[
-              const Divider(height: AppSizes.lg),
-              _InfoRow(
-                label: 'Second Reminder',
-                value: '${reminders.secondReminderDays} days before',
-              ),
-            ],
-
-            if (reminders.remindOnBillingDay) ...[
-              const Divider(height: AppSizes.lg),
-              const _InfoRow(
-                label: 'Day-of Reminder',
-                value: 'Enabled',
-              ),
-            ],
-
-            const Divider(height: AppSizes.lg),
-            _InfoRow(
-              label: 'Reminder Time',
-              value: '${reminders.reminderHour.toString().padLeft(2, '0')}:${reminders.reminderMinute.toString().padLeft(2, '0')}',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Info row widget (label + value)
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final String? highlight;
-
-  const _InfoRow({
-    required this.label,
-    required this.value,
-    this.highlight,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-        Row(
-          children: [
-            Text(
-              value,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            if (highlight != null) ...[
-              const SizedBox(width: AppSizes.sm),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.sm,
-                  vertical: 2,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.trial.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusSm),
-                ),
-                child: Text(
-                  highlight!,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.trial,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ],
     );
   }
 }

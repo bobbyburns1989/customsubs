@@ -36,6 +36,7 @@ This folder contains detailed completion reports for each development phase, doc
 | [MICRO_ANIMATIONS_EXTENDED.md](MICRO_ANIMATIONS_EXTENDED.md) | Extended micro-interactions | ✅ Complete |
 | [ONBOARDING_CONSOLIDATION.md](ONBOARDING_CONSOLIDATION.md) | Single-screen onboarding redesign | ✅ Complete |
 | [ANALYTICS_YEARLY_FOCUS.md](ANALYTICS_YEARLY_FOCUS.md) | Analytics yearly focus improvements | ✅ Complete |
+| [ANALYTICS_DAILY_COST_BREAKDOWN.md](ANALYTICS_DAILY_COST_BREAKDOWN.md) | Daily cost breakdown in analytics | ✅ Complete |
 | [POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | **Skeleton loading, Hero animations, Donut chart** | ✅ Complete |
 
 ### Code Quality & Refactoring
@@ -43,6 +44,7 @@ This folder contains detailed completion reports for each development phase, doc
 | Document | Focus | Status |
 |----------|-------|--------|
 | [ADD_SUBSCRIPTION_REFACTORING.md](ADD_SUBSCRIPTION_REFACTORING.md) | **Form refactoring: 698→393 lines, 57 tests** | ✅ Complete |
+| [SUBSCRIPTION_DETAIL_REFACTORING.md](SUBSCRIPTION_DETAIL_REFACTORING.md) | **Widget extraction: 929→424 lines, 7 widgets** | ✅ Complete |
 
 ---
 
