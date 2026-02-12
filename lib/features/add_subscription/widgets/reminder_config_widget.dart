@@ -61,6 +61,8 @@ class ReminderConfigWidget extends StatelessWidget {
           trailing: const Icon(Icons.access_time),
           onTap: () async {
             await HapticUtils.light(); // Time picker tap feedback
+            if (!context.mounted) return;
+
             final time = await showTimePicker(
               context: context,
               initialTime: TimeOfDay(

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:custom_subs/features/analytics/analytics_controller.dart';
-import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
@@ -738,62 +737,4 @@ String _getCurrencySymbol(String currencyCode) {
     'RUB': '₽',
   };
   return symbols[currencyCode] ?? currencyCode;
-}
-
-String _getCategoryDisplayName(SubscriptionCategory category) {
-  switch (category) {
-    case SubscriptionCategory.entertainment:
-      return 'Entertainment';
-    case SubscriptionCategory.productivity:
-      return 'Productivity';
-    case SubscriptionCategory.fitness:
-      return 'Fitness';
-    case SubscriptionCategory.news:
-      return 'News';
-    case SubscriptionCategory.cloud:
-      return 'Cloud Storage';
-    case SubscriptionCategory.gaming:
-      return 'Gaming';
-    case SubscriptionCategory.education:
-      return 'Education';
-    case SubscriptionCategory.finance:
-      return 'Finance';
-    case SubscriptionCategory.shopping:
-      return 'Shopping';
-    case SubscriptionCategory.utilities:
-      return 'Utilities';
-    case SubscriptionCategory.health:
-      return 'Health';
-    case SubscriptionCategory.other:
-      return 'Other';
-  }
-}
-
-Color _getCategoryColor(SubscriptionCategory category) {
-  switch (category) {
-    case SubscriptionCategory.entertainment:
-      return const Color(0xFFEF4444); // Red
-    case SubscriptionCategory.productivity:
-      return const Color(0xFF3B82F6); // Blue
-    case SubscriptionCategory.fitness:
-      return const Color(0xFF22C55E); // Green
-    case SubscriptionCategory.news:
-      return const Color(0xFFF59E0B); // Amber
-    case SubscriptionCategory.cloud:
-      return const Color(0xFF06B6D4); // Cyan
-    case SubscriptionCategory.gaming:
-      return const Color(0xFF8B5CF6); // Violet
-    case SubscriptionCategory.education:
-      return const Color(0xFF14B8A6); // Teal
-    case SubscriptionCategory.finance:
-      return const Color(0xFF84CC16); // Lime
-    case SubscriptionCategory.shopping:
-      return const Color(0xFFEC4899); // Pink
-    case SubscriptionCategory.utilities:
-      return const Color(0xFF78716C); // Stone
-    case SubscriptionCategory.health:
-      return const Color(0xFFF97316); // Orange
-    case SubscriptionCategory.other:
-      return const Color(0xFF6366F1); // Indigo
-  }
 }

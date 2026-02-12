@@ -47,6 +47,7 @@ class SettingsScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
               await HapticUtils.light(); // ListTile tap feedback
+              if (!context.mounted) return;
 
               final selected = await showDialog<String>(
                 context: context,
@@ -113,6 +114,7 @@ class SettingsScreen extends ConsumerWidget {
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () async {
                   await HapticUtils.light(); // ListTile tap feedback
+                  if (!context.mounted) return;
 
                   final time = await showTimePicker(
                     context: context,
@@ -231,13 +233,13 @@ class SettingsScreen extends ConsumerWidget {
                 title: const Text('Export Backup'),
                 subtitle: const Text('Save your subscriptions to a file'),
                 onTap: () async {
-                  await HapticUtils.medium(); // Action trigger feedback
-
                   // Calculate share position origin for iOS before async gap
                   final box = context.findRenderObject() as RenderBox?;
                   final sharePositionOrigin = box != null
                       ? box.localToGlobal(Offset.zero) & box.size
                       : null;
+
+                  await HapticUtils.medium(); // Action trigger feedback
 
                   try {
                     // Show loading indicator
@@ -347,6 +349,8 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('Permanently delete all subscriptions'),
             onTap: () async {
               await HapticUtils.light(); // ListTile tap feedback
+              if (!context.mounted) return;
+
               // First confirmation
               final confirmed = await showDialog<bool>(
                 context: context,

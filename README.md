@@ -14,7 +14,7 @@ CustomSubs is a mobile application designed to help you track and manage your su
 
 **📊 Development Status:** 98% Complete - Ready for Device Testing! | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
 
-**🆕 Latest Update (v1.0.3):** Add Subscription screen modernized with 60% size reduction, collapsible sections, and sleek compact design!
+**🆕 Latest Update (v1.0.11):** Massive template expansion! Now supporting **260+ subscription services** (was 162) including telehealth, beauty boxes, home services, meal kits, pet care, crypto platforms, and more!
 
 ### Key Features
 
@@ -22,7 +22,7 @@ CustomSubs is a mobile application designed to help you track and manage your su
 
 **Core Functionality:**
 - 📱 Clean Material 3 UI with custom theming
-- ➕ Add/Edit subscriptions with 40+ pre-populated templates
+- ➕ Add/Edit subscriptions with **260+ pre-populated templates**
 - 🎨 Color customization with 12 vibrant colors
 - 🎯 **Service icons** - 50+ popular services display recognizable icons (Netflix, Spotify, Disney+, etc.)
 - 💰 Multi-currency support (30+ currencies with bundled exchange rates)

@@ -666,7 +666,7 @@ Bobby's biggest trust-killer is data loss on reinstall. CustomSubs must solve th
 
 ## Subscription Templates
 
-Bundle a JSON asset at `assets/data/subscription_templates.json` with 40+ popular services. Each template:
+Bundle a JSON asset at `assets/data/subscription_templates.json` with 260+ popular services. Each template:
 
 ```json
 {
@@ -747,7 +747,7 @@ The `isPaid` status is automatically reset when billing dates advance in three s
 - [x] Add Subscription screen (template picker + custom form)
 - [x] Subscription Detail screen (all info + mark as paid + delete)
 - [x] Settings screen (primary currency, test notification, about)
-- [x] Subscription templates (bundled JSON, 40+ services)
+- [x] Subscription templates (bundled JSON, 260+ services)
 - [x] Multi-currency display
 - [x] Date advancement logic (auto-advance past billing dates)
 
