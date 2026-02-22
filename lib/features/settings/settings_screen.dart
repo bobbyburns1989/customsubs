@@ -13,6 +13,8 @@ import 'package:custom_subs/data/services/backup_service.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
+import 'package:custom_subs/core/providers/entitlement_provider.dart';
+import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -155,6 +157,87 @@ class SettingsScreen extends ConsumerWidget {
                     }
                   }
                 },
+              );
+            },
+          ),
+
+          const Divider(height: 1),
+
+          // Premium section
+          const _SectionHeader(title: 'Premium'),
+          Consumer(
+            builder: (context, ref, child) {
+              final isPremiumAsync = ref.watch(isPremiumProvider);
+
+              return isPremiumAsync.when(
+                data: (isPremium) => Column(
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        isPremium ? Icons.workspace_premium : Icons.lock_outline,
+                        color: isPremium ? AppColors.primary : AppColors.textSecondary,
+                      ),
+                      title: Text(isPremium ? 'Premium Active' : 'Free Tier'),
+                      subtitle: Text(
+                        isPremium
+                            ? 'Unlimited subscriptions'
+                            : '${RevenueCatConstants.maxFreeSubscriptions} subscriptions limit',
+                      ),
+                      trailing: isPremium ? null : const Icon(Icons.chevron_right),
+                      onTap: isPremium
+                          ? null
+                          : () async {
+                              await HapticUtils.light();
+                              if (context.mounted) {
+                                context.push('/paywall');
+                              }
+                            },
+                    ),
+                    if (isPremium)
+                      ListTile(
+                        leading: const Icon(Icons.restore),
+                        title: const Text('Restore Purchases'),
+                        subtitle: const Text('Restore premium subscription'),
+                        onTap: () async {
+                          await HapticUtils.light();
+
+                          // Show loading indicator
+                          if (context.mounted) {
+                            SnackBarUtils.show(
+                              context,
+                              SnackBarUtils.info('Restoring purchases...'),
+                            );
+                          }
+
+                          // Restore purchases
+                          final service = ref.read(entitlementServiceProvider);
+                          final restored = await service.restorePurchases();
+
+                          if (context.mounted) {
+                            SnackBarUtils.show(
+                              context,
+                              restored
+                                  ? SnackBarUtils.success('Purchases restored successfully')
+                                  : SnackBarUtils.warning('No purchases to restore'),
+                            );
+                          }
+
+                          // Refresh premium status
+                          ref.invalidate(isPremiumProvider);
+                        },
+                      ),
+                  ],
+                ),
+                loading: () => const ListTile(
+                  leading: Icon(Icons.workspace_premium),
+                  title: Text('Loading...'),
+                  subtitle: Text('Checking premium status'),
+                ),
+                error: (err, stack) => ListTile(
+                  leading: const Icon(Icons.error_outline, color: AppColors.error),
+                  title: const Text('Error loading premium status'),
+                  subtitle: Text('$err'),
+                ),
               );
             },
           ),

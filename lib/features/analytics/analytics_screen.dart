@@ -7,6 +7,7 @@ import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
+import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart';
 
 /// Analytics screen showing spending insights and breakdowns.
@@ -44,7 +45,16 @@ class AnalyticsScreen extends ConsumerWidget {
         data: (analytics) {
           // Empty state: no subscriptions
           if (analytics.activeCount == 0) {
-            return _EmptyState();
+            return EmptyStateWidget(
+              icon: Icons.analytics_outlined,
+              title: 'No Analytics Yet',
+              subtitle: 'Add your first subscription to see spending insights',
+              buttonText: 'Add Subscription',
+              onButtonPressed: () {
+                context.pop();
+                context.push('/add-subscription');
+              },
+            );
           }
 
           return _AnalyticsContent(analytics: analytics, ref: ref);
@@ -659,58 +669,6 @@ class _CurrencyBreakdownCard extends StatelessWidget {
   }
 }
 
-/// Empty state when no subscriptions exist.
-class _EmptyState extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.xxl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(AppSizes.xl),
-              decoration: const BoxDecoration(
-                color: AppColors.primarySurface,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.analytics_outlined,
-                size: 64,
-                color: AppColors.primary.withValues(alpha: 0.6),
-              ),
-            ),
-            const SizedBox(height: AppSizes.xl),
-            Text(
-              'No Analytics Yet',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.md),
-            Text(
-              'Add your first subscription to see spending insights',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSizes.xxl),
-            FilledButton.icon(
-              onPressed: () {
-                context.pop();
-                context.push('/add');
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add Subscription'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 // Helper functions
 

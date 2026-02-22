@@ -7,7 +7,7 @@ part of 'add_subscription_controller.dart';
 // **************************************************************************
 
 String _$addSubscriptionControllerHash() =>
-    r'409436d0db4f498cc51ec8906f3f59c5ff8db6a5';
+    r'fcc41d31e7554a0074784e9550db41d1f7e0c947';
 
 /// Copied from Dart SDK
 class _SystemHash {

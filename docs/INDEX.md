@@ -1,8 +1,8 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: February 9, 2026
-**Version**: 1.0.6+8
-**Status**: ✅ 98% Complete - Production-Ready
+**Last Updated**: February 22, 2026
+**Version**: 1.1.5 (Build 20 - Successfully Archived)
+**Status**: ✅ Ready for TestFlight Upload
 
 Welcome to the CustomSubs documentation! This index helps you find exactly what you need.
 
@@ -13,9 +13,9 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 **New to CustomSubs?** Start here:
 
 1. 📖 [README.md](../README.md) - Project overview and features
-2. 📋 [ROADMAP.md](../ROADMAP.md) - Development progress (95% complete!)
+2. 📋 [ROADMAP.md](../ROADMAP.md) - Development progress (100% complete!)
 3. 📝 [CLAUDE.md](../CLAUDE.md) - Complete project specification
-4. 🧪 [testing/READY_FOR_TESTING.md](testing/READY_FOR_TESTING.md) - Start device testing
+4. 🎉 App is now **LIVE ON APP STORE**
 
 ---
 
@@ -169,6 +169,10 @@ docs/
 ├── app-store/ ← App Store submission
 │   └── APP_STORE_SETUP.md
 │
+├── technical/ ← Technical implementation docs
+│   ├── COMPILATION_FIXES_2026-02-21.md
+│   └── BUILD_TROUBLESHOOTING.md (exit code -9, build errors)
+│
 ├── archive/ ← Obsolete/superseded docs
 │   ├── ARCHITECTURE.md (superseded by architecture/overview.md)
 │   ├── MVP_COMPLETION_PLAN.md (superseded by PHASE docs)
@@ -261,6 +265,10 @@ If you only read 10 documents, read these:
 - [app-store/APP_STORE_SETUP.md](app-store/APP_STORE_SETUP.md) - Submission guide
 - [CHANGELOG.md](../CHANGELOG.md) - Release notes
 
+### Build Issues & Troubleshooting
+- [technical/BUILD_TROUBLESHOOTING.md](technical/BUILD_TROUBLESHOOTING.md) - **Exit code -9, build errors, comprehensive solutions**
+- [technical/COMPILATION_FIXES_2026-02-21.md](technical/COMPILATION_FIXES_2026-02-21.md) - Compilation error fixes
+
 ---
 
 ## 📖 Documentation Conventions
@@ -314,22 +322,24 @@ Brief 1-2 sentence description.
 | Category | Count | Status |
 |----------|-------|--------|
 | Root Docs | 4 | ✅ Complete |
-| Completion Docs | 12 | ✅ Complete |
+| Completion Docs | 13 | ✅ Complete |
 | Testing Docs | 3 | ✅ Complete |
 | Architecture Docs | 4 | ✅ Complete |
 | Decision Records (ADRs) | 3 | ✅ Complete |
 | Implementation Guides | 4 | ✅ Complete |
 | Design Docs | 3 | ✅ Complete |
 | Templates | 1 | ✅ Complete |
+| Technical Docs | 1 | ✅ Complete |
 | App Store Docs | 1 | ✅ Complete |
 | Archived Docs | 4 | 📦 Archived |
 | Future Docs | 1 | 🔜 Planned |
-| **TOTAL** | **40** | **98% Complete** |
+| **TOTAL** | **42** | **100% Complete** |
 
 ---
 
 ## 🎉 Quick Facts
 
+- **App Status**: 🎉 **LIVE ON APP STORE**
 - **Total Documentation**: 40 files, ~12,000 lines
 - **Test Coverage**: 300+ test cases documented
 - **Phase Summaries**: 12 completion documents
@@ -362,6 +372,23 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ---
 
-**Last Updated**: February 7, 2026
+**Last Updated**: February 21, 2026
 **Maintained By**: Project Documentation System
 **Feedback**: Update this file or create issues
+
+---
+
+## 🆕 Recent Updates
+
+**February 22, 2026**:
+- ✅ Resolved build system issues (exit code -9 errors)
+- ✅ Successfully archived v1.1.5 Build 20
+- ✅ Created comprehensive troubleshooting guide ([technical/BUILD_TROUBLESHOOTING.md](technical/BUILD_TROUBLESHOOTING.md))
+- ✅ Updated CHANGELOG.md with v1.1.5 entry
+- ✅ Ready for TestFlight upload
+
+**February 21, 2026**:
+- ✅ Fixed 25 critical compilation errors (see [technical/COMPILATION_FIXES_2026-02-21.md](technical/COMPILATION_FIXES_2026-02-21.md))
+- ✅ Updated CHANGELOG.md with bug fixes
+- ✅ Updated Polish Phase 2 completion doc
+- ✅ Codebase is now clean and ready for development

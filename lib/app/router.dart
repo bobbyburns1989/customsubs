@@ -9,6 +9,8 @@ import 'package:custom_subs/features/settings/settings_screen.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_screen.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_screen.dart';
 import 'package:custom_subs/features/analytics/analytics_screen.dart';
+import 'package:custom_subs/features/paywall/paywall_screen.dart';
+import 'package:custom_subs/core/utils/notification_router.dart';
 
 /// Centralized app routing configuration.
 ///
@@ -23,6 +25,7 @@ class AppRouter {
   static const String addSubscription = '/add-subscription';
   static const String editSubscription = '/edit-subscription';
   static const String subscriptionDetail = '/subscription';
+  static const String paywall = '/paywall';
 
   /// Creates the app's router configuration.
   ///
@@ -38,8 +41,9 @@ class AppRouter {
   /// - `/add-subscription` - Create new subscription
   /// - `/edit-subscription?id=<id>` - Edit existing subscription
   /// - `/subscription/:id` - View subscription details
+  /// - `/paywall` - Premium subscription upgrade screen
   static GoRouter router(bool hasSeenOnboarding) {
-    return GoRouter(
+    final router = GoRouter(
       initialLocation: hasSeenOnboarding ? home : onboarding,
       routes: [
         GoRoute(
@@ -59,6 +63,10 @@ class AppRouter {
           builder: (context, state) => const AnalyticsScreen(),
         ),
         GoRoute(
+          path: paywall,
+          builder: (context, state) => const PaywallScreen(),
+        ),
+        GoRoute(
           path: addSubscription,
           builder: (context, state) => const AddSubscriptionScreen(),
         ),
@@ -75,10 +83,20 @@ class AppRouter {
           path: '$subscriptionDetail/:id',
           builder: (context, state) {
             final id = state.pathParameters['id']!;
-            return SubscriptionDetailScreen(subscriptionId: id);
+            final extra = state.extra as Map<String, dynamic>?;
+            final autoMarkPaid = extra?['autoMarkPaid'] as bool? ?? false;
+            return SubscriptionDetailScreen(
+              subscriptionId: id,
+              autoMarkPaid: autoMarkPaid,
+            );
           },
         ),
       ],
     );
+
+    // Store router instance for notification deep linking
+    NotificationRouter.setRouter(router);
+
+    return router;
   }
 }

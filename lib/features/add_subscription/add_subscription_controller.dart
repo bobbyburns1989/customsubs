@@ -6,6 +6,8 @@ import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/core/providers/entitlement_provider.dart';
+import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 
 part 'add_subscription_controller.g.dart';
 
@@ -95,6 +97,19 @@ class AddSubscriptionController extends _$AddSubscriptionController {
       isPaid: isEditing ? existingSubscription.isPaid : false,
       lastMarkedPaidDate: isEditing ? existingSubscription.lastMarkedPaidDate : null,
     );
+
+    // Check subscription limit for free users (before save)
+    if (!isEditing) {
+      // Only check limit when adding new subscription (not editing existing)
+      final currentCount = repository.getAllActive().length;
+      final isPremium = await ref.read(isPremiumProvider.future);
+
+      if (!isPremium &&
+          currentCount >= RevenueCatConstants.maxFreeSubscriptions) {
+        // User hit free tier limit - throw exception to trigger paywall
+        throw Exception('SUBSCRIPTION_LIMIT_REACHED');
+      }
+    }
 
     await repository.upsert(subscription);
     await notificationService.scheduleNotificationsForSubscription(subscription);

@@ -25,6 +25,7 @@ import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/data/models/monthly_snapshot.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/data/services/entitlement_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 
 /// Application entry point.
@@ -58,7 +59,10 @@ void main() async {
   // Set local timezone to device's actual timezone
   // CRITICAL: Without this, all notifications schedule in UTC!
   try {
-    final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+    // flutter_timezone 5.0.1+ returns TimezoneInfo instead of String
+    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+    // Extract the timezone name from TimezoneInfo object
+    final String timeZoneName = timezoneInfo.identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   } catch (e) {
     // Fallback to UTC if timezone detection fails
@@ -69,6 +73,9 @@ void main() async {
   // Load bundled currency exchange rates from assets/data/exchange_rates.json
   // This enables multi-currency support without network calls
   await CurrencyUtils.loadExchangeRates();
+
+  // Initialize RevenueCat for subscription management
+  await EntitlementService.instance.initialize();
 
   // Create Riverpod container for dependency injection
   final container = ProviderContainer();

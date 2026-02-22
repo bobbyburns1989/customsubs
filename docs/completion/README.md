@@ -46,6 +46,12 @@ This folder contains detailed completion reports for each development phase, doc
 | [ADD_SUBSCRIPTION_REFACTORING.md](ADD_SUBSCRIPTION_REFACTORING.md) | **Form refactoring: 698→393 lines, 57 tests** | ✅ Complete |
 | [SUBSCRIPTION_DETAIL_REFACTORING.md](SUBSCRIPTION_DETAIL_REFACTORING.md) | **Widget extraction: 929→424 lines, 7 widgets** | ✅ Complete |
 
+### 🎉 App Store Launch
+
+| Document | Focus | Status |
+|----------|-------|--------|
+| [APP_STORE_LAUNCH.md](APP_STORE_LAUNCH.md) | **🎉 LIVE ON APP STORE - v1.0.12+14** | ✅ **RELEASED** |
+
 ---
 
 ## 🎯 Purpose
@@ -66,4 +72,4 @@ These documents serve as:
 
 ---
 
-**Last Updated**: February 9, 2026
+**Last Updated**: February 16, 2026 - 🎉 **APP STORE LAUNCH**

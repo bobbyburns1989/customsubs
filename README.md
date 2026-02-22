@@ -12,13 +12,24 @@
 
 CustomSubs is a mobile application designed to help you track and manage your subscriptions with complete privacy. All your data stays on your device - no servers, no accounts, no tracking, no internet connection required.
 
-**📊 Development Status:** 98% Complete - Ready for Device Testing! | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
+**🎉 Status:** ✅ **LIVE ON APP STORE** | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
 
-**🆕 Latest Update (v1.0.11):** Massive template expansion! Now supporting **260+ subscription services** (was 162) including telehealth, beauty boxes, home services, meal kits, pet care, crypto platforms, and more!
+**🆕 Latest Version (v1.1.0):** Premium subscription with **3-day free trial**! Try unlimited subscriptions risk-free, then just $0.99/month. Plus 260+ subscription templates and rock-solid reliability.
+
+**💎 Premium Features:** Free tier includes 5 subscriptions. Upgrade for unlimited tracking with a 3-day free trial—cancel anytime!
 
 ### Key Features
 
-✅ **Completed Features (Phases 0-2 + UI Modernization)**
+✅ **Completed Features (Phases 0-7 + UI Modernization)**
+
+**Monetization (Phase 7 - Complete):**
+- 🎁 **3-Day Free Trial:** Try Premium risk-free with full feature access
+- 💎 **Freemium model:** Track up to 5 subscriptions for free
+- 💳 **Premium ($0.99/month):** Unlimited subscriptions with RevenueCat integration
+- 🔓 Upgrade flow with beautiful paywall screen
+- 🏆 Premium badge on home screen
+- 🔄 Restore purchases support
+- 📊 Enhanced debugging for subscription flow
 
 **Core Functionality:**
 - 📱 Clean Material 3 UI with custom theming

@@ -5,6 +5,7 @@ import 'package:custom_subs/data/models/subscription.dart';
 import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:custom_subs/core/utils/notification_router.dart';
 
 part 'notification_service.g.dart';
 
@@ -80,19 +81,42 @@ class NotificationService {
     // Android initialization
     const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // iOS initialization
-    const iosSettings = DarwinInitializationSettings(
+    // iOS initialization with notification categories and actions
+    final iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
+      notificationCategories: [
+        // iOS notification category with action buttons
+        DarwinNotificationCategory(
+          'subscription_reminder',
+          actions: <DarwinNotificationAction>[
+            DarwinNotificationAction.plain(
+              'mark_paid',
+              'Mark as Paid',
+              options: <DarwinNotificationActionOption>{
+                DarwinNotificationActionOption.foreground,
+              },
+            ),
+            DarwinNotificationAction.plain(
+              'view_details',
+              'View Details',
+            ),
+          ],
+        ),
+      ],
     );
 
-    const initSettings = InitializationSettings(
+    final initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
     );
 
-    await _notifications.initialize(initSettings);
+    // Initialize with notification callback handler for deep linking
+    await _notifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: NotificationRouter.handleNotificationResponse,
+    );
 
     // Create Android notification channel
     const androidChannel = AndroidNotificationChannel(
@@ -152,6 +176,41 @@ class NotificationService {
     final androidGranted = await androidPlugin?.requestNotificationsPermission();
 
     return iosGranted ?? androidGranted ?? true;
+  }
+
+  /// Creates a JSON payload for notification with subscription metadata for deep linking.
+  ///
+  /// The payload is used by [NotificationRouter] to navigate to the correct screen
+  /// when the user taps the notification or an action button.
+  ///
+  /// **Payload Format:**
+  /// ```json
+  /// {
+  ///   "subscriptionId": "uuid",
+  ///   "action": "view_detail" | "mark_paid"
+  /// }
+  /// ```
+  ///
+  /// **Usage:**
+  /// ```dart
+  /// await _notifications.zonedSchedule(
+  ///   id,
+  ///   title,
+  ///   body,
+  ///   scheduledDate,
+  ///   notificationDetails,
+  ///   payload: _createPayload(subscription.id), // Add this
+  /// );
+  /// ```
+  ///
+  /// **Parameters:**
+  /// - [subscriptionId]: UUID of the subscription
+  /// - [action]: Action type (defaults to 'view_detail')
+  String _createPayload(String subscriptionId, {String action = 'view_detail'}) {
+    return NotificationRouter.createPayload(
+      subscriptionId: subscriptionId,
+      action: action,
+    );
   }
 
   /// Generates a stable, deterministic notification ID from subscription UUID and type.
@@ -279,24 +338,51 @@ class NotificationService {
     final formattedDate = DateFormat.yMMMd().format(subscription.nextBillingDate);
     final formattedAmount = _formatAmount(subscription);
 
+    // Rich notification body for expandable view
+    final notificationBody = '$formattedAmount charges on $formattedDate\n\nTap to view details or mark as paid.';
+
     await _notifications.zonedSchedule(
       _notificationId(subscription.id, 'reminder1'),
       '📅 ${subscription.name} — Billing in $daysUntil days',
-      '$formattedAmount charges on $formattedDate',
+      '$formattedAmount charges on $formattedDate', // Short body for collapsed view
       scheduledDate,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'customsubs_reminders',
           'Subscription Reminders',
           channelDescription: 'Notifications for upcoming subscription charges',
           importance: Importance.max,
           priority: Priority.high,
+          // BigTextStyle for expandable notifications with more detail
+          styleInformation: BigTextStyleInformation(
+            notificationBody,
+            contentTitle: '📅 ${subscription.name} — Billing in $daysUntil days',
+            summaryText: formattedAmount,
+          ),
+          // Action buttons for quick interactions
+          actions: <AndroidNotificationAction>[
+            const AndroidNotificationAction(
+              'mark_paid',
+              'Mark as Paid',
+              showsUserInterface: false, // Background action
+            ),
+            const AndroidNotificationAction(
+              'view_details',
+              'View Details',
+              showsUserInterface: true, // Opens app
+            ),
+          ],
         ),
-        iOS: DarwinNotificationDetails(),
+        iOS: DarwinNotificationDetails(
+          subtitle: 'Billing in $daysUntil days',
+          categoryIdentifier: 'subscription_reminder', // Links to category with actions
+        ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      // Add payload for deep linking
+      payload: _createPayload(subscription.id),
     );
   }
 
@@ -321,28 +407,53 @@ class NotificationService {
     final formattedDate = DateFormat.yMMMd().format(subscription.nextBillingDate);
     final formattedAmount = _formatAmount(subscription);
 
-    final title = subscription.reminders.secondReminderDays == 1
+    final daysUntil = subscription.reminders.secondReminderDays;
+    final title = daysUntil == 1
         ? '⚠️ ${subscription.name} — Bills tomorrow'
-        : '⚠️ ${subscription.name} — Bills in ${subscription.reminders.secondReminderDays} days';
+        : '⚠️ ${subscription.name} — Bills in $daysUntil days';
+
+    // Rich notification body
+    final notificationBody = '$formattedAmount will be charged on $formattedDate\n\nTap to view details or mark as paid.';
 
     await _notifications.zonedSchedule(
       _notificationId(subscription.id, 'reminder2'),
       title,
       '$formattedAmount will be charged on $formattedDate',
       scheduledDate,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'customsubs_reminders',
           'Subscription Reminders',
           channelDescription: 'Notifications for upcoming subscription charges',
           importance: Importance.max,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(
+            notificationBody,
+            contentTitle: title,
+            summaryText: formattedAmount,
+          ),
+          actions: <AndroidNotificationAction>[
+            const AndroidNotificationAction(
+              'mark_paid',
+              'Mark as Paid',
+              showsUserInterface: false,
+            ),
+            const AndroidNotificationAction(
+              'view_details',
+              'View Details',
+              showsUserInterface: true,
+            ),
+          ],
         ),
-        iOS: DarwinNotificationDetails(),
+        iOS: DarwinNotificationDetails(
+          subtitle: daysUntil == 1 ? 'Bills tomorrow' : 'Bills in $daysUntil days',
+          categoryIdentifier: 'subscription_reminder',
+        ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      payload: _createPayload(subscription.id),
     );
   }
 
@@ -363,25 +474,47 @@ class NotificationService {
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final formattedAmount = _formatAmount(subscription);
+    final notificationBody = '$formattedAmount charge expected today\n\nTap to view details or mark as paid.';
 
     await _notifications.zonedSchedule(
       _notificationId(subscription.id, 'dayof'),
       '💰 ${subscription.name} — Billing today',
       '$formattedAmount charge expected today',
       scheduledDate,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'customsubs_reminders',
           'Subscription Reminders',
           channelDescription: 'Notifications for upcoming subscription charges',
           importance: Importance.max,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(
+            notificationBody,
+            contentTitle: '💰 ${subscription.name} — Billing today',
+            summaryText: formattedAmount,
+          ),
+          actions: <AndroidNotificationAction>[
+            const AndroidNotificationAction(
+              'mark_paid',
+              'Mark as Paid',
+              showsUserInterface: false,
+            ),
+            const AndroidNotificationAction(
+              'view_details',
+              'View Details',
+              showsUserInterface: true,
+            ),
+          ],
         ),
-        iOS: DarwinNotificationDetails(),
+        iOS: const DarwinNotificationDetails(
+          subtitle: 'Billing today',
+          categoryIdentifier: 'subscription_reminder',
+        ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      payload: _createPayload(subscription.id),
     );
   }
 
@@ -442,24 +575,41 @@ class NotificationService {
       decimalDigits: 2,
     ).format(postAmount);
 
+    final notificationBody = 'Free trial ends $formattedDate. You\'ll be charged $formattedAmount/${subscription.cycle.shortName} after.\n\nTap to view details or mark as paid.';
+
     await _notifications.zonedSchedule(
       _notificationId(subscription.id, type),
       title,
-      'Free trial ends $formattedDate. You\'ll be charged $formattedAmount/${subscription.cycle.shortName} after.',
+      notificationBody,
       scheduledDate,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
           'customsubs_reminders',
           'Subscription Reminders',
           channelDescription: 'Notifications for upcoming subscription charges',
           importance: Importance.max,
           priority: Priority.high,
+          styleInformation: BigTextStyleInformation(
+            notificationBody,
+            contentTitle: title,
+            summaryText: formattedAmount,
+          ),
+          actions: <AndroidNotificationAction>[
+            const AndroidNotificationAction('mark_paid', 'Mark as Paid',
+              showsUserInterface: false),
+            const AndroidNotificationAction('view_details', 'View Details',
+              showsUserInterface: true),
+          ],
         ),
-        iOS: DarwinNotificationDetails(),
+        iOS: const DarwinNotificationDetails(
+          subtitle: 'Trial ending',
+          categoryIdentifier: 'subscription_reminder',
+        ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
+      payload: _createPayload(subscription.id),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
@@ -20,6 +21,7 @@ import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
+import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -166,9 +168,15 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     } catch (e) {
       if (!mounted) return;
 
-      scaffoldMessenger.showSnackBar(
-        SnackBarUtils.error('Error: $e'),
-      );
+      // Check if user hit subscription limit
+      if (e.toString().contains('SUBSCRIPTION_LIMIT_REACHED')) {
+        await _showUpgradePrompt();
+      } else {
+        // Show generic error for other exceptions
+        scaffoldMessenger.showSnackBar(
+          SnackBarUtils.error('Error: $e'),
+        );
+      }
     }
   }
 
@@ -179,6 +187,25 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     final subscriptionCount = subscriptions.length;
     final colorIndex = subscriptionCount % AppColors.subscriptionColors.length;
     return AppColors.subscriptionColors[colorIndex].toARGB32();
+  }
+
+  /// Show upgrade prompt when user hits subscription limit.
+  Future<void> _showUpgradePrompt() async {
+    // Navigate to full paywall screen
+    await context.push('/paywall');
+
+    // After returning from paywall, check if user upgraded
+    final isPremium = await ref.refresh(isPremiumProvider.future);
+
+    if (isPremium && mounted) {
+      // User upgraded! Show success and retry save automatically
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBarUtils.success('Premium activated! Adding subscription...'),
+      );
+
+      // Retry the save operation
+      await _save();
+    }
   }
 
   @override
@@ -244,6 +271,22 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                           .where((t) =>
                               t.name.toLowerCase().contains(_searchQuery))
                           .toList();
+
+                  // Show empty state when search returns no results
+                  if (filteredTemplates.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppSizes.xxxl,
+                      ),
+                      child: EmptyStateWidget(
+                        icon: Icons.search_off_outlined,
+                        title: 'No templates found',
+                        subtitle:
+                            'Try a different search term or create a custom subscription below',
+                        iconSize: 64, // Smaller for inline display
+                      ),
+                    );
+                  }
 
                   return GridView.builder(
                     shrinkWrap: true,

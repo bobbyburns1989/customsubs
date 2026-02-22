@@ -27,10 +27,12 @@ import 'package:custom_subs/features/subscription_detail/widgets/reminder_info_c
 /// - Edit or delete subscription
 class SubscriptionDetailScreen extends ConsumerStatefulWidget {
   final String subscriptionId;
+  final bool autoMarkPaid;
 
   const SubscriptionDetailScreen({
     super.key,
     required this.subscriptionId,
+    this.autoMarkPaid = false,
   });
 
   @override
@@ -83,6 +85,23 @@ class _SubscriptionDetailScreenState
         ),
       );
     });
+
+    // Auto-mark as paid if triggered from notification
+    if (widget.autoMarkPaid) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        final controller = ref.read(
+          subscriptionDetailControllerProvider(widget.subscriptionId).notifier,
+        );
+        await controller.togglePaid();
+
+        if (mounted) {
+          SnackBarUtils.show(
+            context,
+            SnackBarUtils.success('Marked as paid ✓'),
+          );
+        }
+      });
+    }
 
     _controller.forward();
   }

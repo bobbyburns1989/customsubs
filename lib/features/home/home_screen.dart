@@ -9,8 +9,10 @@ import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/core/utils/service_icons.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
+import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
+import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
 import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dart';
 import 'package:custom_subs/app/router.dart';
@@ -142,8 +144,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       body: controller.when(
         data: (subscriptions) {
           if (subscriptions.isEmpty) {
-            return _EmptyState(
-              onAddPressed: () => context.push(AppRouter.addSubscription),
+            return EmptyStateWidget(
+              icon: Icons.inbox_outlined,
+              title: 'No subscriptions yet',
+              subtitle:
+                  'Tap + to add your first one. We\'ll remind you before every charge.',
+              buttonText: 'Add Subscription',
+              onButtonPressed: () async {
+                await HapticUtils.medium();
+                if (!mounted) return;
+                // ignore: use_build_context_synchronously
+                context.push(AppRouter.addSubscription);
+              },
             );
           }
 
@@ -408,50 +420,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 }
 
-class _EmptyState extends StatelessWidget {
-  final VoidCallback onAddPressed;
-
-  const _EmptyState({required this.onAddPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSizes.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'No subscriptions yet',
-              style: theme.textTheme.headlineSmall,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSizes.base),
-            Text(
-              'Tap + to add your first one. We\'ll remind you before every charge.',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSizes.xxl),
-            ElevatedButton.icon(
-              onPressed: () async {
-                await HapticUtils.medium();
-                onAddPressed();
-              },
-              icon: const Icon(Icons.add),
-              label: const Text('Add Subscription'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _SpendingSummaryCard extends StatefulWidget {
   final double monthlyTotal;
   final int activeCount;
@@ -524,11 +492,52 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
             ),
           ),
           const SizedBox(height: AppSizes.sm),
-          Text(
-            '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
+          Consumer(
+            builder: (context, ref, child) {
+              final isPremiumAsync = ref.watch(isPremiumProvider);
+              final isPremium = isPremiumAsync.value ?? false;
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                  if (isPremium) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.workspace_premium,
+                            size: 12,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Premium',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white.withValues(alpha: 0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),
