@@ -270,18 +270,54 @@ flutter run --release
 ```
 
 ### Archive for App Store
+
+**IMPORTANT:** Always run Flutter commands BEFORE opening Xcode to generate required build files.
+
+**Option 1: Archive in Xcode (Recommended)**
+
 ```bash
+# Close Xcode if it's open
+killall Xcode
+
 # Clean build
 flutter clean
 flutter pub get
+
+# Generate code (if you modified models/providers)
 dart run build_runner build --delete-conflicting-outputs
 
-# Build iOS release
-flutter build ios --release
+# Build iOS release (generates all Xcode files)
+flutter build ios --release --no-codesign
 
-# Then in Xcode:
-# Product → Archive → Distribute App
+# Open Xcode workspace
+open ios/Runner.xcworkspace
 ```
+
+Then in Xcode:
+1. Select "Any iOS Device (arm64)" as build target
+2. Product → Clean Build Folder (⌘⇧K)
+3. Product → Archive (⌘⇧B)
+4. Wait ~30 seconds (fast because Flutter already built everything)
+5. Distribute App → App Store Connect
+
+**Option 2: CLI Build + Xcode Archive (For memory issues)**
+
+If you encounter exit code -9 errors:
+
+```bash
+# Build with optimization flags
+flutter build ios --release --no-codesign --split-debug-info=build/debug-info
+
+# Then archive in Xcode (will be very fast)
+open ios/Runner.xcworkspace
+```
+
+**Common Error: package_config.json missing**
+
+If Xcode shows "package_config.json does not exist":
+- You forgot to run `flutter pub get` before opening Xcode
+- Run `flutter pub get && flutter build ios --release --no-codesign`
+- Restart Xcode
 
 ---
 

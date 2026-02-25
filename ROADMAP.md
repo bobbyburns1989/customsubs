@@ -24,9 +24,10 @@
 | **Phase 7** | ✅ Complete | 17/17 | 100% | ~5 hrs | RevenueCat + 3-Day Trial |
 | **Phase 8** | ✅ Complete | 7/7 | 100% | ~15 min | Icon-based empty states |
 | **Phase 9** | ✅ Complete | 2/2 | 100% | ~30 min | Build system fixes (v1.1.5) |
-| **TOTAL** | | 74/74 | **100%** | ~33.75 hrs | |
+| **Phase 10** | 🚧 In Progress | 1/2 | 50% | ~20 min | App Review fixes (v1.1.6) |
+| **TOTAL** | | 75/76 | **99%** | ~34 hrs | |
 
-**Overall Status: 100% Complete** ✅ **v1.1.5 Build 20 Archived - Ready for TestFlight**
+**Overall Status: 99% Complete** ✅ **v1.1.6 Paywall Fixed - Awaiting Legal Links**
 
 ---
 
@@ -1010,7 +1011,109 @@ open ios/Runner.xcworkspace
 
 ---
 
+## 🚧 Phase 10: App Review Rejection Fixes (IN PROGRESS)
+
+**Started:** February 22, 2026
+**Status:** 🚧 50% Complete (1/2 tasks)
+**Focus:** v1.1.6 App Store Compliance
+
+### Summary
+
+Version 1.7 (Build 20) was rejected by Apple with 3 issues:
+1. **Missing legal links** - Privacy Policy and Terms of Use (⏳ User action required)
+2. **Paywall design violation** - Trial too prominent vs price (✅ Fixed in code)
+3. **Purchase failed** - Subscription "Waiting for Review" (⏳ Auto-resolves with approval)
+
+### Completed Tasks ✅
+
+**Task #1: Redesign Paywall for Guideline 3.1.2 Compliance (20 min)** ✅
+- **Guideline:** 3.1.2 - Business - Payments - Subscriptions
+- **Issue:** "The auto-renewable subscription promotes the free trial more clearly and conspicuously than the billed amount"
+- **Fix Applied:**
+  - Price ($0.99/month) now MOST prominent: 36px bold in bordered green box
+  - Trial now subordinate: 14px gray text "Includes 3-day free trial"
+  - Removed large green "3-Day Free Trial" feature box
+  - Changed button text: "Subscribe for $0.99/month" (was "Start 3-Day Free Trial")
+- **File Modified:** `lib/features/paywall/paywall_screen.dart`
+- **Result:** ✅ Paywall now Apple-compliant
+
+### Pending Tasks ⏳
+
+**Task #2: User Adds Legal Links to App Store Connect** ⏳
+- **Status:** Waiting on user action
+- **Required Actions:**
+  1. Add Privacy Policy URL to App Store Connect → App Information
+  2. Add Terms of Use and Privacy Policy links to App Description field
+  3. Verify URLs are functional
+- **User Guide:** `APP_REVIEW_REJECTION_FIXES.md` (complete instructions)
+- **Estimated Time:** 20 minutes
+
+### Files Modified (Phase 10)
+
+**Code Changes (1 file):**
+1. `lib/features/paywall/paywall_screen.dart` - Price-prominent redesign
+
+**Documentation (4 files):**
+1. `APP_REVIEW_REJECTION_FIXES.md` - Complete user guide with copy-paste instructions
+2. `READY_TO_ARCHIVE_v1.1.6.md` - Updated with memory optimization steps
+3. `ARCHIVE_TROUBLESHOOTING_v1.1.6.md` - Comprehensive exit code -9 troubleshooting
+4. `CHANGELOG.md` - Documented archive issues and memory requirements
+
+### Next Steps
+
+**Immediate (User):**
+1. Add Privacy Policy URL: `https://customsubs.us/privacy` (or Apple standard)
+2. Add legal links to App Description (see guide for exact text)
+3. Host privacy policy at URL or use Apple's standard terms
+
+**After User Completes:**
+1. Build version 1.1.6+21
+2. Archive in Xcode
+3. Upload to TestFlight as Build 21
+4. User creates version 1.8 in App Store Connect
+5. User attaches Build 21 + subscription to version 1.8
+6. Resubmit for App Review
+
+### Build Challenges Encountered
+
+**Issue:** Exit code -9 errors during Xcode archive
+- Dart snapshot generator failed with exit code -9
+- Shader compilation failed with exit code -9
+
+**Root Cause:** Insufficient RAM during release build shader compilation
+- Release builds compile GPU shaders (memory-intensive)
+- Peak memory usage: ~4GB during shader compilation
+- macOS kills processes exceeding RAM limits
+
+**Solution Applied:**
+- Aggressive clean of all build artifacts
+- Precached iOS artifacts (`flutter precache --ios`)
+- **Critical:** Close ALL browsers and memory-intensive apps
+- Verify Memory Pressure is GREEN in Activity Monitor
+- Required 4-5GB free RAM for successful archive
+
+**Documentation Added:**
+- Complete troubleshooting guide in `ARCHIVE_TROUBLESHOOTING_v1.1.6.md`
+- Updated `READY_TO_ARCHIVE_v1.1.6.md` with memory optimization steps
+- Added build notes to CHANGELOG
+
+### Impact
+
+- ✅ **Paywall compliance:** Fixed in code, ready for new build
+- ✅ **Build system:** Archive process documented and optimized for memory
+- ⏳ **Legal compliance:** Waiting on user to add links in App Store Connect
+- ⏳ **Purchase functionality:** Will work once subscription approved by Apple
+
+**Timeline:**
+- Memory optimization + archive: ~10 minutes
+- Upload to TestFlight: ~15 minutes
+- User adds legal links: ~20 minutes
+- Create version 1.8 + submit: ~15 minutes
+- **Total:** ~60 minutes → Ready for resubmission
+
+---
+
 **Last Updated**: February 22, 2026
-**Version**: 1.1.5+20
-**Status**: ✅ Phase 9 Complete - Build System Stable
-**Next Milestone**: Upload Build 20 to TestFlight → Premium feature testing
+**Version**: 1.1.6+21 (Prepared)
+**Status**: 🚧 Phase 10 In Progress - Paywall Fixed, Awaiting Legal Links
+**Next Milestone**: User adds legal links → Build 21 → Version 1.8 resubmission

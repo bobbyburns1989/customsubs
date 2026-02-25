@@ -95,13 +95,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     // Advance overdue billing dates and reset isPaid for those subscriptions
     final updatedSubscriptions = await repository.advanceOverdueBillingDates();
 
-    // Re-schedule notifications for subscriptions with advanced dates
-    for (final subscription in updatedSubscriptions) {
+    // Auto-resume subscriptions whose resumeDate has passed
+    final resumedSubscriptions = await repository.autoResumeSubscriptions();
+
+    // Re-schedule notifications for all affected subscriptions
+    for (final subscription in [...updatedSubscriptions, ...resumedSubscriptions]) {
       await notificationService.scheduleNotificationsForSubscription(subscription);
     }
 
-    // Refresh UI if any dates were advanced
-    if (updatedSubscriptions.isNotEmpty) {
+    // Refresh UI if any changes occurred
+    if (updatedSubscriptions.isNotEmpty || resumedSubscriptions.isNotEmpty) {
       ref.read(homeControllerProvider.notifier).refresh();
     }
   }
@@ -164,6 +167,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           final primaryCurrency = homeController.getPrimaryCurrency();
           final monthlyTotal = homeController.calculateMonthlyTotal();
           final activeCount = homeController.getActiveCount();
+          final pausedCount = homeController.getPausedCount();
+          final pausedSubscriptions = homeController.getPausedSubscriptions();
           final trialsEndingSoon = homeController.getTrialsEndingSoon();
 
           return RefreshIndicator(
@@ -181,6 +186,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: _SpendingSummaryCard(
                       monthlyTotal: monthlyTotal,
                       activeCount: activeCount,
+                      pausedCount: pausedCount,
                       currency: primaryCurrency,
                     ),
                   ),
@@ -341,6 +347,56 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
 
+                // Paused Subscriptions Section (only show if there are paused subs)
+                if (pausedSubscriptions.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSizes.base,
+                        AppSizes.sectionSpacing,
+                        AppSizes.base,
+                        AppSizes.sm,
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.pause_circle_outline, size: 20, color: AppColors.textSecondary),
+                          const SizedBox(width: AppSizes.sm),
+                          Text(
+                            'Paused',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(width: AppSizes.sm),
+                          Text(
+                            '$pausedCount paused',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Paused subscription tiles
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final subscription = pausedSubscriptions[index];
+                        return _PausedSubscriptionTile(
+                          subscription: subscription,
+                          onTap: () {
+                            context.push('${AppRouter.subscriptionDetail}/${subscription.id}');
+                          },
+                          onResume: () {
+                            homeController.resumeSubscription(subscription.id);
+                          },
+                        );
+                      },
+                      childCount: pausedSubscriptions.length,
+                    ),
+                  ),
+                ],
+
                 // Bottom padding
                 const SliverToBoxAdapter(
                   child: SizedBox(height: AppSizes.xxxl),
@@ -423,11 +479,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 class _SpendingSummaryCard extends StatefulWidget {
   final double monthlyTotal;
   final int activeCount;
+  final int pausedCount;
   final String currency;
 
   const _SpendingSummaryCard({
     required this.monthlyTotal,
     required this.activeCount,
+    required this.pausedCount,
     required this.currency,
   });
 
@@ -501,7 +559,9 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
+                    widget.pausedCount > 0
+                        ? '${widget.activeCount} active • ${widget.pausedCount} paused'
+                        : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: Colors.white.withValues(alpha: 0.9),
                     ),
@@ -759,5 +819,146 @@ class _SubscriptionTile extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _PausedSubscriptionTile extends StatelessWidget {
+  final Subscription subscription;
+  final VoidCallback onTap;
+  final VoidCallback onResume;
+
+  const _PausedSubscriptionTile({
+    required this.subscription,
+    required this.onTap,
+    required this.onResume,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = material.Color(subscription.colorValue);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.base,
+        vertical: AppSizes.xs,
+      ),
+      child: Dismissible(
+        key: Key('pause-${subscription.id}'),
+        direction: DismissDirection.endToStart,
+        confirmDismiss: (direction) async {
+          await HapticUtils.medium();
+          onResume();
+          return false; // Don't actually dismiss, just trigger resume
+        },
+        background: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.only(right: AppSizes.base),
+          decoration: BoxDecoration(
+            color: AppColors.success,
+            borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          ),
+          child: const Icon(Icons.play_arrow, color: Colors.white),
+        ),
+        child: SubtlePressable(
+          onPressed: () async {
+            await HapticUtils.light();
+            onTap();
+          },
+          scale: 0.99,
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSizes.lg),
+              child: Row(
+                children: [
+                  // Desaturated icon
+                  Opacity(
+                    opacity: 0.5,
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            color.withValues(alpha: 0.15),
+                            color.withValues(alpha: 0.25),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: ServiceIcons.hasCustomIcon(subscription.name)
+                            ? Icon(
+                                ServiceIcons.getIconForService(subscription.name),
+                                color: color,
+                                size: 26,
+                              )
+                            : Text(
+                                subscription.name[0].toUpperCase(),
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: color,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSizes.base),
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          subscription.name,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppColors.textSecondary, // Muted
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _getPauseStatusText(),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Amount (muted)
+                  Text(
+                    CurrencyUtils.formatAmount(
+                      subscription.amount,
+                      subscription.currencyCode,
+                    ),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _getPauseStatusText() {
+    if (subscription.resumeDate != null) {
+      final daysUntil = subscription.resumeDate!.difference(DateTime.now()).inDays;
+      if (daysUntil <= 0) {
+        return 'Resumes today';
+      } else if (daysUntil == 1) {
+        return 'Resumes tomorrow';
+      } else {
+        return 'Resumes in $daysUntil days';
+      }
+    }
+
+    return 'Paused ${subscription.daysPaused} days ago';
   }
 }

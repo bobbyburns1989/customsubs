@@ -268,6 +268,11 @@ class EntitlementService {
   ///
   /// Returns the default offering with packages (monthly subscription).
   /// Used to display pricing in paywall.
+  ///
+  /// Uses fallback logic:
+  /// 1. Try offerings.current (marked as current in dashboard)
+  /// 2. Fall back to explicit 'default' offering by ID
+  /// This ensures we get the offering even if 'current' flag isn't set properly.
   Future<Offering?> getOfferings() async {
     if (!_isInitialized) {
       debugPrint('⚠️ RevenueCat not initialized');
@@ -276,11 +281,82 @@ class EntitlementService {
 
     try {
       final offerings = await Purchases.getOfferings();
-      return offerings.current;
+
+      // Try current offering first, fall back to explicit 'default' lookup
+      final offering = offerings.current ?? offerings.all[RevenueCatConstants.defaultOfferingId];
+
+      if (offering == null) {
+        debugPrint('⚠️ No current offering and no "${RevenueCatConstants.defaultOfferingId}" offering found');
+        debugPrint('   Available offerings: ${offerings.all.keys.join(", ")}');
+      }
+
+      return offering;
     } catch (e) {
       debugPrint('❌ Error fetching offerings: $e');
       return null;
     }
+  }
+
+  /// Get offerings with retry logic for sandbox environment.
+  ///
+  /// Sandbox can be flaky - retry up to 3 times with exponential backoff.
+  /// This is critical for iPad sandbox testing where StoreKit daemon
+  /// connection can be slow or timeout on first attempt.
+  ///
+  /// Returns the current offering, or null if all retries fail.
+  Future<Offering?> getOfferingsWithRetry({
+    int maxRetries = 3,
+    Duration initialDelay = const Duration(seconds: 1),
+  }) async {
+    if (!_isInitialized) {
+      debugPrint('⚠️ RevenueCat not initialized');
+      return null;
+    }
+
+    int attempt = 0;
+    Duration delay = initialDelay;
+
+    while (attempt < maxRetries) {
+      attempt++;
+      debugPrint('📡 Fetching offerings (attempt $attempt/$maxRetries)...');
+
+      try {
+        final offerings = await Purchases.getOfferings();
+
+        // Try current offering first, fall back to explicit 'default' lookup
+        final offering = offerings.current ?? offerings.all[RevenueCatConstants.defaultOfferingId];
+
+        if (offering != null) {
+          debugPrint('✅ Offerings fetched successfully on attempt $attempt');
+          debugPrint('   Offering ID: ${offering.identifier}');
+          debugPrint('   Packages: ${offering.availablePackages.length}');
+          if (offerings.current == null) {
+            debugPrint('   ℹ️ Used fallback to "${RevenueCatConstants.defaultOfferingId}" offering (current was null)');
+          }
+          return offering;
+        } else {
+          debugPrint('⚠️ No current offering and no "${RevenueCatConstants.defaultOfferingId}" offering found (attempt $attempt)');
+          debugPrint('   Available offerings: ${offerings.all.keys.join(", ")}');
+          if (attempt < maxRetries) {
+            debugPrint('   Retrying in ${delay.inSeconds}s...');
+            await Future.delayed(delay);
+            delay *= 2; // Exponential backoff: 1s, 2s, 4s
+          }
+        }
+      } catch (e) {
+        debugPrint('❌ Error fetching offerings (attempt $attempt): $e');
+        if (attempt < maxRetries) {
+          debugPrint('   Retrying in ${delay.inSeconds}s...');
+          await Future.delayed(delay);
+          delay *= 2; // Exponential backoff
+        } else {
+          debugPrint('❌ All retry attempts failed');
+          return null;
+        }
+      }
+    }
+
+    return null;
   }
 
   /// Purchase the monthly premium subscription.
@@ -304,9 +380,20 @@ class EntitlementService {
       return false;
     }
 
+    // iOS 18.0-18.5 Workaround: Add delay to stabilize StoreKit daemon connection
+    // Reference: https://www.revenuecat.com/docs/known-store-issues/storekit/ios-18-purchase-fails
+    if (Platform.isIOS) {
+      debugPrint('');
+      debugPrint('⚙️  iOS detected - applying StoreKit stabilization delay (500ms)');
+      debugPrint('   This prevents iOS 18.x purchase sheet failures in sandbox');
+      await Future.delayed(const Duration(milliseconds: 500));
+    }
+
     try {
       debugPrint('');
       debugPrint('📡 Fetching offerings from RevenueCat...');
+      debugPrint('   OS: ${Platform.operatingSystem}');
+      debugPrint('   OS Version: ${Platform.operatingSystemVersion}');
 
       // Get available offerings
       final offerings = await Purchases.getOfferings();

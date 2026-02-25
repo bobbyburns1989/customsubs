@@ -85,4 +85,45 @@ class SubscriptionDetailController extends _$SubscriptionDetailController {
     // Set state to null (subscription deleted)
     state = const AsyncValue.data(null);
   }
+
+  /// Pause subscription with optional resume date
+  Future<void> pauseSubscription({DateTime? resumeDate}) async {
+    final subscription = state.value;
+    if (subscription == null) return;
+
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    final notificationService = await ref.read(notificationServiceProvider.future);
+
+    await repository.pauseSubscription(subscription.id, resumeDate: resumeDate);
+    await notificationService.cancelNotificationsForSubscription(subscription.id);
+
+    // Refresh state
+    final updated = repository.getById(subscription.id);
+    state = AsyncValue.data(updated);
+
+    // Invalidate home controller
+    ref.invalidate(homeControllerProvider);
+  }
+
+  /// Resume a paused subscription
+  Future<void> resumeSubscription() async {
+    final subscription = state.value;
+    if (subscription == null) return;
+
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    final notificationService = await ref.read(notificationServiceProvider.future);
+
+    await repository.resumeSubscription(subscription.id);
+
+    final updated = repository.getById(subscription.id);
+    if (updated != null) {
+      await notificationService.scheduleNotificationsForSubscription(updated);
+    }
+
+    // Refresh state
+    state = AsyncValue.data(updated);
+
+    // Invalidate home controller
+    ref.invalidate(homeControllerProvider);
+  }
 }

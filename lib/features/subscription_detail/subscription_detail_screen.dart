@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
@@ -12,6 +13,7 @@ import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/notes_card.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/header_card.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/billing_info_card.dart';
@@ -191,30 +193,35 @@ class _SubscriptionDetailScreenState
 
                 const SizedBox(height: AppSizes.base),
 
-                // Card 1: Mark as Paid button (always present)
+                // Card 1: Subscription Actions (conditional based on pause state)
                 SlideTransition(
                   position: _slideAnimations[cardIndex],
                   child: FadeTransition(
                     opacity: _fadeAnimations[cardIndex++],
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton.icon(
-                        onPressed: () async {
-                          await HapticUtils.medium();
-                          ref
-                              .read(subscriptionDetailControllerProvider(
-                                      widget.subscriptionId)
-                                  .notifier)
-                              .togglePaid();
-                        },
-                        icon: Icon(
-                          subscription.isPaid
-                              ? Icons.check_circle
-                              : Icons.check_circle_outline,
-                        ),
-                        label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
-                      ),
-                    ),
+                    child: subscription.isActive
+                        ? _ActiveSubscriptionActions(
+                            subscription: subscription,
+                            onMarkPaid: () async {
+                              await HapticUtils.medium();
+                              ref
+                                  .read(subscriptionDetailControllerProvider(
+                                          widget.subscriptionId)
+                                      .notifier)
+                                  .togglePaid();
+                            },
+                            onPause: () => _showPauseDialog(context, ref, subscription),
+                          )
+                        : _PausedSubscriptionActions(
+                            subscription: subscription,
+                            onResume: () async {
+                              await HapticUtils.medium();
+                              ref
+                                  .read(subscriptionDetailControllerProvider(
+                                          widget.subscriptionId)
+                                      .notifier)
+                                  .resumeSubscription();
+                            },
+                          ),
                   ),
                 ),
 
@@ -437,5 +444,224 @@ class _SubscriptionDetailScreenState
         ],
       ),
     );
+  }
+
+  void _showPauseDialog(BuildContext context, WidgetRef ref, Subscription subscription) {
+    DateTime? selectedResumeDate;
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Pause Subscription'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'While paused:',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              const Row(
+                children: [
+                  Icon(Icons.notifications_off, size: 16, color: AppColors.textSecondary),
+                  SizedBox(width: AppSizes.sm),
+                  Expanded(child: Text('No reminders will be sent')),
+                ],
+              ),
+              const SizedBox(height: AppSizes.xs),
+              const Row(
+                children: [
+                  Icon(Icons.pause_circle_outline, size: 16, color: AppColors.textSecondary),
+                  SizedBox(width: AppSizes.sm),
+                  Expanded(child: Text('Billing dates won\'t advance')),
+                ],
+              ),
+              const SizedBox(height: AppSizes.xs),
+              const Row(
+                children: [
+                  Icon(Icons.trending_down, size: 16, color: AppColors.textSecondary),
+                  SizedBox(width: AppSizes.sm),
+                  Expanded(child: Text('Excluded from spending totals')),
+                ],
+              ),
+
+              const SizedBox(height: AppSizes.lg),
+
+              const Text(
+                'Auto-resume date (optional):',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: AppSizes.sm),
+              OutlinedButton(
+                onPressed: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now().add(const Duration(days: 30)),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                  );
+                  if (picked != null) {
+                    setState(() => selectedResumeDate = picked);
+                  }
+                },
+                child: Text(
+                  selectedResumeDate != null
+                      ? DateFormat('MMM d, y').format(selectedResumeDate!)
+                      : 'Resume manually',
+                ),
+              ),
+
+              if (selectedResumeDate != null) ...[
+                const SizedBox(height: AppSizes.sm),
+                TextButton(
+                  onPressed: () => setState(() => selectedResumeDate = null),
+                  child: const Text('Clear date'),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                Navigator.pop(dialogContext);
+                await HapticUtils.medium();
+                ref
+                    .read(subscriptionDetailControllerProvider(widget.subscriptionId).notifier)
+                    .pauseSubscription(resumeDate: selectedResumeDate);
+              },
+              child: const Text('Pause'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Helper widget for active subscription actions
+class _ActiveSubscriptionActions extends StatelessWidget {
+  final Subscription subscription;
+  final VoidCallback onMarkPaid;
+  final VoidCallback onPause;
+
+  const _ActiveSubscriptionActions({
+    required this.subscription,
+    required this.onMarkPaid,
+    required this.onPause,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Mark as Paid button (2/3 width)
+        Expanded(
+          flex: 2,
+          child: OutlinedButton.icon(
+            onPressed: onMarkPaid,
+            icon: Icon(
+              subscription.isPaid
+                  ? Icons.check_circle
+                  : Icons.check_circle_outline,
+            ),
+            label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
+          ),
+        ),
+
+        const SizedBox(width: AppSizes.md),
+
+        // Pause button (1/3 width)
+        Expanded(
+          flex: 1,
+          child: OutlinedButton(
+            onPressed: onPause,
+            child: const Icon(Icons.pause, size: 20),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Helper widget for paused subscription actions
+class _PausedSubscriptionActions extends StatelessWidget {
+  final Subscription subscription;
+  final VoidCallback onResume;
+
+  const _PausedSubscriptionActions({
+    required this.subscription,
+    required this.onResume,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      children: [
+        // Pause status info card
+        Container(
+          padding: const EdgeInsets.all(AppSizes.base),
+          decoration: BoxDecoration(
+            color: AppColors.primarySurface,
+            borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+            border: Border.all(color: AppColors.border, width: 1.5),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.pause_circle, color: AppColors.primary),
+              const SizedBox(width: AppSizes.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Subscription Paused',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _getResumeInfoText(),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: AppSizes.md),
+
+        // Resume button
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton.icon(
+            onPressed: onResume,
+            icon: const Icon(Icons.play_arrow, size: 20),
+            label: const Text('Resume Subscription'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _getResumeInfoText() {
+    if (subscription.resumeDate != null) {
+      final formatter = DateFormat('MMM d, y');
+      return 'Auto-resumes on ${formatter.format(subscription.resumeDate!)}';
+    }
+    return 'Paused ${subscription.daysPaused} days ago';
   }
 }

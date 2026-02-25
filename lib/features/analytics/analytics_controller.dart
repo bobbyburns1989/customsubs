@@ -89,12 +89,21 @@ class AnalyticsController extends _$AnalyticsController {
   AnalyticsData _calculateAnalytics(List<Subscription> subscriptions) {
     final primaryCurrency = ref.read(primaryCurrencyProvider);
 
-    // Calculate totals
+    // Split active and paused subscriptions
+    final repository = ref.read(subscriptionRepositoryProvider).value;
+    final allSubscriptions = repository?.getAll() ?? [];
+    final pausedSubs = allSubscriptions.where((s) => !s.isActive).toList();
+
+    // Calculate totals for active subscriptions
     final currentMonthTotal = _calculateTotal(subscriptions, primaryCurrency);
     final previousMonthTotal = _getPreviousMonthTotal();
     final monthlyChange = previousMonthTotal != null
         ? currentMonthTotal - previousMonthTotal
         : null;
+
+    // Calculate paused total
+    final pausedMonthlyTotal = _calculateTotal(pausedSubs, primaryCurrency);
+    final combinedMonthlyTotal = currentMonthTotal + pausedMonthlyTotal;
 
     // Calculate breakdowns
     final categoryBreakdown = _calculateCategoryBreakdown(subscriptions, primaryCurrency, currentMonthTotal);
@@ -105,6 +114,9 @@ class AnalyticsController extends _$AnalyticsController {
       monthlyTotal: currentMonthTotal,
       yearlyForecast: currentMonthTotal * 12,
       activeCount: subscriptions.length,
+      pausedCount: pausedSubs.length,
+      pausedMonthlyTotal: pausedMonthlyTotal,
+      combinedMonthlyTotal: combinedMonthlyTotal,
       monthlyChange: monthlyChange,
       categoryBreakdown: categoryBreakdown,
       topSubscriptions: topSubscriptions,
@@ -237,7 +249,7 @@ class AnalyticsController extends _$AnalyticsController {
 
 /// Analytics data containing all calculated spending information.
 class AnalyticsData {
-  /// Total monthly spending in primary currency
+  /// Total monthly spending in primary currency (active subs only)
   final double monthlyTotal;
 
   /// Projected yearly spending (monthlyTotal * 12)
@@ -245,6 +257,15 @@ class AnalyticsData {
 
   /// Number of active subscriptions
   final int activeCount;
+
+  /// Number of paused subscriptions
+  final int pausedCount;
+
+  /// Total monthly spending for paused subscriptions
+  final double pausedMonthlyTotal;
+
+  /// Combined monthly total (active + paused)
+  final double combinedMonthlyTotal;
 
   /// Change from previous month (positive = increase, negative = decrease)
   /// Null if no previous month data available
@@ -266,6 +287,9 @@ class AnalyticsData {
     required this.monthlyTotal,
     required this.yearlyForecast,
     required this.activeCount,
+    required this.pausedCount,
+    required this.pausedMonthlyTotal,
+    required this.combinedMonthlyTotal,
     required this.monthlyChange,
     required this.categoryBreakdown,
     required this.topSubscriptions,

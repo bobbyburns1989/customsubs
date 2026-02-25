@@ -145,8 +145,8 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
       duration: const Duration(milliseconds: 600),
     );
 
-    // 4 cards: Forecast, Category, Top Subs, Currency
-    _fadeAnimations = List.generate(4, (index) {
+    // 5 cards: Forecast, Active vs Paused, Category, Top Subs, Currency
+    _fadeAnimations = List.generate(5, (index) {
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           parent: _controller,
@@ -159,7 +159,7 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
       );
     });
 
-    _slideAnimations = List.generate(4, (index) {
+    _slideAnimations = List.generate(5, (index) {
       return Tween<Offset>(
         begin: const Offset(0, 0.15), // Start 15% below
         end: Offset.zero,
@@ -215,7 +215,19 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
             ),
             const SizedBox(height: AppSizes.sectionSpacing),
 
-            // Card 1: Category Breakdown (conditional)
+            // Card 1: Active vs Paused (conditional - only if paused subs exist)
+            if (widget.analytics.pausedCount > 0) ...[
+              SlideTransition(
+                position: _slideAnimations[cardIndex],
+                child: FadeTransition(
+                  opacity: _fadeAnimations[cardIndex++],
+                  child: _ActiveVsPausedCard(analytics: widget.analytics),
+                ),
+              ),
+              const SizedBox(height: AppSizes.sectionSpacing),
+            ],
+
+            // Card 2: Category Breakdown (conditional)
             if (widget.analytics.categoryBreakdown.isNotEmpty) ...[
               SlideTransition(
                 position: _slideAnimations[cardIndex],
@@ -695,4 +707,128 @@ String _getCurrencySymbol(String currencyCode) {
     'RUB': '₽',
   };
   return symbols[currencyCode] ?? currencyCode;
+}
+
+/// Active vs Paused spending breakdown card.
+class _ActiveVsPausedCard extends StatelessWidget {
+  final AnalyticsData analytics;
+
+  const _ActiveVsPausedCard({required this.analytics});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final currencyFormat = NumberFormat.currency(
+      symbol: _getCurrencySymbol(analytics.primaryCurrency),
+      decimalDigits: 2,
+    );
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSizes.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Active vs Paused',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: AppSizes.lg),
+
+            // Active row
+            _SpendingRow(
+              icon: Icons.play_arrow,
+              iconColor: AppColors.success,
+              label: 'Active (${analytics.activeCount})',
+              amount: '${currencyFormat.format(analytics.monthlyTotal)}/mo',
+              isActive: true,
+            ),
+
+            const SizedBox(height: AppSizes.md),
+
+            // Paused row
+            _SpendingRow(
+              icon: Icons.pause,
+              iconColor: AppColors.textSecondary,
+              label: 'Paused (${analytics.pausedCount})',
+              amount: '${currencyFormat.format(analytics.pausedMonthlyTotal)}/mo',
+              isActive: false,
+            ),
+
+            const Divider(height: AppSizes.xl),
+
+            // Combined total info
+            Row(
+              children: [
+                const Icon(Icons.info_outline, size: 16, color: AppColors.textSecondary),
+                const SizedBox(width: AppSizes.sm),
+                Expanded(
+                  child: Text(
+                    'If all resumed',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                Text(
+                  '${currencyFormat.format(analytics.combinedMonthlyTotal)}/mo',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Individual spending row for active/paused breakdown.
+class _SpendingRow extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String amount;
+  final bool isActive;
+
+  const _SpendingRow({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.amount,
+    required this.isActive,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: iconColor),
+        const SizedBox(width: AppSizes.md),
+        Expanded(
+          child: Text(
+            label,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+            ),
+          ),
+        ),
+        Text(
+          amount,
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+          ),
+        ),
+      ],
+    );
+  }
 }

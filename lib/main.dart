@@ -94,13 +94,22 @@ void main() async {
 
   // Advance billing dates that are in the past to prevent outdated reminders
   // This ensures the app catches up if it hasn't been opened in a while
-  await repository.advanceOverdueBillingDates();
+  final updatedSubscriptions = await repository.advanceOverdueBillingDates();
 
-  // Re-schedule all notifications for active subscriptions
+  // Auto-resume subscriptions whose resumeDate has passed
+  final resumedSubscriptions = await repository.autoResumeSubscriptions();
+
+  // Re-schedule all notifications for active subscriptions + updated/resumed ones
   // This ensures notifications are up-to-date after app launch
   // (Needed because OS may clear scheduled notifications)
   final activeSubscriptions = repository.getAllActive();
-  for (final subscription in activeSubscriptions) {
+  final affectedSubscriptions = {
+    ...activeSubscriptions,
+    ...updatedSubscriptions,
+    ...resumedSubscriptions,
+  }.toList();
+
+  for (final subscription in affectedSubscriptions) {
     await notificationService.scheduleNotificationsForSubscription(subscription);
   }
 

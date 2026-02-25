@@ -40,13 +40,16 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       reminders: fields[20] as ReminderConfig,
       isPaid: fields[21] as bool,
       lastMarkedPaidDate: fields[22] as DateTime?,
+      pausedDate: fields[23] as DateTime?,
+      resumeDate: fields[24] as DateTime?,
+      pauseCount: fields[25] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Subscription obj) {
     writer
-      ..writeByte(23)
+      ..writeByte(26)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -92,7 +95,13 @@ class SubscriptionAdapter extends TypeAdapter<Subscription> {
       ..writeByte(21)
       ..write(obj.isPaid)
       ..writeByte(22)
-      ..write(obj.lastMarkedPaidDate);
+      ..write(obj.lastMarkedPaidDate)
+      ..writeByte(23)
+      ..write(obj.pausedDate)
+      ..writeByte(24)
+      ..write(obj.resumeDate)
+      ..writeByte(25)
+      ..write(obj.pauseCount);
   }
 
   @override

@@ -64,13 +64,27 @@ class SubscriptionRepository {
     return _getBox.values.toList();
   }
 
-  /// Get all active subscriptions
+  /// Get all active (non-paused) subscriptions
   ///
-  /// NOTE: As of v1.0.3, the pause/resume feature was removed.
-  /// This method now returns all subscriptions for backward compatibility.
-  /// Consider renaming to getAll() in future major version.
+  /// NOTE: Changed in v1.2.0 to filter by pause state.
+  /// Previously returned all subscriptions (pause feature was removed in v1.0.3).
   List<Subscription> getAllActive() {
-    return _getBox.values.toList();
+    return _getBox.values.where((sub) => sub.isActive).toList();
+  }
+
+  /// Get all paused subscriptions
+  List<Subscription> getAllPaused() {
+    return _getBox.values.where((sub) => !sub.isActive).toList();
+  }
+
+  /// Get subscriptions that should auto-resume (resume date has passed)
+  List<Subscription> getSubscriptionsToAutoResume() {
+    final now = DateTime.now();
+    return _getBox.values.where((sub) {
+      return !sub.isActive &&
+             sub.resumeDate != null &&
+             sub.resumeDate!.isBefore(now);
+    }).toList();
   }
 
   /// Get subscription by ID
@@ -183,6 +197,90 @@ class SubscriptionRepository {
     await upsert(updated);
   }
 
+  /// Pause a subscription with optional auto-resume date
+  ///
+  /// - Increments pauseCount for history tracking
+  /// - Sets pausedDate to now
+  /// - Sets resumeDate if provided
+  /// - Caller is responsible for canceling notifications
+  Future<void> pauseSubscription(
+    String subscriptionId, {
+    DateTime? resumeDate,
+  }) async {
+    final subscription = getById(subscriptionId);
+    if (subscription == null) return;
+
+    final updated = subscription.copyWith(
+      isActive: false,
+      pausedDate: DateTime.now(),
+      resumeDate: resumeDate,
+      pauseCount: subscription.pauseCount + 1,
+    );
+
+    await upsert(updated);
+  }
+
+  /// Resume a paused subscription
+  ///
+  /// - Clears pause state (pausedDate, resumeDate set to null)
+  /// - Caller is responsible for rescheduling notifications
+  Future<void> resumeSubscription(String subscriptionId) async {
+    final subscription = getById(subscriptionId);
+    if (subscription == null) return;
+
+    // Create a new subscription with pause state cleared
+    // We reconstruct the object to ensure nullable fields are set to null
+    final resumed = Subscription(
+      id: subscription.id,
+      name: subscription.name,
+      amount: subscription.amount,
+      currencyCode: subscription.currencyCode,
+      cycle: subscription.cycle,
+      nextBillingDate: subscription.nextBillingDate,
+      startDate: subscription.startDate,
+      category: subscription.category,
+      isActive: true,
+      isTrial: subscription.isTrial,
+      trialEndDate: subscription.trialEndDate,
+      postTrialAmount: subscription.postTrialAmount,
+      cancelUrl: subscription.cancelUrl,
+      cancelPhone: subscription.cancelPhone,
+      cancelNotes: subscription.cancelNotes,
+      cancelChecklist: subscription.cancelChecklist,
+      checklistCompleted: subscription.checklistCompleted,
+      notes: subscription.notes,
+      iconName: subscription.iconName,
+      colorValue: subscription.colorValue,
+      reminders: subscription.reminders,
+      isPaid: subscription.isPaid,
+      lastMarkedPaidDate: subscription.lastMarkedPaidDate,
+      pausedDate: null,      // Clear pause date
+      resumeDate: null,      // Clear resume date
+      pauseCount: subscription.pauseCount, // Preserve count
+    );
+
+    await upsert(resumed);
+  }
+
+  /// Auto-resume subscriptions whose resumeDate has passed
+  ///
+  /// Returns list of resumed subscriptions for notification rescheduling.
+  /// Caller should call this on app launch, app resume, and pull-to-refresh.
+  Future<List<Subscription>> autoResumeSubscriptions() async {
+    final toResume = getSubscriptionsToAutoResume();
+    final resumed = <Subscription>[];
+
+    for (final subscription in toResume) {
+      await resumeSubscription(subscription.id);
+      final updated = getById(subscription.id);
+      if (updated != null) {
+        resumed.add(updated);
+      }
+    }
+
+    return resumed;
+  }
+
 
   /// Advances billing dates for subscriptions that are past due.
   ///
@@ -235,6 +333,9 @@ class SubscriptionRepository {
     final updated = <Subscription>[];
 
     for (final subscription in getAll()) {
+      // SKIP paused subscriptions - billing dates freeze while paused
+      if (!subscription.isActive) continue;
+
       if (subscription.nextBillingDate.isBefore(now)) {
         // Calculate how many cycles have passed
         var newBillingDate = subscription.nextBillingDate;

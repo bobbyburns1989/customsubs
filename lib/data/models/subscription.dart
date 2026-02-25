@@ -33,8 +33,7 @@ class Subscription extends HiveObject {
   final SubscriptionCategory category;
 
   @HiveField(8)
-  @Deprecated('Pause/resume feature removed in v1.0.3. Field kept for backward compatibility with old backups.')
-  final bool isActive;
+  final bool isActive; // true = active, false = paused
 
   @HiveField(9)
   final bool isTrial; // FREE TRIAL MODE
@@ -78,6 +77,15 @@ class Subscription extends HiveObject {
   @HiveField(22)
   final DateTime? lastMarkedPaidDate; // When user last marked paid
 
+  @HiveField(23)
+  final DateTime? pausedDate; // When subscription was paused (null if active)
+
+  @HiveField(24)
+  final DateTime? resumeDate; // Optional auto-resume date (null = manual only)
+
+  @HiveField(25)
+  final int pauseCount; // Number of times paused (for history tracking)
+
   Subscription({
     required this.id,
     required this.name,
@@ -87,7 +95,7 @@ class Subscription extends HiveObject {
     required this.nextBillingDate,
     required this.startDate,
     required this.category,
-    this.isActive = true, // Always true - pause feature removed
+    this.isActive = true,
     this.isTrial = false,
     this.trialEndDate,
     this.postTrialAmount,
@@ -102,6 +110,9 @@ class Subscription extends HiveObject {
     required this.reminders,
     this.isPaid = false,
     this.lastMarkedPaidDate,
+    this.pausedDate,
+    this.resumeDate,
+    this.pauseCount = 0,
   });
 
   Subscription copyWith({
@@ -128,6 +139,9 @@ class Subscription extends HiveObject {
     ReminderConfig? reminders,
     bool? isPaid,
     DateTime? lastMarkedPaidDate,
+    DateTime? pausedDate,
+    DateTime? resumeDate,
+    int? pauseCount,
   }) {
     return Subscription(
       id: id ?? this.id,
@@ -153,6 +167,9 @@ class Subscription extends HiveObject {
       reminders: reminders ?? this.reminders,
       isPaid: isPaid ?? this.isPaid,
       lastMarkedPaidDate: lastMarkedPaidDate ?? this.lastMarkedPaidDate,
+      pausedDate: pausedDate ?? this.pausedDate,
+      resumeDate: resumeDate ?? this.resumeDate,
+      pauseCount: pauseCount ?? this.pauseCount,
     );
   }
 
@@ -194,6 +211,29 @@ class Subscription extends HiveObject {
   /// Check if billing is overdue
   bool get isOverdue {
     return daysUntilBilling < 0;
+  }
+
+  /// Returns true if subscription is currently paused
+  bool get isPaused => !isActive;
+
+  /// Returns true if subscription should auto-resume soon (within 7 days)
+  bool get isResumingSoon {
+    if (!isPaused || resumeDate == null) return false;
+    final now = DateTime.now();
+    final daysUntilResume = resumeDate!.difference(now).inDays;
+    return daysUntilResume >= 0 && daysUntilResume <= 7;
+  }
+
+  /// Returns true if auto-resume date has passed
+  bool get shouldAutoResume {
+    if (!isPaused || resumeDate == null) return false;
+    return resumeDate!.isBefore(DateTime.now());
+  }
+
+  /// Returns days paused (if currently paused)
+  int get daysPaused {
+    if (!isPaused || pausedDate == null) return 0;
+    return DateTime.now().difference(pausedDate!).inDays;
   }
 
   /// Get next billing date after the current one
@@ -253,6 +293,9 @@ class Subscription extends HiveObject {
       'reminders': reminders.toJson(),
       'isPaid': isPaid,
       'lastMarkedPaidDate': lastMarkedPaidDate?.toIso8601String(),
+      'pausedDate': pausedDate?.toIso8601String(),
+      'resumeDate': resumeDate?.toIso8601String(),
+      'pauseCount': pauseCount,
     };
   }
 
@@ -301,6 +344,13 @@ class Subscription extends HiveObject {
       lastMarkedPaidDate: json['lastMarkedPaidDate'] != null
           ? DateTime.parse(json['lastMarkedPaidDate'] as String)
           : null,
+      pausedDate: json['pausedDate'] != null
+          ? DateTime.parse(json['pausedDate'] as String)
+          : null,
+      resumeDate: json['resumeDate'] != null
+          ? DateTime.parse(json['resumeDate'] as String)
+          : null,
+      pauseCount: json['pauseCount'] as int? ?? 0,
     );
   }
 }

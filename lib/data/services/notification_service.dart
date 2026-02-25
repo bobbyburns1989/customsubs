@@ -295,6 +295,11 @@ class NotificationService {
     // Cancel existing notifications first
     await cancelNotificationsForSubscription(subscription.id);
 
+    // SKIP scheduling if subscription is paused
+    if (!subscription.isActive) {
+      return; // Paused subscriptions get no notifications
+    }
+
     final reminders = subscription.reminders;
 
     // Handle trial-specific notifications

@@ -14,7 +14,8 @@ This guide covers common build errors and their solutions for the CustomSubs Flu
 2. [Dart Snapshot Generator Failed](#dart-snapshot-generator-failed)
 3. [Shader Compilation Failed](#shader-compilation-failed)
 4. [Pod Install Issues](#pod-install-issues)
-5. [Prevention Best Practices](#prevention-best-practices)
+5. [Package Config Missing](#package-config-missing)
+6. [Prevention Best Practices](#prevention-best-practices)
 
 ---
 
@@ -210,6 +211,166 @@ flutter pub get  # Generates Flutter config
 cd ios
 pod install     # Now works
 ```
+
+---
+
+## Package Config Missing
+
+### Error Message
+
+When opening Xcode and trying to build/archive:
+
+```
+Runner 1 issue
+/Users/bobbyburns/Projects/customsubs/.dart_tool/package_config.json does not exist.
+```
+
+**Build Status:** Build Failed - Flutter files not generated
+
+---
+
+### Root Cause
+
+**Xcode requires Flutter-generated configuration files** that are created when you run `flutter pub get` and `flutter build`. If you:
+- Open Xcode directly without running Flutter commands first
+- Clean Xcode Derived Data but don't regenerate Flutter files
+- Clone the repo and open Xcode without setup
+
+Then these critical files won't exist:
+- `.dart_tool/package_config.json` - Dart package configuration
+- `ios/Flutter/Generated.xcconfig` - Flutter build configuration
+- Other generated files Xcode needs to compile
+
+---
+
+### Solution (Quick Fix)
+
+**Close Xcode, then run:**
+
+```bash
+# Navigate to project root
+cd /Users/bobbyburns/Projects/customsubs
+
+# Generate package configuration
+flutter pub get
+
+# Build iOS to create all Flutter files
+flutter build ios --release --no-codesign
+```
+
+**Expected Output:**
+```
+Building com.customsubs.app for device (ios-release)...
+Running pod install...                                             ~20s
+Running Xcode build...
+✓ Built build/ios/iphoneos/Runner.app
+```
+
+**Then open Xcode:**
+
+```bash
+open ios/Runner.xcworkspace
+```
+
+Now in Xcode:
+1. **Clean Build Folder**: Product → Clean Build Folder (⌘⇧K)
+2. **Select Device**: "Any iOS Device (arm64)"
+3. **Archive**: Product → Archive (⌘⇧B)
+
+The archive will complete **much faster** (~30 seconds instead of 3-5 minutes) since Flutter already built everything.
+
+---
+
+### Complete Clean Solution
+
+If the quick fix doesn't work, do a full clean:
+
+```bash
+# Close Xcode completely
+killall Xcode
+
+# Full Flutter clean
+flutter clean
+
+# Remove all generated files
+rm -rf .dart_tool
+rm -rf ios/build
+
+# Regenerate everything
+flutter pub get
+flutter build ios --release --no-codesign
+
+# Open Xcode
+open ios/Runner.xcworkspace
+```
+
+---
+
+### Why This Happens
+
+**Flutter is a build system on top of Xcode.** The workflow is:
+
+1. **Flutter generates native code** from your Dart code
+2. **Xcode compiles** that native code into an iOS app
+
+If you skip step 1 (Flutter build) and go straight to step 2 (Xcode), it fails because there's nothing to compile.
+
+**Correct Workflow:**
+```
+Flutter commands → Generates files → Xcode uses files → Archive
+```
+
+**Incorrect Workflow:**
+```
+Open Xcode directly → No files exist → Build fails ❌
+```
+
+---
+
+### Prevention
+
+**Before every Xcode archive session:**
+
+```bash
+# Always run these first
+flutter clean
+flutter pub get
+flutter build ios --release --no-codesign
+
+# THEN open Xcode
+open ios/Runner.xcworkspace
+```
+
+**Or add to your shell profile:**
+
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+alias xcode-flutter='flutter clean && flutter pub get && flutter build ios --release --no-codesign && open ios/Runner.xcworkspace'
+```
+
+Then just run: `xcode-flutter`
+
+---
+
+### Verification
+
+**Check that files exist:**
+
+```bash
+# Verify package_config.json was created
+ls -la .dart_tool/package_config.json
+
+# Verify Flutter config was created
+ls -la ios/Flutter/Generated.xcconfig
+```
+
+**Expected:**
+```
+-rw-r--r--  1 user  staff  25728 Feb 24 12:20 .dart_tool/package_config.json
+-rw-r--r--  1 user  staff   1234 Feb 24 12:20 ios/Flutter/Generated.xcconfig
+```
+
+If both files exist, Xcode will be able to build/archive.
 
 ---
 

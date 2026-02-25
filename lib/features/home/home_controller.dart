@@ -1,6 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
+import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 
@@ -16,16 +17,18 @@ class HomeController extends _$HomeController {
 
   /// Get upcoming subscriptions sorted by billing date
   ///
-  /// Returns only subscriptions billing within the next [days] (default: 30).
-  /// Sorts by active status first (active first), then paid status (unpaid first), then billing date.
+  /// Returns only ACTIVE subscriptions billing within the next [days] (default: 30).
+  /// Paused subscriptions are excluded.
+  /// Sorts by paid status (unpaid first), then billing date.
   List<Subscription> getUpcomingSubscriptions({int days = 30}) {
     final subs = state.value ?? [];
     final now = DateTime.now();
     final cutoffDate = now.add(Duration(days: days));
 
-    // Filter to only subscriptions within the date range
+    // Filter to only ACTIVE subscriptions within the date range
     final filteredSubs = subs.where((sub) {
-      return sub.nextBillingDate.isAfter(now) &&
+      return sub.isActive &&
+             sub.nextBillingDate.isAfter(now) &&
              sub.nextBillingDate.isBefore(cutoffDate);
     }).toList();
 
@@ -46,12 +49,13 @@ class HomeController extends _$HomeController {
   /// Calculate total monthly spending in primary currency
   ///
   /// Converts all subscriptions to primary currency before summing.
+  /// Excludes paused subscriptions from the total.
   double calculateMonthlyTotal() {
     final subs = state.value ?? [];
     final primaryCurrency = getPrimaryCurrency();
 
-    // Sum ALL subscriptions
-    return subs.fold(0.0, (sum, sub) {
+    // Sum ACTIVE (non-paused) subscriptions only
+    return subs.where((sub) => sub.isActive).fold(0.0, (sum, sub) {
       // Convert subscription's monthly amount to primary currency
       final convertedAmount = CurrencyUtils.convert(
         sub.effectiveMonthlyAmount,
@@ -69,7 +73,30 @@ class HomeController extends _$HomeController {
 
   /// Get count of active subscriptions
   int getActiveCount() {
-    return state.value?.length ?? 0;
+    final subs = state.value ?? [];
+    return subs.where((sub) => sub.isActive).length;
+  }
+
+  /// Get count of paused subscriptions
+  int getPausedCount() {
+    final subs = state.value ?? [];
+    return subs.where((sub) => sub.isPaused).length;
+  }
+
+  /// Get all paused subscriptions sorted by pause date
+  List<Subscription> getPausedSubscriptions() {
+    final subs = state.value ?? [];
+    final paused = subs.where((sub) => sub.isPaused).toList();
+
+    // Sort by pause date (most recently paused first)
+    paused.sort((a, b) {
+      if (a.pausedDate == null && b.pausedDate == null) return 0;
+      if (a.pausedDate == null) return 1;
+      if (b.pausedDate == null) return -1;
+      return b.pausedDate!.compareTo(a.pausedDate!);
+    });
+
+    return paused;
   }
 
   /// Get trials ending soon (within 7 days)
@@ -98,6 +125,39 @@ class HomeController extends _$HomeController {
   Future<void> deleteSubscription(String subscriptionId) async {
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     await repository.delete(subscriptionId);
+    await refresh();
+  }
+
+  /// Pause a subscription
+  Future<void> pauseSubscription(
+    String subscriptionId, {
+    DateTime? resumeDate,
+  }) async {
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    final notificationService = await ref.read(notificationServiceProvider.future);
+
+    await repository.pauseSubscription(subscriptionId, resumeDate: resumeDate);
+
+    // Notifications are automatically skipped by scheduleNotificationsForSubscription
+    // but we explicitly cancel to be safe
+    await notificationService.cancelNotificationsForSubscription(subscriptionId);
+
+    await refresh();
+  }
+
+  /// Resume a paused subscription
+  Future<void> resumeSubscription(String subscriptionId) async {
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    final notificationService = await ref.read(notificationServiceProvider.future);
+
+    await repository.resumeSubscription(subscriptionId);
+
+    // Re-schedule notifications for resumed subscription
+    final subscription = repository.getById(subscriptionId);
+    if (subscription != null) {
+      await notificationService.scheduleNotificationsForSubscription(subscription);
+    }
+
     await refresh();
   }
 

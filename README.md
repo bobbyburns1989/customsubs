@@ -14,15 +14,15 @@ CustomSubs is a mobile application designed to help you track and manage your su
 
 **🎉 Status:** ✅ **LIVE ON APP STORE** | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
 
-**🆕 Latest Version (v1.1.0):** Premium subscription with **3-day free trial**! Try unlimited subscriptions risk-free, then just $0.99/month. Plus 260+ subscription templates and rock-solid reliability.
+**🆕 Latest Version (v1.3.0 Build 29):** Critical IAP reliability fixes! Dynamic pricing from StoreKit, offering fallback logic, and iPad-optimized layout for App Store compliance.
 
-**💎 Premium Features:** Free tier includes 5 subscriptions. Upgrade for unlimited tracking with a 3-day free trial—cancel anytime!
+**💎 Premium Features:** Free tier includes 5 subscriptions. Upgrade for unlimited tracking with a 3-day free trial—cancel anytime! Just $0.99/month.
 
 ### Key Features
 
 ✅ **Completed Features (Phases 0-7 + UI Modernization)**
 
-**Monetization (Phase 7 - Complete):**
+**Monetization (Phase 7 - Complete + v1.3.0 IAP Fixes):**
 - 🎁 **3-Day Free Trial:** Try Premium risk-free with full feature access
 - 💎 **Freemium model:** Track up to 5 subscriptions for free
 - 💳 **Premium ($0.99/month):** Unlimited subscriptions with RevenueCat integration
@@ -30,6 +30,12 @@ CustomSubs is a mobile application designed to help you track and manage your su
 - 🏆 Premium badge on home screen
 - 🔄 Restore purchases support
 - 📊 Enhanced debugging for subscription flow
+- 🛡️ **IAP Reliability (v1.3.0):**
+  - Offering fallback logic (`offerings.current` → `offerings.all['default']`)
+  - Dynamic pricing from StoreKit (no hardcoded prices)
+  - Dynamic trial period display (always matches App Store Connect)
+  - iPad-optimized legal link placement (always visible)
+  - Resilient to RevenueCat sync issues
 
 **Core Functionality:**
 - 📱 Clean Material 3 UI with custom theming
@@ -297,10 +303,27 @@ flutter test integration_test/
 
 ### iOS
 
+**IMPORTANT:** Always run Flutter commands BEFORE opening Xcode.
+
 ```bash
-flutter build ios --release
-# Then open ios/Runner.xcworkspace in Xcode and archive
+# Clean and prepare
+flutter clean
+flutter pub get
+
+# Build iOS (generates all Xcode files - REQUIRED)
+flutter build ios --release --no-codesign
+
+# Open Xcode workspace
+open ios/Runner.xcworkspace
 ```
+
+Then in Xcode:
+1. Select "Any iOS Device (arm64)"
+2. Product → Clean Build Folder (⌘⇧K)
+3. Product → Archive (⌘⇧B)
+4. Distribute App → App Store Connect
+
+**Common Error:** If Xcode shows "package_config.json does not exist", you skipped the `flutter build ios` step. Close Xcode and run the commands above.
 
 ### Android
 
