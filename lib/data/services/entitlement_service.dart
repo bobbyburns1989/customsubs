@@ -396,11 +396,17 @@ class EntitlementService {
       debugPrint('   OS Version: ${Platform.operatingSystemVersion}');
 
       // Get available offerings
+      // Use same fallback logic as getOfferings()/getOfferingsWithRetry():
+      // Try offerings.current first, fall back to explicit 'default' lookup.
+      // This prevents purchase failure when RevenueCat's 'current' flag isn't synced.
       final offerings = await Purchases.getOfferings();
-      final offering = offerings.current;
+      final offering = offerings.current ?? offerings.all[RevenueCatConstants.defaultOfferingId];
 
       debugPrint('Total Offerings: ${offerings.all.length}');
       debugPrint('Current Offering: ${offering?.identifier ?? "NONE"}');
+      if (offerings.current == null && offering != null) {
+        debugPrint('   ℹ️ Used fallback to "${RevenueCatConstants.defaultOfferingId}" offering (current was null)');
+      }
 
       if (offering == null) {
         debugPrint('');
