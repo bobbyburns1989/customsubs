@@ -34,6 +34,7 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 
 | Document | Purpose | Priority |
 |----------|---------|----------|
+| [guides/development-setup.md](guides/development-setup.md) | Environment setup | 🔴 START HERE |
 | [QUICK-REFERENCE.md](QUICK-REFERENCE.md) | Cheat sheet | 🔴 FREQUENT USE |
 | [architecture/overview.md](architecture/overview.md) | System design | 🟠 HIGH |
 | [architecture/state-management.md](architecture/state-management.md) | Riverpod patterns | 🟠 HIGH |
@@ -85,11 +86,12 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 ### I'm a Developer 👨‍💻
 
 **Your reading order**:
-1. [CLAUDE.md](../CLAUDE.md) - Complete project spec (15 min)
-2. [architecture/overview.md](architecture/overview.md) - System design (20 min)
-3. [QUICK-REFERENCE.md](QUICK-REFERENCE.md) - Cheat sheet (10 min)
-4. [guides/adding-a-feature.md](guides/adding-a-feature.md) - How-to (15 min)
-5. Browse [decisions/](decisions/) - ADRs (optional)
+1. [guides/development-setup.md](guides/development-setup.md) - Environment setup (10 min)
+2. [CLAUDE.md](../CLAUDE.md) - Complete project spec (15 min)
+3. [architecture/overview.md](architecture/overview.md) - System design (20 min)
+4. [QUICK-REFERENCE.md](QUICK-REFERENCE.md) - Cheat sheet (10 min)
+5. [guides/adding-a-feature.md](guides/adding-a-feature.md) - How-to (15 min)
+6. Browse [decisions/](decisions/) - ADRs (optional)
 
 **Time**: 1-2 hours to get productive
 
@@ -153,6 +155,7 @@ docs/
 │   └── 003-offline-first-architecture.md
 │
 ├── guides/ ← Implementation how-tos
+│   ├── development-setup.md (environment setup)
 │   ├── adding-a-feature.md
 │   ├── forms-and-validation.md
 │   ├── multi-currency.md
@@ -326,24 +329,24 @@ Brief 1-2 sentence description.
 | Testing Docs | 3 | ✅ Complete |
 | Architecture Docs | 4 | ✅ Complete |
 | Decision Records (ADRs) | 3 | ✅ Complete |
-| Implementation Guides | 4 | ✅ Complete |
+| Implementation Guides | 5 | ✅ Complete |
 | Design Docs | 3 | ✅ Complete |
 | Templates | 1 | ✅ Complete |
 | Technical Docs | 1 | ✅ Complete |
 | App Store Docs | 1 | ✅ Complete |
 | Archived Docs | 4 | 📦 Archived |
 | Future Docs | 1 | 🔜 Planned |
-| **TOTAL** | **42** | **100% Complete** |
+| **TOTAL** | **43** | **100% Complete** |
 
 ---
 
 ## 🎉 Quick Facts
 
 - **App Status**: 🎉 **LIVE ON APP STORE**
-- **Total Documentation**: 40 files, ~12,000 lines
+- **Total Documentation**: 41 files, ~12,500 lines
 - **Test Coverage**: 300+ test cases documented
 - **Phase Summaries**: 12 completion documents
-- **Implementation Guides**: 4 detailed how-tos
+- **Implementation Guides**: 5 detailed how-tos
 - **Architectural Decisions**: 3 ADRs documented
 - **Overall Quality**: Professional-grade documentation ✅
 

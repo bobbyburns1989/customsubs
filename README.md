@@ -143,6 +143,8 @@ For detailed architecture documentation, see [Architecture Overview](docs/archit
 
 ## Getting Started
 
+**📖 Complete Setup Guide**: See [docs/guides/development-setup.md](docs/guides/development-setup.md) for comprehensive setup instructions including Claude Code configuration.
+
 ### Prerequisites
 
 - Flutter SDK 3.24.0 or higher

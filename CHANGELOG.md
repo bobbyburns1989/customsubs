@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Documentation
+
+**2026-02-25** - Development Environment Documentation
+
+- ✅ Created comprehensive development setup guide (`docs/guides/development-setup.md`)
+  - Environment prerequisites and installation steps
+  - Claude Code CLI configuration and best practices
+  - Common development commands and workflows
+  - Troubleshooting guide
+  - Quick reference card
+- ✅ Fixed `.claude/settings.local.json` - removed hardcoded commit message (400+ lines)
+  - Replaced specific commit pattern with generic `Bash(git commit:*)`
+  - Settings now allow dynamic commit messages
+- ✅ Updated documentation index (`docs/INDEX.md`)
+  - Added development setup guide to "For Development" section
+  - Updated guide count and documentation stats
+  - Added to developer reading order
+- ✅ Updated guides README (`docs/guides/README.md`)
+  - Added development setup as first guide for new developers
+  - Updated guide count to 5
+- ✅ Updated main README.md
+  - Added link to development setup guide in "Getting Started" section
+- ✅ Updated CLAUDE.md
+  - Added reference to development setup guide in "Build Instructions"
+  - Documented Claude Code configuration location
+
+**Why This Matters:**
+- Fixes configuration issue that blocked dynamic commit message generation
+- Provides clear onboarding for new developers and AI assistants
+- Documents Claude Code CLI usage and project-specific settings
+- Consolidates environment setup instructions in one place
+
+---
+
 ## [1.3.0] - 2026-02-25
 
 **Build**: 29

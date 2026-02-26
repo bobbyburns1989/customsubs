@@ -12,6 +12,7 @@ Practical, actionable guides for common development tasks. Each guide includes c
 
 | Guide | Topic | Priority |
 |-------|-------|----------|
+| [development-setup.md](development-setup.md) | Environment setup | 🔴 **NEW HERE?** |
 | [adding-a-feature.md](adding-a-feature.md) | Feature implementation | 🔴 Start here |
 | [working-with-notifications.md](working-with-notifications.md) | Notification system | ⚠️ **CRITICAL** |
 | [forms-and-validation.md](forms-and-validation.md) | Form patterns | 🟡 Medium |
@@ -19,9 +20,14 @@ Practical, actionable guides for common development tasks. Each guide includes c
 
 ---
 
-## 🚀 Quick Start for New Features
+## 🚀 Quick Start
 
-**Adding a new feature to CustomSubs?**
+**New to the project?**
+
+1. Setup your environment: [development-setup.md](development-setup.md) (10 min)
+2. Read the project spec: [CLAUDE.md](../../CLAUDE.md) (15 min)
+
+**Adding a new feature?**
 
 1. Read [adding-a-feature.md](adding-a-feature.md) first (20 min)
 2. Follow the step-by-step checklist
@@ -50,6 +56,6 @@ Notifications are the **#1 feature** of CustomSubs. If you're working with notif
 
 ---
 
-**Last Updated**: February 4, 2026
-**Guide Count**: 4 comprehensive guides
+**Last Updated**: February 25, 2026
+**Guide Count**: 5 comprehensive guides
 **Target Audience**: Developers implementing new features

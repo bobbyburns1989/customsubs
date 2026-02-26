@@ -855,7 +855,9 @@ dev_dependencies:
 
 ## Build Instructions
 
-After scaffolding the project:
+**📖 For complete setup instructions** (including Claude Code configuration, IDE setup, and troubleshooting), see [`docs/guides/development-setup.md`](docs/guides/development-setup.md).
+
+**Quick start**:
 
 ```bash
 flutter pub get
@@ -870,3 +872,7 @@ flutter run
 ```
 
 Target iOS Simulator and/or Android Emulator. Verify notifications on a real device (simulators have limited notification support).
+
+### Claude Code Configuration
+
+The project includes pre-configured permissions at `.claude/settings.local.json` for common development tasks (git, flutter, build tools). See the development setup guide for details.
