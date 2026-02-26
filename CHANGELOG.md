@@ -7,11 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2] - 2026-02-26
+
+**Build**: 32
+**Status**: Ready for App Store Submission
+**Focus**: IAP Purchase Reliability Fix
+
+### Summary
+
+Build 32 fixes a critical gap in the offering fallback logic introduced in Build 29.
+The `purchaseMonthlySubscription()` method was fetching offerings directly via
+`Purchases.getOfferings()` and only reading `offerings.current` — bypassing the
+`offerings.current ?? offerings.all['default']` fallback that was correctly applied
+to `getOfferings()` and `getOfferingsWithRetry()`. This meant the paywall could
+pre-load successfully but the actual purchase would fail with "No offering available"
+if RevenueCat's current flag wasn't synced at the moment of purchase.
+
+### Fixed
+
+**Issue: Missing offering fallback in purchase flow**
+- ✅ `purchaseMonthlySubscription()` now uses `offerings.current ?? offerings.all[defaultOfferingId]`
+- ✅ Consistent with all other offering fetch points in the service
+- ✅ Prevents silent "No offering available" failure when `offerings.current` is null
+- ✅ Adds debug log when fallback is used: `ℹ️ Used fallback to "default" offering`
+- File: `lib/data/services/entitlement_service.dart` (line 403)
+
+### Technical Detail
+
+```dart
+// Before (Build 29-31): No fallback in purchase path
+final offerings = await Purchases.getOfferings();
+final offering = offerings.current; // ← null = purchase fails silently
+
+// After (Build 32): Consistent fallback
+final offering = offerings.current ?? offerings.all[RevenueCatConstants.defaultOfferingId];
+```
+
+---
+
 ## [Unreleased]
 
 ### Documentation
 
-**2026-02-25** - Development Environment Documentation
+**2026-02-26** - Release Preparation & Dev Setup Documentation
 
 - ✅ Created comprehensive development setup guide (`docs/guides/development-setup.md`)
   - Environment prerequisites and installation steps
