@@ -1,7 +1,7 @@
 # App Store Configuration Guide
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: February 26, 2026
 **Relevant to**: Developers
 
 ---
@@ -318,6 +318,49 @@ If Xcode shows "package_config.json does not exist":
 - You forgot to run `flutter pub get` before opening Xcode
 - Run `flutter pub get && flutter build ios --release --no-codesign`
 - Restart Xcode
+
+---
+
+## 💳 RevenueCat & IAP Configuration
+
+### RevenueCat Setup (Completed Feb 2026)
+
+| Item | Value |
+|------|-------|
+| SDK | `purchases_flutter: ^9.0.0` (upgraded from 8.x for iOS 26 compatibility) |
+| iOS API Key | `appl_rRzabPDSmVyXEYjWSaSuklniHEA` — copy from RC dashboard, never type manually |
+| Product ID | `customsubs_premium_monthly` |
+| Entitlement ID | `premium` |
+| Offering ID | `default` |
+| Price | $0.99/month with 3-day free trial |
+| App-Specific Shared Secret | Configured in RC → Apps & providers → CustomSubs (App Store) |
+
+### IAP Submission Process (Critical)
+- IAP products are **automatically returned** to "Developer Action Needed" when a binary is rejected — this is normal Apple cascade behavior, not a content problem
+- IAP **must be submitted with the binary** — go to version page → "In-App Purchases and Subscriptions" → add the product → Submit for Review
+- Do NOT submit the IAP product standalone from its own page
+- Localization showing "Rejected" after binary rejection = same cascade, content is fine
+
+### Hard-Learned API Key Lessons
+The iOS API key was mistyped twice across multiple builds, causing `INVALID_CREDENTIALS` errors. Both were visually ambiguous character swaps:
+1. `app1_` (number `1`) instead of `appl_` (lowercase `l`) — prefix typo
+2. `Sukt` instead of `Sukl` — character typo in the middle of the key
+
+**Rule: always copy-paste API keys directly from the RevenueCat dashboard. Never type them manually.** When RevenueCat returns `INVALID_CREDENTIALS`, verify the key character-by-character against the dashboard.
+
+### RC Initialization — Known Pitfalls
+1. **`_isInitialized` must be set after `configure()`, not after `getCustomerInfo()`**
+   - `getCustomerInfo()` can throw due to StoreKit timing or network conditions at launch
+   - If it throws and `_isInitialized` hasn't been set yet, RC appears uninitialized even though `configure()` succeeded
+   - Fix: set `_isInitialized = true` immediately after `Purchases.configure()`; wrap `getCustomerInfo()` in its own try/catch
+
+2. **Offering fallback must be applied everywhere**
+   - Always use `offerings.current ?? offerings.all[RevenueCatConstants.defaultOfferingId]`
+   - If only `offerings.current` is used, purchase silently fails when RC sync lags
+
+3. **Never gate the subscribe button on `_offeringError`**
+   - Pre-load failure must not permanently disable the button
+   - The service layer retries internally — the UI must always allow a purchase attempt
 
 ---
 

@@ -7,10 +7,81 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - 2026-02-26
+
+**Build**: 43
+**Status**: Current — Ready for App Store Submission
+
+### Fixed
+- **CRITICAL**: Second RevenueCat API key character typo: `Sukt` → `Sukl` near end of key
+- Verified correct key `appl_rRzabPDSmVyXEYjWSaSuklniHEA` by copy-paste from RC dashboard
+- All prior builds failing with `PurchasesErrorCode.invalidCredentialsError` / `INVALID_CREDENTIALS`
+- File: `lib/core/constants/revenue_cat_constants.dart`
+
+---
+
+## [1.4.0] - 2026-02-26
+
+**Build**: 41
+**Status**: Superseded by Build 43 (release prep only, no code changes)
+
+---
+
+## [1.4.0] - 2026-02-26
+
+**Build**: 39
+**Status**: Superseded by Build 43
+
+### Fixed
+- `_isInitialized` in `EntitlementService.initialize()` was only set to `true` after `Purchases.getCustomerInfo()` succeeded
+- If `getCustomerInfo()` threw at launch (StoreKit timing, network hiccup), `_isInitialized` stayed `false` permanently even though `Purchases.configure()` had succeeded
+- Fix: move `_isInitialized = true` to immediately after `Purchases.configure()`; `getCustomerInfo()` is now a non-fatal verification step
+- File: `lib/data/services/entitlement_service.dart`
+
+---
+
+## [1.4.0] - 2026-02-26
+
+**Build**: 38
+**Status**: Superseded by Build 39
+
+### Fixed
+- First RevenueCat API key typo: `app1_` (number 1) → `appl_` (lowercase L) at start of key
+- Upgraded `purchases_flutter` ^8.0.0 → ^9.0.0 for iOS 26 compatibility (8.x failed to initialize on iOS 26.3)
+- Fixed `purchasePackage()` 9.x breaking change: now returns `PurchaseResult`, extract `.customerInfo`
+- Upgraded `share_plus` ^9.0.0 → ^12.0.1 (required by RC 9.x `web ^1.1.1` dependency)
+- Paywall subscribe button was permanently disabled when `_offeringError != null`; removed from disable condition
+- Added "Retry" button in paywall error state
+- Added re-fetch in `_handlePurchase()` when `_cachedOffering` is null at purchase time
+- Added RC re-initialization attempt in `purchaseMonthlySubscription()` and `getOfferingsWithRetry()` when `_isInitialized` is false
+
+---
+
+## [1.4.0] - 2026-02-26
+
+**Build**: 37
+**Status**: Superseded by Build 38
+**Focus**: App is fully free — paywall temporarily disabled
+
+### Changed
+- Removed 5-subscription free tier limit
+- Removed paywall navigation from Add Subscription flow
+- Removed "Premium / Free Tier" section from Settings
+- Removed premium badge from Home spending summary card
+
+### Notes — Re-enable Checklist
+All IAP infrastructure is preserved. To restore the paywall:
+1. Restore limit check in `lib/features/add_subscription/add_subscription_controller.dart`
+2. Restore `_showUpgradePrompt()` call in `lib/features/add_subscription/add_subscription_screen.dart`
+3. Restore Premium Consumer widget in `lib/features/settings/settings_screen.dart`
+4. Restore premium badge Consumer in `lib/features/home/home_screen.dart`
+
+---
+
 ## [1.3.2] - 2026-02-26
 
 **Build**: 36
-**Status**: Ready for App Store Submission — Critical API Key Fix
+**Status**: Superseded by v1.4.0 — Critical API Key Fix
 
 ### Fixed
 
