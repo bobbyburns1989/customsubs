@@ -96,172 +96,126 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Pre-compute dynamic values from StoreKit (or fallback strings for loading state)
+    final priceString = _monthlyPackage?.storeProduct.priceString ?? '\$0.99';
+    final hasIntro = _monthlyPackage?.storeProduct.introductoryPrice != null;
+    final trialPeriod = hasIntro
+        ? _monthlyPackage!.storeProduct.introductoryPrice!.period
+        : '3 days';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upgrade to Premium'),
+        title: const Text('Go Premium'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () async {
             await HapticUtils.light();
-            if (context.mounted) {
-              context.pop();
-            }
+            if (context.mounted) context.pop();
           },
         ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSizes.lg),
+          // SingleChildScrollView ensures very small devices (iPhone SE) can still
+          // scroll if needed, while larger iPhones see everything without scrolling.
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSizes.lg,
+            vertical: AppSizes.base,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Premium icon
+              // ── Header: icon + title + inline price ───────────────────
+              const SizedBox(height: AppSizes.sm),
               const Icon(
                 Icons.workspace_premium,
-                size: 80,
+                size: 56, // Compact (was 80px)
                 color: AppColors.primary,
               ),
-              const SizedBox(height: AppSizes.xl),
-
-              // Title - PRICE PROMINENT (Apple requirement)
+              const SizedBox(height: AppSizes.sm),
               const Text(
-                'Premium',
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
+                'Go Premium',
+                style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppSizes.sm),
+              const SizedBox(height: AppSizes.xs),
 
-              // PRICE - MOST PROMINENT ELEMENT (Apple compliance)
-              Container(
-                padding: const EdgeInsets.all(AppSizes.lg),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                  border: Border.all(color: AppColors.primary, width: 2),
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      // Dynamic price from StoreKit (fallback to hardcoded for loading state)
-                      _monthlyPackage?.storeProduct.priceString ?? '\$0.99/month',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
-                        letterSpacing: -1,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    const Text(
-                      'Unlock unlimited subscriptions',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: AppSizes.base),
-
-              // Trial - SUBORDINATE (Apple requirement)
-              // Dynamic trial period from StoreKit
-              if (_monthlyPackage?.storeProduct.introductoryPrice != null)
-                Text(
-                  'Includes ${_monthlyPackage!.storeProduct.introductoryPrice!.period} free trial',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                )
-              else
-                const Text(
-                  'Includes 3-day free trial',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textSecondary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              const SizedBox(height: AppSizes.xxxl),
-
-              // Features list
-              _buildFeatureItem(
-                icon: Icons.add_circle_outline,
-                title: 'Unlimited Subscriptions',
-                subtitle: 'Track as many subscriptions as you need',
-              ),
-              const SizedBox(height: AppSizes.lg),
-
-              _buildFeatureItem(
-                icon: Icons.notifications_active,
-                title: 'All Notification Features',
-                subtitle: '7-day, 1-day, and day-of reminders',
-              ),
-              const SizedBox(height: AppSizes.lg),
-
-              _buildFeatureItem(
-                icon: Icons.analytics,
-                title: 'Advanced Analytics',
-                subtitle: 'Detailed spending insights and charts',
-              ),
-              const SizedBox(height: AppSizes.lg),
-
-              _buildFeatureItem(
-                icon: Icons.backup,
-                title: 'Automatic Backups',
-                subtitle: 'Never lose your subscription data',
-              ),
-              const SizedBox(height: AppSizes.xxxl),
-
-              // Current limitation
-              Container(
-                padding: const EdgeInsets.all(AppSizes.base),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                  border: Border.all(color: AppColors.warning),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.info_outline, color: AppColors.warning),
-                    SizedBox(width: AppSizes.base),
-                    Expanded(
-                      child: Text(
-                        'Free tier limited to ${RevenueCatConstants.maxFreeSubscriptions} subscriptions',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textPrimary,
+              // PRICE — prominent, Apple compliance (was a tall bordered box)
+              // Shows inline with trial info on a single line for compactness.
+              _isLoadingOffering
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 4),
+                        child: SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ),
+                    )
+                  : Text(
+                      '$priceString/month · $trialPeriod free trial',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                  ],
+
+              const SizedBox(height: AppSizes.xl),
+
+              // ── Feature checkmarks ─────────────────────────────────────
+              // Compact single-line rows replace the tall icon+subtitle items.
+              _buildCompactFeatureRow('Unlimited subscriptions'),
+              _buildCompactFeatureRow('All reminders — 7-day, 1-day, day-of'),
+              _buildCompactFeatureRow('Spending analytics & yearly forecast'),
+              _buildCompactFeatureRow('Backup & restore your data'),
+
+              const SizedBox(height: AppSizes.xl),
+
+              // ── Inline error + retry (if preload failed) ───────────────
+              // Subscribe button is still enabled — service layer retries internally.
+              // (Build 33 fix: never permanently disable the subscribe button.)
+              if (_offeringError != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: AppSizes.sm),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.warning_amber_rounded,
+                          size: 14, color: AppColors.warning),
+                      const SizedBox(width: 4),
+                      const Text(
+                        'Could not load pricing. ',
+                        style: TextStyle(
+                            fontSize: 12, color: AppColors.textSecondary),
+                      ),
+                      GestureDetector(
+                        onTap: _preloadOffering,
+                        child: const Text(
+                          'Retry',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.primary,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSizes.xxxl),
 
-              // iPad: Show legal links BEFORE subscribe button (always visible)
-              if (_isTablet(context)) ...[
-                _buildLegalLinks(context),
-                const SizedBox(height: AppSizes.lg),
-              ],
-
-              // Subscribe button
+              // ── Subscribe button ───────────────────────────────────────
               // NOTE: Do NOT gate on _offeringError here.
               // Pre-load is an optimization only. purchaseMonthlySubscription()
-              // does its own fresh fetch with fallback, so the button must
-              // remain tappable even if pre-load failed (e.g. sandbox flakiness
-              // on Apple review devices caused repeated rejections).
+              // does its own fresh fetch with fallback (Build 33 Apple fix).
               FilledButton(
-                onPressed: (_isPurchasing || _isLoadingOffering)
-                    ? null
-                    : _handlePurchase,
+                onPressed:
+                    (_isPurchasing || _isLoadingOffering) ? null : _handlePurchase,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -269,107 +223,95 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                   ),
                 ),
-                child: _isLoadingOffering
-                    ? const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          ),
-                          SizedBox(width: 12),
-                          Text('Loading...'),
-                        ],
+                child: _isLoadingOffering || _isPurchasing
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
                       )
-                    : _isPurchasing
-                        ? const SizedBox(
-                            height: 20,
-                            width: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Text(
-                            // Dynamic button text from StoreKit
-                            _monthlyPackage != null
-                                ? 'Subscribe for ${_monthlyPackage!.storeProduct.priceString}'
-                                : 'Subscribe for \$0.99/month',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                    : Text(
+                        // Dynamic button text from StoreKit
+                        'Subscribe for $priceString/month',
+                        style: const TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
               const SizedBox(height: AppSizes.sm),
 
-              // If pre-load failed, show warning + retry option.
-              // The subscribe button above is still enabled so the user can
-              // attempt a purchase anyway (service layer retries internally).
-              if (_offeringError != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Could not load pricing. You can still try subscribing, or tap Retry.',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textSecondary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSizes.xs),
-                      TextButton(
-                        onPressed: _preloadOffering,
-                        child: const Text(
-                          'Retry',
-                          style: TextStyle(color: AppColors.primary),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-              // Trial terms - Dynamic from StoreKit
+              // ── Trial terms (Apple required disclosure) ────────────────
               Text(
-                _monthlyPackage != null && _monthlyPackage!.storeProduct.introductoryPrice != null
-                    ? 'Free for ${_monthlyPackage!.storeProduct.introductoryPrice!.period}, then ${_monthlyPackage!.storeProduct.priceString}. Renews monthly. Cancel anytime.'
-                    : 'Free for 3 days, then \$0.99/month. Renews monthly. Cancel anytime.',
+                'Free for $trialPeriod, then $priceString/month. Renews monthly. Cancel anytime.',
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textTertiary,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppSizes.base),
+              const SizedBox(height: AppSizes.xs),
 
-              // Restore purchases
-              TextButton(
-                onPressed: _isPurchasing ? null : _handleRestore,
-                child: const Text('Restore Purchases'),
+              // ── Restore · Terms · Privacy in one compact row ───────────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: _isPurchasing ? null : _handleRestore,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.xs, vertical: AppSizes.xs),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Restore',
+                        style: TextStyle(
+                            fontSize: 13, color: AppColors.primary)),
+                  ),
+                  const Text(' · ',
+                      style: TextStyle(
+                          fontSize: 12, color: AppColors.textTertiary)),
+                  TextButton(
+                    onPressed: () => _openUrl('https://customsubs.us/terms'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.xs, vertical: AppSizes.xs),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Terms',
+                        style: TextStyle(
+                            fontSize: 13, color: AppColors.primary)),
+                  ),
+                  const Text(' · ',
+                      style: TextStyle(
+                          fontSize: 12, color: AppColors.textTertiary)),
+                  TextButton(
+                    onPressed: () => _openUrl('https://customsubs.us/privacy'),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSizes.xs, vertical: AppSizes.xs),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text('Privacy',
+                        style: TextStyle(
+                            fontSize: 13, color: AppColors.primary)),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSizes.md),
 
-              // iPhone: Show legal links AFTER restore button
-              if (!_isTablet(context)) ...[
-                _buildLegalLinks(context),
-                const SizedBox(height: AppSizes.base),
-              ],
-
-              // Fine print
-              const Text(
-                'Subscription managed through App Store. Cancel anytime in settings.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textTertiary,
-                ),
+              // ── Fine print ─────────────────────────────────────────────
+              Text(
+                'Managed through App Store. Free tier: ${RevenueCatConstants.maxFreeSubscriptions} subscriptions.',
+                style: const TextStyle(
+                    fontSize: 11, color: AppColors.textTertiary),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: AppSizes.sm),
             ],
           ),
         ),
@@ -377,124 +319,22 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     );
   }
 
-  Widget _buildFeatureItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-  }) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.primarySurface,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: AppColors.primary, size: 24),
-        ),
-        const SizedBox(width: AppSizes.base),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Build legal links (Terms + Privacy) with iPad-optimized styling
-  Widget _buildLegalLinks(BuildContext context) {
-    final isTablet = _isTablet(context);
-    final fontSize = isTablet ? 14.0 : 12.0;
-
-    return Container(
-      padding: EdgeInsets.all(isTablet ? AppSizes.base : AppSizes.sm),
-      decoration: isTablet
-          ? BoxDecoration(
-              color: AppColors.background,
-              borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-              border: Border.all(color: AppColors.border, width: 1),
-            )
-          : null,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+  /// Compact single-line feature row with a green checkmark.
+  /// Replaces the previous tall icon-box + two-line text layout.
+  Widget _buildCompactFeatureRow(String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSizes.xs),
+      child: Row(
         children: [
-          // "Legal" label for iPad
-          if (isTablet) ...[
-            const Text(
-              'Legal',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.textTertiary,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
-              ),
+          const Icon(Icons.check_circle_rounded,
+              color: AppColors.primary, size: 20),
+          const SizedBox(width: AppSizes.md),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.w500),
             ),
-            const SizedBox(height: AppSizes.xs),
-          ],
-          // Links row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextButton(
-                onPressed: () => _openUrl('https://customsubs.us/terms'),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.sm,
-                    vertical: AppSizes.xs,
-                  ),
-                ),
-                child: Text(
-                  'Terms of Use',
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: AppColors.primary,
-                    decoration: TextDecoration.underline, // Clear tap affordance
-                  ),
-                ),
-              ),
-              Text(
-                ' • ',
-                style: TextStyle(
-                  fontSize: fontSize,
-                  color: AppColors.textTertiary,
-                ),
-              ),
-              TextButton(
-                onPressed: () => _openUrl('https://customsubs.us/privacy'),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSizes.sm,
-                    vertical: AppSizes.xs,
-                  ),
-                ),
-                child: Text(
-                  'Privacy Policy',
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    color: AppColors.primary,
-                    decoration: TextDecoration.underline, // Clear tap affordance
-                  ),
-                ),
-              ),
-            ],
           ),
         ],
       ),

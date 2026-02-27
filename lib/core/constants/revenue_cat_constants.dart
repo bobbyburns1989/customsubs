@@ -14,12 +14,12 @@ class RevenueCatConstants {
 
   /// iOS API key from RevenueCat dashboard.
   /// Get from: https://app.revenuecat.com/projects/YOUR_PROJECT/api-keys
-  static const String iosApiKey = 'appl_rRzabPDSmVyXEYjWSaSuktniHEA';
+  static const String iosApiKey = 'appl_rRzabPDSmVyXEYjWSaSuklniHEA';
 
   /// Android API key from RevenueCat dashboard.
   /// Get from: https://app.revenuecat.com/projects/YOUR_PROJECT/api-keys
   /// TODO: Add Android app to RevenueCat and update this key
-  static const String androidApiKey = 'appl_rRzabPDSmVyXEYjWSaSuktniHEA'; // Using iOS key as placeholder for now
+  static const String androidApiKey = 'appl_rRzabPDSmVyXEYjWSaSuklniHEA'; // Using iOS key as placeholder for now
 
   // ============================================================
   // PRODUCT IDS (Must match App Store Connect / Play Console)
