@@ -71,11 +71,19 @@ class EntitlementService {
       debugPrint('Configuring RevenueCat SDK...');
       await Purchases.configure(configuration);
 
-      // Verify configuration by checking customer info
-      final customerInfo = await Purchases.getCustomerInfo();
-      debugPrint('Customer Info Retrieved: ${customerInfo.originalAppUserId}');
-
+      // Mark initialized immediately after configure() — this is the critical step.
+      // getCustomerInfo() below is a non-fatal verification only; if it fails
+      // (StoreKit timing, network hiccup) RC is still configured and purchases work.
       _isInitialized = true;
+
+      // Verify configuration by checking customer info (non-fatal)
+      try {
+        final customerInfo = await Purchases.getCustomerInfo();
+        debugPrint('Customer Info Retrieved: ${customerInfo.originalAppUserId}');
+      } catch (e) {
+        debugPrint('⚠️ getCustomerInfo() verification failed (non-fatal): $e');
+        debugPrint('   RC is configured — purchases will still work.');
+      }
 
       debugPrint('');
       debugPrint('✅ RevenueCat initialized successfully');
