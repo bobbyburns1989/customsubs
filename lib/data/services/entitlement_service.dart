@@ -309,8 +309,13 @@ class EntitlementService {
     Duration initialDelay = const Duration(seconds: 1),
   }) async {
     if (!_isInitialized) {
-      debugPrint('⚠️ RevenueCat not initialized');
-      return null;
+      debugPrint('⚠️ RevenueCat not initialized - attempting re-initialization...');
+      await initialize();
+      if (!_isInitialized) {
+        debugPrint('❌ Re-initialization failed - cannot fetch offerings');
+        return null;
+      }
+      debugPrint('✅ Re-initialization succeeded - fetching offerings');
     }
 
     int attempt = 0;
@@ -376,8 +381,20 @@ class EntitlementService {
     debugPrint('Target Product: ${RevenueCatConstants.monthlyProductId}');
 
     if (!_isInitialized) {
-      debugPrint('❌ RevenueCat not initialized - aborting purchase');
-      return false;
+      debugPrint('❌ RevenueCat not initialized - attempting re-initialization...');
+      await initialize();
+
+      if (!_isInitialized) {
+        debugPrint('❌ Re-initialization failed - aborting purchase');
+        lastErrorMessage = 'RevenueCat failed to initialize';
+        lastErrorDetails = {
+          'error': 'RC_NOT_INITIALIZED',
+          'suggestion': 'Check network connection and API key. RevenueCat SDK failed to start.',
+        };
+        return false;
+      }
+
+      debugPrint('✅ Re-initialization succeeded - continuing purchase');
     }
 
     // iOS 18.0-18.5 Workaround: Add delay to stabilize StoreKit daemon connection
@@ -553,7 +570,10 @@ class EntitlementService {
       debugPrint('   Price: ${monthlyPackage.storeProduct.priceString}');
 
       // Initiate purchase
-      final customerInfo = await Purchases.purchasePackage(monthlyPackage);
+      // purchases_flutter 9.x: purchasePackage() now returns PurchaseResult
+      // (previously returned CustomerInfo directly in 8.x)
+      final purchaseResult = await Purchases.purchasePackage(monthlyPackage);
+      final customerInfo = purchaseResult.customerInfo;
 
       debugPrint('');
       debugPrint('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');

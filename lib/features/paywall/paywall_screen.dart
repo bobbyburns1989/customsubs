@@ -253,8 +253,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               ],
 
               // Subscribe button
+              // NOTE: Do NOT gate on _offeringError here.
+              // Pre-load is an optimization only. purchaseMonthlySubscription()
+              // does its own fresh fetch with fallback, so the button must
+              // remain tappable even if pre-load failed (e.g. sandbox flakiness
+              // on Apple review devices caused repeated rejections).
               FilledButton(
-                onPressed: (_isPurchasing || _isLoadingOffering || _offeringError != null)
+                onPressed: (_isPurchasing || _isLoadingOffering)
                     ? null
                     : _handlePurchase,
                 style: FilledButton.styleFrom(
@@ -302,17 +307,31 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               ),
               const SizedBox(height: AppSizes.sm),
 
-              // Show error message if offering failed to load
+              // If pre-load failed, show warning + retry option.
+              // The subscribe button above is still enabled so the user can
+              // attempt a purchase anyway (service layer retries internally).
               if (_offeringError != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                  child: Text(
-                    _offeringError!,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.error,
-                    ),
-                    textAlign: TextAlign.center,
+                  child: Column(
+                    children: [
+                      Text(
+                        'Could not load pricing. You can still try subscribing, or tap Retry.',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSizes.xs),
+                      TextButton(
+                        onPressed: _preloadOffering,
+                        child: const Text(
+                          'Retry',
+                          style: TextStyle(color: AppColors.primary),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -485,6 +504,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Future<void> _handlePurchase() async {
     setState(() => _isPurchasing = true);
     await HapticUtils.medium();
+
+    // If pre-load failed, attempt one more fetch before going to purchase.
+    // This handles the case where the paywall opened during a sandbox hiccup
+    // but the user taps Subscribe after connectivity recovers.
+    if (_cachedOffering == null && !_isLoadingOffering) {
+      debugPrint('⚠️ PAYWALL: Cached offering null at purchase time, re-fetching...');
+      await _preloadOffering();
+    }
 
     try {
       final service = ref.read(entitlementServiceProvider);

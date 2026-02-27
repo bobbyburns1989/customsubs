@@ -25,8 +25,8 @@ import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/data/models/monthly_snapshot.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
-import 'package:custom_subs/data/services/entitlement_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
+import 'package:custom_subs/data/services/entitlement_service.dart';
 
 /// Application entry point.
 ///

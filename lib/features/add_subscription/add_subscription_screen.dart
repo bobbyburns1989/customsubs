@@ -180,15 +180,6 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     }
   }
 
-  /// Auto-assigns a color by cycling through the color palette
-  /// based on the current number of subscriptions
-  Future<int> _getNextAutoColor() async {
-    final subscriptions = await ref.read(homeControllerProvider.future);
-    final subscriptionCount = subscriptions.length;
-    final colorIndex = subscriptionCount % AppColors.subscriptionColors.length;
-    return AppColors.subscriptionColors[colorIndex].toARGB32();
-  }
-
   /// Show upgrade prompt when user hits subscription limit.
   Future<void> _showUpgradePrompt() async {
     // Navigate to full paywall screen
@@ -206,6 +197,15 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       // Retry the save operation
       await _save();
     }
+  }
+
+  /// Auto-assigns a color by cycling through the color palette
+  /// based on the current number of subscriptions
+  Future<int> _getNextAutoColor() async {
+    final subscriptions = await ref.read(homeControllerProvider.future);
+    final subscriptionCount = subscriptions.length;
+    final colorIndex = subscriptionCount % AppColors.subscriptionColors.length;
+    return AppColors.subscriptionColors[colorIndex].toARGB32();
   }
 
   @override

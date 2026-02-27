@@ -9,8 +9,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2026-02-26
 
+**Build**: 36
+**Status**: Ready for App Store Submission — Critical API Key Fix
+
+### Fixed
+
+**CRITICAL: RevenueCat API key typo causing all IAP to fail**
+- ✅ Fixed `iosApiKey` and `androidApiKey` in `RevenueCatConstants`: `app1_` (number 1) → `appl_` (lowercase L)
+- This single character typo caused every RevenueCat `configure()` call to authenticate with an invalid key
+- Symptoms: RC would silently fail to initialize → "Could not load pricing" on paywall → "Purchase failed: Unknown error"
+- File: `lib/core/constants/revenue_cat_constants.dart`
+
+---
+
+## [1.3.2] - 2026-02-26
+
+**Build**: 35
+**Status**: Superseded by Build 36
+
+### Fixed
+- Added RevenueCat re-initialization attempt in `purchaseMonthlySubscription()` and `getOfferingsWithRetry()` when `_isInitialized` is false
+- Improved error messaging for uninitialized RC state
+
+---
+
+## [1.3.2] - 2026-02-26
+
+**Build**: 34
+**Status**: Superseded by Build 35
+
+### Changed
+- Upgraded `purchases_flutter` from 8.x → 9.x for iOS 26 compatibility
+- Fixed `purchasePackage()` breaking change: now returns `PurchaseResult`, extract `.customerInfo`
+- Upgraded `share_plus` to ^12.0.1 (required by RC 9.x)
+
+---
+
+## [1.3.2] - 2026-02-26
+
+**Build**: 33
+**Status**: Superseded by Build 34
+
+### Configuration
+- ✅ App-Specific Shared Secret added to RevenueCat (Apps & providers → CustomSubs (App Store)) — enables RevenueCat to validate receipts with Apple's servers
+
+---
+
+## [1.3.2] - 2026-02-26
+
 **Build**: 32
-**Status**: Ready for App Store Submission
+**Status**: Superseded by Build 33
 **Focus**: IAP Purchase Reliability Fix
 
 ### Summary
