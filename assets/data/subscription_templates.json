@@ -2,7 +2,7 @@
   {
     "id": "netflix",
     "name": "Netflix",
-    "defaultAmount": 15.49,
+    "defaultAmount": 17.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -13,7 +13,7 @@
   {
     "id": "spotify",
     "name": "Spotify",
-    "defaultAmount": 10.99,
+    "defaultAmount": 12.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -35,7 +35,7 @@
   {
     "id": "disney_plus",
     "name": "Disney+",
-    "defaultAmount": 10.99,
+    "defaultAmount": 11.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -57,7 +57,7 @@
   {
     "id": "apple_tv_plus",
     "name": "Apple TV+",
-    "defaultAmount": 9.99,
+    "defaultAmount": 12.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -112,7 +112,7 @@
   {
     "id": "hulu",
     "name": "Hulu",
-    "defaultAmount": 7.99,
+    "defaultAmount": 11.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -123,7 +123,7 @@
   {
     "id": "hbo_max",
     "name": "Max (HBO Max)",
-    "defaultAmount": 15.99,
+    "defaultAmount": 18.49,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -134,7 +134,7 @@
   {
     "id": "paramount_plus",
     "name": "Paramount+",
-    "defaultAmount": 11.99,
+    "defaultAmount": 8.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -145,7 +145,7 @@
   {
     "id": "peacock",
     "name": "Peacock",
-    "defaultAmount": 5.99,
+    "defaultAmount": 10.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -156,7 +156,7 @@
   {
     "id": "crunchyroll",
     "name": "Crunchyroll",
-    "defaultAmount": 7.99,
+    "defaultAmount": 13.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -167,7 +167,7 @@
   {
     "id": "adobe_cc",
     "name": "Adobe Creative Cloud",
-    "defaultAmount": 54.99,
+    "defaultAmount": 59.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -178,7 +178,7 @@
   {
     "id": "microsoft_365",
     "name": "Microsoft 365",
-    "defaultAmount": 6.99,
+    "defaultAmount": 9.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -266,7 +266,7 @@
   {
     "id": "linkedin_premium",
     "name": "LinkedIn Premium",
-    "defaultAmount": 29.99,
+    "defaultAmount": 39.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -299,7 +299,7 @@
   {
     "id": "xbox_game_pass",
     "name": "Xbox Game Pass Ultimate",
-    "defaultAmount": 16.99,
+    "defaultAmount": 19.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "gaming",
@@ -310,7 +310,7 @@
   {
     "id": "playstation_plus",
     "name": "PlayStation Plus",
-    "defaultAmount": 17.99,
+    "defaultAmount": 9.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "gaming",
@@ -365,7 +365,7 @@
   {
     "id": "calm",
     "name": "Calm",
-    "defaultAmount": 14.99,
+    "defaultAmount": 16.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -486,7 +486,7 @@
   {
     "id": "1password",
     "name": "1Password",
-    "defaultAmount": 2.99,
+    "defaultAmount": 3.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -563,7 +563,7 @@
   {
     "id": "bumble_premium",
     "name": "Bumble Premium",
-    "defaultAmount": 29.99,
+    "defaultAmount": 39.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -684,7 +684,7 @@
   {
     "id": "nordpass",
     "name": "NordPass",
-    "defaultAmount": 1.49,
+    "defaultAmount": 1.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -739,7 +739,7 @@
   {
     "id": "rosetta_stone",
     "name": "Rosetta Stone",
-    "defaultAmount": 12.00,
+    "defaultAmount": 15.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "education",
@@ -783,7 +783,7 @@
   {
     "id": "monarch_money",
     "name": "Monarch Money",
-    "defaultAmount": 14.95,
+    "defaultAmount": 14.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -816,7 +816,7 @@
   {
     "id": "ring_protect",
     "name": "Ring Protect",
-    "defaultAmount": 3.99,
+    "defaultAmount": 4.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -827,7 +827,7 @@
   {
     "id": "noom",
     "name": "Noom",
-    "defaultAmount": 60.00,
+    "defaultAmount": 42.00,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -838,7 +838,7 @@
   {
     "id": "expressvpn",
     "name": "ExpressVPN",
-    "defaultAmount": 12.95,
+    "defaultAmount": 12.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -849,7 +849,7 @@
   {
     "id": "pocketguard_premium",
     "name": "PocketGuard Premium",
-    "defaultAmount": 7.99,
+    "defaultAmount": 12.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -882,7 +882,7 @@
   {
     "id": "classpass",
     "name": "ClassPass",
-    "defaultAmount": 79.00,
+    "defaultAmount": 35.00,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -893,7 +893,7 @@
   {
     "id": "ea_play",
     "name": "EA Play",
-    "defaultAmount": 4.99,
+    "defaultAmount": 5.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "gaming",
@@ -904,7 +904,7 @@
   {
     "id": "twitch_turbo",
     "name": "Twitch Turbo",
-    "defaultAmount": 8.99,
+    "defaultAmount": 11.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -915,7 +915,7 @@
   {
     "id": "nest_aware",
     "name": "Nest Aware",
-    "defaultAmount": 6.00,
+    "defaultAmount": 10.00,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -937,7 +937,7 @@
   {
     "id": "beachbody",
     "name": "Beachbody On Demand",
-    "defaultAmount": 99.00,
+    "defaultAmount": 179.00,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "fitness",
@@ -962,7 +962,7 @@
     "defaultAmount": 12.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
-    "category": "entertainment",
+    "category": "sports",
     "cancelUrl": "https://plus.espn.com/settings",
     "color": "0xFFFF0033",
     "iconName": "espn"
@@ -981,7 +981,7 @@
   {
     "id": "fubotv",
     "name": "FuboTV",
-    "defaultAmount": 84.99,
+    "defaultAmount": 73.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -992,7 +992,7 @@
   {
     "id": "sling_tv",
     "name": "Sling TV",
-    "defaultAmount": 50.99,
+    "defaultAmount": 45.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -1014,7 +1014,7 @@
   {
     "id": "amc_plus",
     "name": "AMC+",
-    "defaultAmount": 8.99,
+    "defaultAmount": 10.99,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -2858,5 +2858,335 @@
     "cancelUrl": "https://superhuman.com/",
     "color": "0xFF000000",
     "iconName": "superhuman"
+  },
+  {
+    "id": "amazon_music",
+    "name": "Amazon Music Unlimited",
+    "defaultAmount": 10.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://www.amazon.com/music/unlimited",
+    "color": "0xFF232F3E",
+    "iconName": "amazon_music"
+  },
+  {
+    "id": "youtube_music",
+    "name": "YouTube Music",
+    "defaultAmount": 10.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://music.youtube.com/",
+    "color": "0xFFFF0000",
+    "iconName": "youtube_music"
+  },
+  {
+    "id": "deezer",
+    "name": "Deezer Premium",
+    "defaultAmount": 10.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://www.deezer.com/account",
+    "color": "0xFFEF5466",
+    "iconName": "deezer"
+  },
+  {
+    "id": "oura_ring",
+    "name": "Oura Ring",
+    "defaultAmount": 5.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "health",
+    "cancelUrl": "https://cloud.ouraring.com/profile",
+    "color": "0xFF1A1A1A",
+    "iconName": "oura"
+  },
+  {
+    "id": "garmin_connect_plus",
+    "name": "Garmin Connect+",
+    "defaultAmount": 6.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "fitness",
+    "cancelUrl": "https://connect.garmin.com/modern/settings/subscriptions",
+    "color": "0xFF1E5C96",
+    "iconName": "garmin"
+  },
+  {
+    "id": "surfshark",
+    "name": "Surfshark",
+    "defaultAmount": 3.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://my.surfshark.com/",
+    "color": "0xFF1E2260",
+    "iconName": "surfshark"
+  },
+  {
+    "id": "protonvpn",
+    "name": "ProtonVPN",
+    "defaultAmount": 4.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://proton.me/vpn",
+    "color": "0xFF6D4AFF",
+    "iconName": "protonvpn"
+  },
+  {
+    "id": "mullvad_vpn",
+    "name": "Mullvad VPN",
+    "defaultAmount": 5.50,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://mullvad.net/account",
+    "color": "0xFF44AD4D",
+    "iconName": "mullvad"
+  },
+  {
+    "id": "proton_mail",
+    "name": "Proton Mail",
+    "defaultAmount": 3.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://proton.me/mail/pricing",
+    "color": "0xFF6D4AFF",
+    "iconName": "protonmail"
+  },
+  {
+    "id": "fastmail",
+    "name": "Fastmail",
+    "defaultAmount": 5.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://www.fastmail.com/account/",
+    "color": "0xFF2867B2",
+    "iconName": "fastmail"
+  },
+  {
+    "id": "copilot_money",
+    "name": "Copilot Money",
+    "defaultAmount": 14.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://copilot.money/",
+    "color": "0xFF2C5F8A",
+    "iconName": "copilot"
+  },
+  {
+    "id": "simplifi",
+    "name": "Simplifi by Quicken",
+    "defaultAmount": 5.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://app.simplifimoney.com/",
+    "color": "0xFF0073E6",
+    "iconName": "simplifi"
+  },
+  {
+    "id": "mgm_plus",
+    "name": "MGM+",
+    "defaultAmount": 5.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://www.mgmplus.com/account",
+    "color": "0xFF003087",
+    "iconName": "mgmplus"
+  },
+  {
+    "id": "philo",
+    "name": "Philo",
+    "defaultAmount": 25.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://www.philo.com/account/",
+    "color": "0xFF4B0082",
+    "iconName": "philo"
+  },
+  {
+    "id": "mubi",
+    "name": "MUBI",
+    "defaultAmount": 14.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://mubi.com/account",
+    "color": "0xFF212121",
+    "iconName": "mubi"
+  },
+  {
+    "id": "espn_plus",
+    "name": "ESPN+",
+    "defaultAmount": 10.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://plus.espn.com/account",
+    "color": "0xFFCC0000",
+    "iconName": "espnplus"
+  },
+  {
+    "id": "nba_league_pass",
+    "name": "NBA League Pass",
+    "defaultAmount": 14.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://www.nba.com/watch",
+    "color": "0xFF1D428A",
+    "iconName": "nba"
+  },
+  {
+    "id": "mlb_tv",
+    "name": "MLB.TV",
+    "defaultAmount": 24.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://www.mlb.com/live-stream-games/subscribe",
+    "color": "0xFF002D72",
+    "iconName": "mlb"
+  },
+  {
+    "id": "mls_season_pass",
+    "name": "MLS Season Pass",
+    "defaultAmount": 12.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://www.mlssoccer.com/mls-season-pass",
+    "color": "0xFF000000",
+    "iconName": "mls"
+  },
+  {
+    "id": "dazn",
+    "name": "DAZN",
+    "defaultAmount": 19.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://www.dazn.com/account",
+    "color": "0xFF2AF598",
+    "iconName": "dazn"
+  },
+  {
+    "id": "f1_tv",
+    "name": "F1 TV Pro",
+    "defaultAmount": 9.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "sports",
+    "cancelUrl": "https://f1tv.formula1.com/account",
+    "color": "0xFFE8002D",
+    "iconName": "f1tv"
+  },
+  {
+    "id": "todoist_pro",
+    "name": "Todoist Pro",
+    "defaultAmount": 5.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://todoist.com/app/settings/subscription",
+    "color": "0xFFDB4035",
+    "iconName": "todoist"
+  },
+  {
+    "id": "fantastical",
+    "name": "Fantastical",
+    "defaultAmount": 4.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://flexibits.com/fantastical",
+    "color": "0xFFFF3B30",
+    "iconName": "fantastical"
+  },
+  {
+    "id": "obsidian_sync",
+    "name": "Obsidian Sync",
+    "defaultAmount": 8.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://obsidian.md/pricing",
+    "color": "0xFF7C3AED",
+    "iconName": "obsidian"
+  },
+  {
+    "id": "kagi",
+    "name": "Kagi Search",
+    "defaultAmount": 10.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://kagi.com/settings?p=billing",
+    "color": "0xFF3A5FCD",
+    "iconName": "kagi"
+  },
+  {
+    "id": "raycast_pro",
+    "name": "Raycast Pro",
+    "defaultAmount": 8.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://www.raycast.com/store",
+    "color": "0xFFFF6363",
+    "iconName": "raycast"
+  },
+  {
+    "id": "poe",
+    "name": "Poe",
+    "defaultAmount": 19.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://poe.com/settings/subscription",
+    "color": "0xFF7B2FBE",
+    "iconName": "poe"
+  },
+  {
+    "id": "character_ai_plus",
+    "name": "Character.ai+",
+    "defaultAmount": 9.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://character.ai/settings",
+    "color": "0xFF4A90D9",
+    "iconName": "characterai"
+  },
+  {
+    "id": "notebooklm_plus",
+    "name": "NotebookLM Plus",
+    "defaultAmount": 19.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://notebooklm.google.com/",
+    "color": "0xFF4285F4",
+    "iconName": "notebooklm"
+  },
+  {
+    "id": "arlo_secure",
+    "name": "Arlo Secure",
+    "defaultAmount": 12.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://my.arlo.com/#/account",
+    "color": "0xFF18AEBF",
+    "iconName": "arlo"
   }
 ]

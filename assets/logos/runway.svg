@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Darker cyan bg for white text contrast — template accent color is very light -->
+  <rect width="100" height="100" fill="#00ACC1"/>
+  <text x="50" y="71" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="60" fill="white">R</text>
+</svg>

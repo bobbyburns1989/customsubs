@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
-import 'package:custom_subs/core/utils/service_icons.dart';
+import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 
 /// A mini preview card showing how a subscription will appear on the home screen.
@@ -43,6 +43,10 @@ class SubscriptionPreviewCard extends StatelessWidget {
   /// The color as an integer (convert to Color via Color(colorValue))
   final int colorValue;
 
+  /// Optional template iconName — enables brand icon in the live preview.
+  /// Null for custom (user-created) subscriptions.
+  final String? iconName;
+
   const SubscriptionPreviewCard({
     super.key,
     required this.name,
@@ -50,6 +54,7 @@ class SubscriptionPreviewCard extends StatelessWidget {
     required this.currencyCode,
     required this.cycle,
     required this.colorValue,
+    this.iconName,
   });
 
   @override
@@ -85,43 +90,13 @@ class SubscriptionPreviewCard extends StatelessWidget {
           // Subscription Tile Preview (matches home_screen.dart)
           Row(
             children: [
-              // Circular gradient icon (exact match from home screen)
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      color.withValues(alpha: 0.15),
-                      color.withValues(alpha: 0.25),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: color.withValues(alpha: 0.12),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: ServiceIcons.hasCustomIcon(displayName)
-                      ? Icon(
-                          ServiceIcons.getIconForService(displayName),
-                          color: color,
-                          size: 26,
-                        )
-                      : Text(
-                          displayName[0].toUpperCase(),
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
+              // Live preview icon — matches exactly how it appears on home screen
+              SubscriptionIcon(
+                name: displayName,
+                iconName: iconName,
+                color: color,
+                size: 48,
+                isCircle: true,
               ),
               const SizedBox(width: AppSizes.base),
 

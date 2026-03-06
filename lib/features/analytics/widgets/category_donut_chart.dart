@@ -27,32 +27,99 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
     final sortedEntries = widget.categoryBreakdown.entries.toList()
       ..sort((a, b) => b.value.amount.compareTo(a.value.amount));
 
+    // Calculate total for center display
+    final total = widget.categoryBreakdown.values
+        .fold(0.0, (sum, d) => sum + d.amount);
+
+    // Center overlay text: shows touched category detail, or monthly total by default
+    final String centerLabel;
+    final String centerAmount;
+    String? centerPercent;
+
+    if (_touchedIndex != null && _touchedIndex! < sortedEntries.length) {
+      final entry = sortedEntries[_touchedIndex!];
+      centerLabel = _getCategoryDisplayName(entry.key);
+      centerAmount =
+          '${widget.currencySymbol}${entry.value.amount.toStringAsFixed(2)}';
+      centerPercent = '${entry.value.percentage.toStringAsFixed(1)}%';
+    } else {
+      centerLabel = 'Monthly';
+      centerAmount = '${widget.currencySymbol}${total.toStringAsFixed(2)}';
+    }
+
     return Column(
       children: [
-        // Donut Chart
+        // Donut chart with center text overlay (Stack avoids on-slice label clipping)
         SizedBox(
-          height: 240,
-          child: PieChart(
-            PieChartData(
-              sectionsSpace: 2,
-              centerSpaceRadius: 60, // Donut hole
-              sections: _buildSections(sortedEntries),
-              pieTouchData: PieTouchData(
-                touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                  setState(() {
-                    if (!event.isInterestedForInteractions ||
-                        pieTouchResponse == null ||
-                        pieTouchResponse.touchedSection == null) {
-                      _touchedIndex = null;
-                      return;
-                    }
-                    _touchedIndex = pieTouchResponse.touchedSection!.touchedSectionIndex;
-                  });
-                },
+          height: 210,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              PieChart(
+                PieChartData(
+                  sectionsSpace: 2,
+                  centerSpaceRadius: 65,
+                  sections: _buildSections(sortedEntries),
+                  pieTouchData: PieTouchData(
+                    touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                      setState(() {
+                        if (!event.isInterestedForInteractions ||
+                            pieTouchResponse == null ||
+                            pieTouchResponse.touchedSection == null) {
+                          _touchedIndex = null;
+                          return;
+                        }
+                        _touchedIndex =
+                            pieTouchResponse.touchedSection!.touchedSectionIndex;
+                      });
+                    },
+                  ),
+                ),
+                swapAnimationDuration: const Duration(milliseconds: 250),
+                swapAnimationCurve: Curves.easeOut,
               ),
-            ),
-            swapAnimationDuration: const Duration(milliseconds: 250),
-            swapAnimationCurve: Curves.easeOut,
+
+              // Center info panel — shows total by default, category on touch
+              IgnorePointer(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Column(
+                    key: ValueKey('$centerLabel$centerAmount'),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        centerLabel,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        centerAmount,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.textPrimary,
+                          fontFeatures: [FontFeature.tabularFigures()],
+                        ),
+                      ),
+                      if (centerPercent != null) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          centerPercent,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textTertiary,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
 
@@ -82,6 +149,8 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
     );
   }
 
+  /// Builds pie sections with no on-slice labels — percentages are shown
+  /// in the center overlay instead to avoid clipping against the chart bounds.
   List<PieChartSectionData> _buildSections(
     List<MapEntry<SubscriptionCategory, CategoryData>> entries,
   ) {
@@ -91,40 +160,13 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
       final data = entry.value.value;
       final isTouched = index == _touchedIndex;
 
-      final radius = isTouched ? 50.0 : 45.0;
-      final fontSize = isTouched ? 16.0 : 14.0;
-
       return PieChartSectionData(
         color: _getCategoryColor(category),
         value: data.amount,
-        title: '${data.percentage.toStringAsFixed(1)}%',
-        radius: radius,
-        titleStyle: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          shadows: const [
-            Shadow(color: Colors.black26, offset: Offset(0, 1), blurRadius: 2),
-          ],
-        ),
-        badgeWidget: isTouched ? _buildBadge(data.count) : null,
-        badgePositionPercentageOffset: 1.3,
+        title: '', // Percentages shown in center overlay — no on-slice clipping
+        radius: isTouched ? 52.0 : 46.0,
       );
     }).toList();
-  }
-
-  Widget _buildBadge(int count) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.sm, vertical: AppSizes.xs),
-      decoration: BoxDecoration(
-        color: AppColors.textPrimary.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(AppSizes.radiusFull),
-      ),
-      child: Text(
-        '$count',
-        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-      ),
-    );
   }
 }
 
@@ -188,6 +230,7 @@ String _getCategoryDisplayName(SubscriptionCategory category) {
     case SubscriptionCategory.utilities: return 'Utilities';
     case SubscriptionCategory.health: return 'Health';
     case SubscriptionCategory.other: return 'Other';
+    case SubscriptionCategory.sports: return 'Sports';
   }
 }
 
@@ -205,5 +248,6 @@ Color _getCategoryColor(SubscriptionCategory category) {
     case SubscriptionCategory.utilities: return const Color(0xFF78716C);
     case SubscriptionCategory.health: return const Color(0xFFF97316);
     case SubscriptionCategory.other: return const Color(0xFF6366F1);
+    case SubscriptionCategory.sports: return const Color(0xFF0EA5E9); // sky blue — distinct from gaming purple and fitness green
   }
 }

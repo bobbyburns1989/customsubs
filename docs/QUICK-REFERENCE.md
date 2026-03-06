@@ -1,7 +1,7 @@
 # Quick Reference
 
 **Status**: ✅ Complete
-**Last Updated**: February 7, 2026
+**Last Updated**: March 5, 2026 (v1.4.3 — 290 templates, Sports category)
 **Relevant to**: Developers
 
 **Fast lookup for common tasks and patterns in CustomSubs.**
@@ -129,6 +129,21 @@ onPressed: () {
 }
 ```
 
+### Optimistic State Update (avoid skeleton flash)
+
+For mutations where you only need to patch one field in the list (e.g., `markAsPaid`), update state in-place rather than calling `refresh()`:
+
+```dart
+// Patch only the affected item — avoids AsyncValue.loading() skeleton flash
+final currentSubs = state.value ?? [];
+state = AsyncValue.data(
+  currentSubs.map((sub) {
+    if (sub.id == targetId) return sub.copyWith(isPaid: true);
+    return sub;
+  }).toList(),
+);
+```
+
 ---
 
 ## 💾 Hive / Repository
@@ -230,52 +245,106 @@ final symbol = CurrencyUtils.getCurrencySymbol('EUR');
 
 ---
 
-## 🎨 Service Icons
+## 🎨 Brand Icons (SubscriptionIcon)
 
-**Added in v0.1.1** - Display recognizable icons for 50+ popular services
+**Updated in v1.4.0** — Real brand logos via `simple_icons` (~80 services) + bundled SVG logos for trademark-removed brands
+
+### Use the widget — don't call ServiceIcons directly
+
+```dart
+import 'package:custom_subs/core/widgets/subscription_icon.dart';
+
+// Home screen tile (circle, 48px)
+SubscriptionIcon(
+  name: subscription.name,
+  iconName: subscription.iconName,   // from template JSON, null for custom subs
+  color: Color(subscription.colorValue),
+  size: 48,
+  isCircle: true,
+)
+
+// Detail header (rounded rect, 80px)
+SubscriptionIcon(
+  name: subscription.name,
+  iconName: subscription.iconName,
+  color: subscriptionColor,
+  size: 80,
+  isCircle: false,
+)
+
+// Template grid (circle, 56px)
+SubscriptionIcon(
+  name: template.name,
+  iconName: template.iconName,
+  color: Color(template.color),
+  size: 56,
+  isCircle: true,
+)
+```
+
+### Icon resolution order (three tiers)
+
+1. **Local SVG asset** (`assets/logos/{iconName}.svg`) — for brands removed from Simple Icons
+2. **SimpleIcons** — `iconName` → `SimpleIcons.netflix` etc., then name-based fuzzy match
+3. **Letter avatar** — first character of `name` in brand color
+
+### Brands with bundled SVG logos (`assets/logos/`)
+
+| Brand | File | Design |
+|---|---|---|
+| Disney+ | `disney.svg` | #113CCF blue, white "D+" |
+| Hulu | `hulu.svg` | #1CE783 green, white "h" |
+| Microsoft | `microsoft.svg` | white bg, 4 Windows squares |
+| Adobe | `adobe.svg` | #FA0F00 red, white "A" |
+| LinkedIn | `linkedin.svg` | #0077B5 blue, white "in" |
+| Xbox | `xbox.svg` | #107C10 green, white "X" |
+| Nintendo | `nintendo.svg` | #E4000F red, white "N" |
+| Bumble | `bumble.svg` | #FFC629 yellow, dark "B" |
+
+### Adding a logo for a new missing brand
+
+```dart
+// 1. Create assets/logos/{iconName}.svg  (100×100 viewBox, brand-color bg, white icon)
+// 2. Add iconName to _localLogoIconNames in service_icons.dart
+// 3. Run flutter pub get
+static const Set<String> _localLogoIconNames = {
+  'disney', 'hulu', 'microsoft', 'adobe', 'linkedin', 'xbox', 'nintendo', 'bumble',
+  'hinge',  // after adding assets/logos/hinge.svg
+};
+```
+
+### ServiceIcons API (used internally by SubscriptionIcon)
 
 ```dart
 import 'package:custom_subs/core/utils/service_icons.dart';
 
-// Get icon for service
-IconData icon = ServiceIcons.getIconForService('Netflix');
-// Returns: Icons.movie
+// Check if local SVG exists (tier 1)
+bool hasLogo = ServiceIcons.hasLocalLogo('disney');      // true
+String path  = ServiceIcons.getLocalLogoPath('disney');  // 'assets/logos/disney.svg'
 
-// Check if service has custom icon
-bool hasIcon = ServiceIcons.hasCustomIcon('Spotify');
-// Returns: true
-
-// Get fallback letter
-String letter = ServiceIcons.getDisplayLetter('MyService');
-// Returns: "M"
+// SimpleIcons lookup (tier 2)
+IconData? icon = ServiceIcons.getIconForIconName('netflix');  // SimpleIcons.netflix
+IconData? icon = ServiceIcons.getIconByName('Netflix');       // name-based fuzzy match
 ```
 
-### Usage in CircleAvatar
+### Mapped services via SimpleIcons (~80 total)
 
-```dart
-CircleAvatar(
-  backgroundColor: color.withOpacity(0.2),
-  child: ServiceIcons.hasCustomIcon(subscription.name)
-      ? Icon(
-          ServiceIcons.getIconForService(subscription.name),
-          color: color,
-          size: 24,
-        )
-      : Text(
-          subscription.name[0].toUpperCase(),
-          style: TextStyle(color: color),
-        ),
-)
-```
+- **Streaming**: Netflix, Spotify, YouTube, Apple Music, Apple TV+, HBO, Crunchyroll, Tidal, Twitch, Pandora
+- **Apple**: Apple Music, Apple TV+, Apple Arcade, iCloud
+- **AI**: ChatGPT (OpenAI icon), Claude, Perplexity
+- **Productivity**: Notion, Figma, Canva, Sketch, Framer, Miro, Loom, Airtable, Trello, Asana, ClickUp, Linear, Basecamp, Slack, Zoom, Discord
+- **Developer**: GitHub, JetBrains, Replit, Webflow, Zapier
+- **Finance**: Coinbase, Dashlane, NordVPN, ExpressVPN, Xero, Quickbooks
+- **Gaming**: PlayStation, EA, Ubisoft
+- **Fitness/Health**: Strava, Peloton, Headspace, Duolingo, Coursera, Skillshare
+- **News**: Medium, Substack, New York Times
+- **Social**: Discord, Snapchat, X, Patreon, OnlyFans, Tinder
+- **Retail**: Target, Walmart, Amazon, Audible, Instacart, DoorDash, Uber, Tesla, Ring
+- **And more**: Shopify, Mailchimp, HubSpot, Salesforce, Zendesk, Calendly, Typeform, Intercom, SurveyMonkey, 1Password, Paramount+
 
-### Supported Services
+### Still falling back to letter avatar
 
-- **Streaming**: Netflix, Spotify, Disney+, Hulu, HBO Max, YouTube, Apple Music/TV
-- **Cloud**: iCloud, Google One, Dropbox, OneDrive
-- **Gaming**: Xbox Game Pass, PlayStation Plus, Nintendo Switch Online
-- **Productivity**: Microsoft 365, Adobe, Canva, Notion, Evernote
-- **Fitness**: Peloton, Strava, Headspace, Calm
-- **And 30+ more services!**
+Hinge, MyFitnessPal, ESPN, SiriusXM, Monday.com, Midjourney, Discovery, WSJ, Washington Post — no SVG file yet. Add one to `assets/logos/` to cover them.
 
 ---
 
@@ -762,6 +831,116 @@ RefreshIndicator(
 
 ---
 
+## 🏠 Home Screen
+
+### Spending Summary Card
+
+`_SpendingSummaryCard` (home_screen.dart) — tappable card at the top of the home feed.
+
+- **Tap to cycle:** Monthly → Yearly → Daily → Monthly (loops)
+- **Formulas:** yearly = `monthlyTotal * 12`, daily = `monthlyTotal * 12 / 365` (matches analytics_screen)
+- **State:** `_SpendingPeriod` enum + `_tweenBegin` tracked in `_SpendingSummaryCardState`
+- **Animation:** `TweenAnimationBuilder` (800ms) animates the number; `AnimatedSwitcher` (200ms) crossfades the label; `AnimatedContainer` dots indicate active period
+- **Source data:** `HomeController.calculateMonthlyTotal()` — active subs only, converted to primary currency
+- **No controller changes needed** — yearly/daily derived in-widget
+
+### Home Screen Sections
+
+The Home screen has **three subscription list sections** — all must stay in sync:
+
+| Section | Method | Range | Notes |
+|---|---|---|---|
+| **Upcoming** | `getUpcomingSubscriptions(days: 31)` | Today → +30 days (inclusive) | Sortable, swipe actions |
+| **Later** | `getLaterSubscriptions(fromDays: 31)` | +31 → +90 days | Read-only, muted tile |
+| **Paused** | `getPausedSubscriptions()` | N/A | Sorted by pause date |
+
+> **Boundary note:** `getUpcomingSubscriptions` is called with `days: 31` so that its exclusive upper bound (`isBefore(today + 31)`) correctly includes subscriptions billing exactly 30 days from now. `getLaterSubscriptions` starts at `fromDays: 31` to match.
+
+```dart
+// All use calendar-day boundaries (not current time):
+final todayStart = DateTime(now.year, now.month, now.day);
+```
+
+---
+
+## ⏸️ Subscription Pause / Snooze
+
+**Rule:** `isActive` is the pause flag. `isActive = false` means paused. Use the `isPaused` getter — never add a new `isPaused` field (see ADR 004).
+
+```dart
+// Check pause state — always use the getter, not the raw field
+subscription.isPaused          // true if paused
+subscription.isResumingSoon    // true if resumeDate is within 7 days
+subscription.shouldAutoResume  // true if resumeDate has passed
+
+// Pause a subscription (with optional auto-resume date)
+await repository.pauseSubscription(id, resumeDate: DateTime(2026, 4, 1));
+
+// Resume manually
+await repository.resumeSubscription(id);
+
+// Get all paused subscriptions
+final paused = await repository.getAllPaused();
+
+// Auto-resume any with past resumeDate (called on startup, foreground, refresh)
+await repository.autoResumeSubscriptions();
+```
+
+**Three rules for paused subscriptions:**
+1. **Upcoming/Later queries exclude paused** — always filter `sub.isActive &&`
+2. **Billing dates freeze while paused** — `advanceOverdueBillingDates()` skips paused subs
+3. **Notifications skip paused** — `scheduleNotificationsForSubscription()` returns early if `!sub.isActive`
+
+**Auto-resume runs in 3 places** (same pattern as billing date advancement):
+- App startup → `main.dart`
+- App foreground → `home_screen.dart` → `didChangeAppLifecycleState(resumed)`
+- Pull-to-refresh → `home_screen.dart`
+
+---
+
+## 📅 Date Comparison — Calendar Day vs Exact Time
+
+**Always strip time when comparing billing dates at the day level.**
+
+```dart
+// ❌ WRONG — advances midnight-dated subs at 9am (user never sees "Today")
+if (nextBillingDate.isBefore(DateTime.now())) { ... }
+
+// ✅ CORRECT — only advances dates strictly before today
+final today = DateTime(now.year, now.month, now.day);
+if (nextBillingDate.isBefore(today)) { ... }
+
+// ✅ CORRECT — includes today's subs in the upcoming list
+final todayStart = DateTime(now.year, now.month, now.day);
+if (!nextBillingDate.isBefore(todayStart)) { ... }
+```
+
+This pattern is used in:
+- `subscription_repository.dart` → `advanceOverdueBillingDates()`
+- `home_controller.dart` → `getUpcomingSubscriptions()`, `getLaterSubscriptions()`
+
+---
+
+## 💎 Premium Entitlement — Refresh Points
+
+`isPremiumProvider` is an `AutoDisposeFutureProvider<bool>` (NOT a stream). It must be manually invalidated when the entitlement status may have changed:
+
+```dart
+// Invalidate (async rebuild of all watchers):
+ref.invalidate(isPremiumProvider);
+
+// Refresh and await result (used before gating an action):
+final isPremium = await ref.refresh(isPremiumProvider.future);
+```
+
+**Where it is invalidated:**
+1. `paywall_screen.dart` — after successful purchase
+2. `paywall_screen.dart` — after successful restore
+3. `settings_screen.dart` — after restore purchases
+4. `home_screen.dart` — on `didChangeAppLifecycleState(resumed)` ← covers trial expiry
+
+---
+
 ## ⚠️ Common Pitfalls
 
 ### ❌ Don't Access Hive Directly from Widgets
@@ -807,6 +986,43 @@ dart run build_runner build --delete-conflicting-outputs
 
 ---
 
+## 📦 Subscription Templates
+
+**File:** `assets/data/subscription_templates.json` — 290 services
+
+### Price Convention (established March 2026)
+- **Tier:** Most popular individual paid plan (not cheapest, not premium)
+- **Cycle:** Monthly billing rate (exception: annual-only services use `yearly` cycle)
+- **Currency:** USD
+- **Last verified:** March 2026 — next review Q3 2026
+
+### Key tier decisions
+| Service | Tier | Why |
+|---------|------|-----|
+| Netflix | Standard | Most popular non-ads tier |
+| Disney+ | Standard (with ads) | Most popular by subscriber count |
+| Hulu | Standard (with ads) | Most popular entry point |
+| Max | Standard (ad-free) | Primary product positioning |
+| Paramount+ | Essential (with ads) | Most popular entry tier |
+| PlayStation Plus | Essential | Most popular; Extra/Premium are niche |
+
+### Adding/updating a template
+```json
+{
+  "id": "service_name",          // lowercase snake_case, unique
+  "name": "Display Name",        // as shown in app
+  "defaultAmount": 9.99,         // most popular plan, USD monthly
+  "defaultCurrency": "USD",
+  "defaultCycle": "monthly",     // weekly/monthly/quarterly/biannual/yearly
+  "category": "entertainment",   // entertainment/productivity/fitness/news/cloud/gaming/education/finance/shopping/utilities/health/other/sports
+  "cancelUrl": "https://...",    // direct cancel page, null if unknown
+  "color": "0xFFRRGGBB",        // hex ARGB
+  "iconName": "service_name"    // must match ServiceIcons mapping or falls back to letter
+}
+```
+
+---
+
 ## 📚 File Locations
 
 | File | Path |
@@ -817,6 +1033,7 @@ dart run build_runner build --delete-conflicting-outputs
 | **Router** | `lib/app/router.dart` |
 | **Currency Utils** | `lib/core/utils/currency_utils.dart` |
 | **Service Icons** | `lib/core/utils/service_icons.dart` |
+| **Subscription Icon Widget** | `lib/core/widgets/subscription_icon.dart` |
 | **Haptic Utils** | `lib/core/utils/haptic_utils.dart` |
 | **SnackBar Utils** | `lib/core/utils/snackbar_utils.dart` |
 | **Undo Service** | `lib/data/services/undo_service.dart` |
@@ -886,6 +1103,27 @@ dart run build_runner build --delete-conflicting-outputs
 - Add `ref.invalidate(homeControllerProvider)` after save
 - This forces the home screen to refresh
 
+**Subscription billing today not showing as "Today"?** *(Fixed in v1.4.1)*
+- Check that `advanceOverdueBillingDates()` uses `isBefore(today)` not `isBefore(now)`
+- Check that `getUpcomingSubscriptions()` uses `!isBefore(todayStart)` not `isAfter(now)`
+- See: `subscription_repository.dart` and `home_controller.dart`
+
+**Premium badge not clearing after trial expires?** *(Fixed in v1.4.1)*
+- `ref.invalidate(isPremiumProvider)` must be called in `didChangeAppLifecycleState(resumed)`
+- See: `home_screen.dart` → `didChangeAppLifecycleState`
+
+**Yearly subscription invisible on Home screen?** *(Fixed in v1.4.1)*
+- Subs billing 31–90 days out now appear in the "Later" section
+- `getLaterSubscriptions(fromDays: 31)` in `HomeController` handles this range
+
+**Subscription billing in exactly 30 days showing in "Later" instead of "Upcoming"?** *(Fixed post-v1.4.1)*
+- `getUpcomingSubscriptions` uses an exclusive upper bound — `days: 31` ensures day 30 is included
+- `getLaterSubscriptions` starts at `fromDays: 31` to avoid overlap
+
+**Mark as Paid causes a skeleton flash + jarring list reorder?** *(Fixed post-v1.4.1)*
+- `markAsPaid()` in `home_controller.dart` was calling `refresh()` which sets `AsyncValue.loading()`, triggering the skeleton screen before re-rendering the reordered list
+- Fix: use an optimistic in-place state update (see "Optimistic State Update" pattern above) — patches only the affected item, no loading state, smooth single-frame reorder
+
 **NotificationService not initialized?** *(Fixed in v0.1.1)*
 ```dart
 // Wrong
@@ -899,6 +1137,67 @@ final service = await ref.read(notificationServiceProvider.future);
 - Check GridView `childAspectRatio` (lower = taller cells)
 - Verify padding doesn't exceed available space
 - Use `MainAxisSize.min` in Column/Row when needed
+
+---
+
+## 🔔 Notification Permission Check (v1.4.2+)
+
+Check if OS notifications are enabled before firing a test notification. Android exposes a public API; iOS is optimistic (no public check without `permission_handler`).
+
+```dart
+// In NotificationService
+Future<bool> areNotificationsEnabled() async {
+  if (Platform.isAndroid) {
+    final plugin = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    return await plugin?.areNotificationsEnabled() ?? true;
+  }
+  return true; // iOS: optimistic — trust that user configured on first launch
+}
+
+// Usage in settings_screen.dart
+final enabled = await notificationService.areNotificationsEnabled();
+if (!enabled) {
+  // Show dialog with AppSettings.openAppSettings(type: AppSettingsType.notification)
+} else {
+  // Fire test notification
+  await notificationService.showTestNotification();
+}
+```
+
+**Package**: `app_settings: ^5.2.0` — use `AppSettings.openAppSettings(type: AppSettingsType.notification)` on both platforms. Note: `openNotificationSettings()` was removed in v5.x; use the typed `openAppSettings()` API instead.
+
+---
+
+## 💰 Spending Period Toggle Pattern (v1.4.2+)
+
+Tap-to-cycle between spending periods. Used in the home spending summary card.
+
+```dart
+// File-private enum — add above the widget class
+enum _SpendingPeriod { monthly, yearly, daily }
+
+// In State class
+_SpendingPeriod _period = _SpendingPeriod.monthly;
+double _tweenBegin = 0.0;
+
+double _amountForPeriod(double monthly, _SpendingPeriod p) => switch (p) {
+  _SpendingPeriod.monthly => monthly,
+  _SpendingPeriod.yearly  => monthly * 12,
+  _SpendingPeriod.daily   => monthly * 12 / 365,
+};
+
+void _cyclePeriod() {
+  setState(() {
+    _tweenBegin = _amountForPeriod(widget.monthlyTotal, _period); // morph from current
+    _period = _SpendingPeriod.values[(_period.index + 1) % 3];
+  });
+}
+```
+
+- **Number animation**: `TweenAnimationBuilder<double>` (800ms, `Curves.easeOutCubic`)
+- **Label animation**: `AnimatedSwitcher` (200ms) for the `/month` → `/year` → `/day` label
+- **Page indicator**: `AnimatedContainer` (250ms) for the 3-dot indicator
 
 ---
 

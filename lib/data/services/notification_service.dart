@@ -101,6 +101,11 @@ class NotificationService {
             DarwinNotificationAction.plain(
               'view_details',
               'View Details',
+              options: <DarwinNotificationActionOption>{
+                // foreground required — our handler navigates via GoRouter
+                // which needs the app in the foreground to work correctly.
+                DarwinNotificationActionOption.foreground,
+              },
             ),
           ],
         ),
@@ -693,6 +698,21 @@ class NotificationService {
         iOS: DarwinNotificationDetails(),
       ),
     );
+  }
+
+  /// Returns true if notifications are enabled at the OS level.
+  ///
+  /// On Android 13+, uses the platform API for an accurate check.
+  /// On iOS, returns true (optimistic) — iOS has no public synchronous check
+  /// without permission_handler; the test notification itself serves as the
+  /// real check there.
+  Future<bool> areNotificationsEnabled() async {
+    final android = _notifications.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      return await android.areNotificationsEnabled() ?? true;
+    }
+    return true; // iOS: optimistic — test notification serves as real check
   }
 
   /// Format amount with currency

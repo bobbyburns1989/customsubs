@@ -372,6 +372,18 @@ class Subscription {
 - Make field nullable or provide default
 - Existing data loads fine (new field = null)
 
+**Real example — Pause/Snooze feature (v1.2.0):**
+
+HiveFields 23–25 were added to `Subscription` for pause tracking. All three are nullable/defaulted so existing records load without migration:
+
+```dart
+@HiveField(23) final DateTime? pausedDate;   // null = not paused
+@HiveField(24) final DateTime? resumeDate;   // null = manual resume only
+@HiveField(25) final int pauseCount;         // defaults to 0
+```
+
+> Note: `isActive` (HiveField 8) was repurposed as the pause flag — `false` means paused. See [ADR 004](../decisions/004-pause-feature-isactive-reuse.md) before touching this field.
+
 ### Removing Fields
 
 **Option 1: Leave field, stop using it**

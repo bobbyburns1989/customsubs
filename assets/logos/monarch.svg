@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#6366F1"/>
+  <!-- Crown above letter to distinguish from generic M brands -->
+  <path d="M 30 38 L 38 28 L 50 36 L 62 28 L 70 38 L 70 46 L 30 46 Z" fill="white"/>
+  <text x="50" y="78" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="36" fill="white">M</text>
+</svg>

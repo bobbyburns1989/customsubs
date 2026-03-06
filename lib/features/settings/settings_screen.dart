@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:app_settings/app_settings.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
@@ -249,18 +250,79 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
             title: const Text('Test Notification'),
-            subtitle: const Text('Send a test notification now'),
+            subtitle: const Text('Verify reminders are working'),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () async {
-              await HapticUtils.medium(); // Action trigger feedback
+              await HapticUtils.medium();
               final notificationService = await ref.read(notificationServiceProvider.future);
+
+              // Android 13+: check before firing a doomed notification
+              final enabled = await notificationService.areNotificationsEnabled();
+
+              if (!context.mounted) return;
+
+              if (!enabled) {
+                // We know notifications are disabled — skip the test, offer fix
+                await showDialog<void>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Notifications Disabled'),
+                    content: const Text(
+                      'Notifications are currently disabled for CustomSubs. '
+                      'Enable them in device settings to receive billing reminders.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Not Now'),
+                      ),
+                      FilledButton(
+                        onPressed: () async {
+                          Navigator.pop(ctx);
+                          await AppSettings.openAppSettings(
+                            type: AppSettingsType.notification,
+                          );
+                        },
+                        child: const Text('Open Settings'),
+                      ),
+                    ],
+                  ),
+                );
+                return;
+              }
+
+              // Send the test
               await notificationService.showTestNotification();
 
-              if (context.mounted) {
-                SnackBarUtils.show(
-                  context,
-                  SnackBarUtils.success('Test notification sent!'),
-                );
-              }
+              if (!context.mounted) return;
+
+              // Follow-up dialog — gives iOS users an escape hatch even though
+              // we can't pre-check iOS permissions without a heavier dependency
+              await showDialog<void>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Test Sent'),
+                  content: const Text(
+                    'A test notification was just sent.\n\n'
+                    "Don't see it? Notifications may be disabled in your device settings.",
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        Navigator.pop(ctx);
+                        await AppSettings.openAppSettings(
+                          type: AppSettingsType.notification,
+                        );
+                      },
+                      child: const Text('Open Settings'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Got It'),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
           const Padding(
@@ -269,7 +331,8 @@ class SettingsScreen extends ConsumerWidget {
               vertical: AppSizes.sm,
             ),
             child: Text(
-              'CustomSubs sends reminders at your chosen time before billing dates. Make sure notifications are enabled in your device settings.',
+              'CustomSubs sends reminders at your chosen time before billing dates. '
+              'Make sure notifications are enabled in your device settings.',
               style: TextStyle(
                 fontSize: 13,
                 color: AppColors.textSecondary,

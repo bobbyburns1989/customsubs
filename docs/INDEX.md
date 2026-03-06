@@ -1,8 +1,8 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: February 22, 2026
-**Version**: 1.1.5 (Build 20 - Successfully Archived)
-**Status**: ✅ Ready for TestFlight Upload
+**Last Updated**: March 4, 2026
+**Version**: 1.4.2 (Build 46 — Live on App Store)
+**Status**: ✅ Live — Active post-launch improvements
 
 Welcome to the CustomSubs documentation! This index helps you find exactly what you need.
 
@@ -63,6 +63,11 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 | [completion/HAPTICS_AND_SNACKBARS.md](completion/HAPTICS_AND_SNACKBARS.md) | Haptics & snackbars | ✅ Complete |
 | [completion/ANALYTICS_DAILY_COST_BREAKDOWN.md](completion/ANALYTICS_DAILY_COST_BREAKDOWN.md) | Daily cost in analytics | ✅ Complete |
 | [completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md](completion/POLISH_IMPROVEMENTS_SKELETON_HERO_DONUT.md) | Skeleton loading, Hero animations, Donut chart | ✅ Complete |
+| [completion/BRAND_ICONS.md](completion/BRAND_ICONS.md) | SimpleIcons + local SVG logos for 80+ services | ✅ Complete |
+| [completion/BUG_FIXES_V141.md](completion/BUG_FIXES_V141.md) | Today billing, Later section, rich notifications | ✅ Complete |
+| [completion/ANALYTICS_SCREEN_POLISH_2026-03-03.md](completion/ANALYTICS_SCREEN_POLISH_2026-03-03.md) | Donut chart center overlay, forecast card | ✅ Complete |
+| [completion/PAYWALL_REDESIGN.md](completion/PAYWALL_REDESIGN.md) | Compact single-screen paywall layout | ✅ Complete |
+| [completion/TEMPLATE_PRICE_VERIFICATION.md](completion/TEMPLATE_PRICE_VERIFICATION.md) | 32 template price updates, March 2026 | ✅ Complete |
 
 ### For App Store Submission
 
@@ -152,12 +157,14 @@ docs/
 ├── decisions/ ← Architectural Decision Records (ADRs)
 │   ├── 001-riverpod-code-generation.md
 │   ├── 002-notification-id-strategy.md
-│   └── 003-offline-first-architecture.md
+│   ├── 003-offline-first-architecture.md
+│   └── 004-pause-feature-isactive-reuse.md
 │
 ├── guides/ ← Implementation how-tos
 │   ├── development-setup.md (environment setup)
 │   ├── adding-a-feature.md
 │   ├── forms-and-validation.md
+│   ├── iap-and-premium.md (RevenueCat, paywall)
 │   ├── multi-currency.md
 │   └── working-with-notifications.md (CRITICAL)
 │
@@ -324,30 +331,30 @@ Brief 1-2 sentence description.
 
 | Category | Count | Status |
 |----------|-------|--------|
-| Root Docs | 4 | ✅ Complete |
-| Completion Docs | 13 | ✅ Complete |
+| Root Docs | 5 | ✅ Complete |
+| Completion Docs | 25+ | ✅ Complete |
 | Testing Docs | 3 | ✅ Complete |
-| Architecture Docs | 4 | ✅ Complete |
-| Decision Records (ADRs) | 3 | ✅ Complete |
-| Implementation Guides | 5 | ✅ Complete |
+| Architecture Docs | 5 | ✅ Complete |
+| Decision Records (ADRs) | 4 | ✅ Complete |
+| Implementation Guides | 6 | ✅ Complete |
 | Design Docs | 3 | ✅ Complete |
-| Templates | 1 | ✅ Complete |
-| Technical Docs | 1 | ✅ Complete |
+| Templates | 3 | ✅ Complete |
+| Technical Docs | 2 | ✅ Complete |
 | App Store Docs | 1 | ✅ Complete |
-| Archived Docs | 4 | 📦 Archived |
+| Archived Docs | 4+ | 📦 Archived |
 | Future Docs | 1 | 🔜 Planned |
-| **TOTAL** | **43** | **100% Complete** |
+| **TOTAL** | **70+** | **100% Complete** |
 
 ---
 
 ## 🎉 Quick Facts
 
 - **App Status**: 🎉 **LIVE ON APP STORE**
-- **Total Documentation**: 41 files, ~12,500 lines
+- **Total Documentation**: 70+ files, ~15,000+ lines
 - **Test Coverage**: 300+ test cases documented
-- **Phase Summaries**: 12 completion documents
-- **Implementation Guides**: 5 detailed how-tos
-- **Architectural Decisions**: 3 ADRs documented
+- **Phase Summaries**: 25+ completion documents
+- **Implementation Guides**: 6 detailed how-tos
+- **Architectural Decisions**: 4 ADRs documented
 - **Overall Quality**: Professional-grade documentation ✅
 
 ---
@@ -375,7 +382,7 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ---
 
-**Last Updated**: February 21, 2026
+**Last Updated**: March 4, 2026
 **Maintained By**: Project Documentation System
 **Feedback**: Update this file or create issues
 
@@ -383,15 +390,21 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ## 🆕 Recent Updates
 
+**March 4, 2026**:
+- ✅ Documentation reorganized and optimized (fixed broken refs in CLAUDE.md, updated doc counts)
+- ✅ Root-level historical .md files moved to `docs/archive/root-history/`
+- ✅ Added `docs/completion/README.md` — index of all completion docs
+
+**March 3, 2026 (v1.4.1–v1.4.2)**:
+- ✅ [Brand icons](completion/BRAND_ICONS.md) — SimpleIcons integration, 80+ services, local SVG fallbacks
+- ✅ [Bug fixes v1.4.1](completion/BUG_FIXES_V141.md) — today billing date, Later section, rich notifications
+- ✅ [Analytics screen polish](completion/ANALYTICS_SCREEN_POLISH_2026-03-03.md) — donut chart center overlay, forecast card
+- ✅ [Template price verification](completion/TEMPLATE_PRICE_VERIFICATION.md) — 32 prices updated to March 2026 rates
+
+**February 26, 2026 (v1.4.0)**:
+- ✅ [Paywall redesign](completion/PAYWALL_REDESIGN.md) — compact single-screen layout (Apple compliant)
+- ✅ RevenueCat IAP fully live — see [iap-and-premium.md](guides/iap-and-premium.md)
+
 **February 22, 2026**:
 - ✅ Resolved build system issues (exit code -9 errors)
-- ✅ Successfully archived v1.1.5 Build 20
-- ✅ Created comprehensive troubleshooting guide ([technical/BUILD_TROUBLESHOOTING.md](technical/BUILD_TROUBLESHOOTING.md))
-- ✅ Updated CHANGELOG.md with v1.1.5 entry
-- ✅ Ready for TestFlight upload
-
-**February 21, 2026**:
-- ✅ Fixed 25 critical compilation errors (see [technical/COMPILATION_FIXES_2026-02-21.md](technical/COMPILATION_FIXES_2026-02-21.md))
-- ✅ Updated CHANGELOG.md with bug fixes
-- ✅ Updated Polish Phase 2 completion doc
-- ✅ Codebase is now clean and ready for development
+- ✅ Created [BUILD_TROUBLESHOOTING.md](technical/BUILD_TROUBLESHOOTING.md)

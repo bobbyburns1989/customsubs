@@ -38,7 +38,10 @@ enum SubscriptionCategory {
   health, // Insurance, telehealth
 
   @HiveField(11)
-  other;
+  other,
+
+  @HiveField(12)
+  sports; // ESPN+, NBA League Pass, DAZN, live sports streaming
 
   String get displayName {
     switch (this) {
@@ -66,6 +69,8 @@ enum SubscriptionCategory {
         return 'Health';
       case SubscriptionCategory.other:
         return 'Other';
+      case SubscriptionCategory.sports:
+        return 'Sports';
     }
   }
 
@@ -95,6 +100,8 @@ enum SubscriptionCategory {
         return '🏥';
       case SubscriptionCategory.other:
         return '📦';
+      case SubscriptionCategory.sports:
+        return '🏆';
     }
   }
 }

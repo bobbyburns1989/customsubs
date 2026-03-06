@@ -10,53 +10,46 @@
 
 ## Overview
 
-CustomSubs is a mobile application designed to help you track and manage your subscriptions with complete privacy. All your data stays on your device - no servers, no accounts, no tracking, no internet connection required.
+CustomSubs is a mobile application designed to help you track and manage your subscriptions with complete privacy. All your data stays on your device — no servers, no accounts, no tracking, no internet connection required.
 
-**🎉 Status:** ✅ **LIVE ON APP STORE** | **📋 See [ROADMAP.md](ROADMAP.md) for detailed progress tracking**
+**🎉 Status:** ✅ **LIVE ON APP STORE**
 
-**🆕 Latest Version (v1.3.0 Build 29):** Critical IAP reliability fixes! Dynamic pricing from StoreKit, offering fallback logic, and iPad-optimized layout for App Store compliance.
+**🆕 Latest Version (v1.4.0 Build 44):** Brand icons for 80+ services, compact paywall redesign, "Later" section for subscriptions 30–90 days out, notification deep linking, and critical v1.4.1 bug fixes.
 
-**💎 Premium Features:** Free tier includes 5 subscriptions. Upgrade for unlimited tracking with a 3-day free trial—cancel anytime! Just $0.99/month.
+**💎 Premium Features:** Free tier supports a limited number of subscriptions. Upgrade for unlimited tracking with a 3-day free trial — cancel anytime! Just $0.99/month.
+
+---
 
 ### Key Features
 
-✅ **Completed Features (Phases 0-7 + UI Modernization)**
-
-**Monetization (Phase 7 - Complete + v1.3.0 IAP Fixes):**
-- 🎁 **3-Day Free Trial:** Try Premium risk-free with full feature access
-- 💎 **Freemium model:** Track up to 5 subscriptions for free
-- 💳 **Premium ($0.99/month):** Unlimited subscriptions with RevenueCat integration
-- 🔓 Upgrade flow with beautiful paywall screen
-- 🏆 Premium badge on home screen
-- 🔄 Restore purchases support
-- 📊 Enhanced debugging for subscription flow
-- 🛡️ **IAP Reliability (v1.3.0):**
-  - Offering fallback logic (`offerings.current` → `offerings.all['default']`)
-  - Dynamic pricing from StoreKit (no hardcoded prices)
-  - Dynamic trial period display (always matches App Store Connect)
-  - iPad-optimized legal link placement (always visible)
-  - Resilient to RevenueCat sync issues
-
-**Core Functionality:**
-- 📱 Clean Material 3 UI with custom theming
+**Subscription Tracking:**
 - ➕ Add/Edit subscriptions with **260+ pre-populated templates**
 - 🎨 Color customization with 12 vibrant colors
-- 🎯 **Service icons** - 50+ popular services display recognizable icons (Netflix, Spotify, Disney+, etc.)
+- 🎯 **Brand icons** — ~80 popular services display recognizable icons (Netflix, Spotify, Apple Music, etc.)
 - 💰 Multi-currency support (30+ currencies with bundled exchange rates)
-- 🔔 Smart notification system with timezone support (fixed critical bugs)
 - 📅 Multiple billing cycles (weekly, biweekly, monthly, quarterly, biannual, yearly)
-- 🎁 Free trial tracking with post-trial amount
-- 📋 Cancellation management (URLs, phone numbers, interactive checklists)
-- 🏠 Home screen with spending summary and subscription list
-- 🔍 Template search and quick subscription creation
-- 📝 Custom notes and detailed subscription info
-- ✨ Real-time home screen refresh after adding subscriptions
+- 🎁 Free trial tracking with post-trial amount and trial-specific reminders
+- ⏸️ **Pause / Snooze** — temporarily pause a subscription; billing dates freeze while paused, auto-resume on a set date
 
-**Subscription Management:**
-- 📊 **Full subscription detail screen** with complete management
-- ✅ Mark as Paid functionality with visual badges
-- 🗑️ Delete with confirmation and notification cleanup
-- 📱 Interactive cancellation checklists with progress tracking
+**Notifications:**
+- 🔔 Smart notification system with timezone support
+- Reminders at 7 days, 1 day, and day-of billing (fully configurable)
+- Trial ending reminders (3 days, 1 day, day-of)
+- Rich notification actions — "Mark as Paid" and "View Details" directly from the notification
+- Deep linking from notification tap to subscription detail screen
+- 🧪 Test notification feature so users can verify delivery
+
+**Home Screen:**
+- 🏠 Spending summary with animated monthly total
+- **Upcoming** section (0–30 days) — sorted by billing date, unpaid first
+- **Later** section (30–90 days) — subscriptions coming up in the next quarter
+- **Paused** section — paused subscriptions with resume date info
+- Swipe left to delete; swipe right to mark as paid
+- Pull-to-refresh with automatic billing date advancement
+
+**Cancellation Management:**
+- 📋 Cancellation URLs, phone numbers, and freeform notes
+- Interactive step-by-step cancellation checklists with progress tracking
 - 🌐 Launch cancel URLs and phone numbers directly
 
 **Settings & Data Safety:**
@@ -65,67 +58,46 @@ CustomSubs is a mobile application designed to help you track and manage your su
 - 💾 **Backup and restore** (export to JSON, share to Files/email/cloud)
 - 🔄 Import with duplicate detection
 - ⏰ Backup reminders (after 3rd subscription)
-- 📅 Last backup date tracking
-- 🧪 Test notification feature
-- 🗑️ Delete all data with double confirmation (type-to-confirm security)
-- 📄 Privacy Policy and Terms of Service links
-- ℹ️ Version info and company attribution
+- 🗑️ Delete all data with double confirmation
 
-**Analytics & Insights:**
-- 📈 **Analytics screen** with comprehensive spending insights
+**Analytics:**
+- 📈 Yearly spending forecast (hero metric)
 - 📊 Category breakdown with horizontal bar charts
-- 📉 Month-over-month spending comparison with automatic snapshots
 - 🏆 Top 5 subscriptions ranking
-- 💰 Monthly and yearly spending forecasts
 - 💱 Multi-currency breakdown
 
-**Critical Bug Fixes (Phase 0):**
-- ✅ Fixed notification timezone (now uses device local time)
-- ✅ Fixed same-day reminder skip bug
-- ✅ Fixed month-end billing date drift (Jan 31 stays Jan 31)
-- ✅ Fixed edit state preservation (no data loss on edit)
-- ✅ Fixed multi-currency total conversion
-- ✅ Fixed "Next 30 days" filter accuracy
+**Premium / IAP:**
+- 💎 Freemium model — free tier with subscription limit
+- 💳 Premium ($0.99/month): unlimited subscriptions
+- 🎁 3-Day Free Trial via StoreKit
+- 🏆 Premium badge on home screen
+- 🔄 Restore purchases support
+- Dynamic pricing and trial display from StoreKit (no hardcoded values)
 
-**Code Quality (Phases 4-5):**
-- ✅ Zero analysis warnings or errors
-- ✅ All deprecations resolved
-- ✅ Performance optimized (60fps)
-- ✅ Error handling utilities
-- ✅ Comprehensive testing checklist (300+ test cases)
-
-**UI Modernization (v1.0.3):**
-- ✨ **60% reduction in Add Subscription form height**
-- 📝 Smart collapsible sections with smooth animations
-- 🎯 Compact, modern design (12px padding, 36px icons)
-- 🎨 Unified FormSectionCard styling across all sections
-- 🔽 Animated chevron icons (300ms transitions)
-- 👆 All touch targets maintained >32px for accessibility
-- 📱 Collapsed preview widgets (e.g., color dot when Appearance collapsed)
-- **See:** [`docs/completion/ADD_SUBSCRIPTION_MODERNIZATION.md`](docs/completion/ADD_SUBSCRIPTION_MODERNIZATION.md)
-
-🔮 **Planned (Future Versions)**
-- 🌙 Dark mode support
-- 🏠 Home screen widgets (iOS/Android)
-- 📊 Advanced analytics with charts (fl_chart)
-- 🎯 Dedicated cancellation flow screen
-- 🌍 Localization (i18n)
-- ☁️ iCloud backup option (iOS)
-- 📸 Receipt scanning (OCR)
+---
 
 ## Screenshots
 
 [Coming soon]
 
+---
+
 ## Technology Stack
 
-- **Framework**: Flutter 3.x
-- **Language**: Dart 3.x
-- **State Management**: Riverpod with code generation
-- **Local Database**: Hive (NoSQL, encrypted)
-- **Navigation**: GoRouter
-- **Notifications**: flutter_local_notifications with timezone support
-- **Design**: Material 3 with custom theme
+| Area | Technology |
+|------|-----------|
+| Framework | Flutter (latest stable) |
+| Language | Dart 3.x |
+| State Management | Riverpod with code generation (`@riverpod`) |
+| Local Database | Hive (NoSQL, on-device) |
+| Navigation | GoRouter |
+| Notifications | `flutter_local_notifications` + `timezone` |
+| Brand Icons | `simple_icons` (3,270 brands, font-based, offline) |
+| Charts | `fl_chart` |
+| IAP / Premium | RevenueCat (`purchases_flutter` 9.x) |
+| Design | Material 3 with custom DM Sans theme |
+
+---
 
 ## Architecture
 
@@ -134,12 +106,14 @@ CustomSubs follows clean architecture principles with a feature-first folder str
 ```
 lib/
 ├── app/              # App-level configuration (theme, router)
-├── core/             # Shared utilities, constants, extensions
+├── core/             # Shared utilities, constants, extensions, widgets
 ├── data/             # Data layer (models, repositories, services)
 └── features/         # Feature modules (onboarding, home, add, detail, etc.)
 ```
 
 For detailed architecture documentation, see [Architecture Overview](docs/architecture/overview.md).
+
+---
 
 ## Getting Started
 
@@ -172,96 +146,88 @@ For detailed architecture documentation, see [Architecture Overview](docs/archit
 
 4. **Run the app**
    ```bash
-   # List available devices
-   flutter devices
-
-   # Run on specific device
-   flutter run -d <device-id>
-
-   # Or run on default device
-   flutter run
+   flutter devices          # List available devices
+   flutter run -d <device>  # Run on specific device
    ```
 
 ### Development Workflow
 
-**Hot Reload** (while app is running):
 ```bash
-# Press 'r' in terminal for hot reload
-# Press 'R' for hot restart
-```
+# Hot reload (while running): press 'r' in terminal
+# Hot restart: press 'R'
 
-**Clean build** (if you encounter issues):
-```bash
-flutter clean
-flutter pub get
+# Clean build (if you encounter issues)
+flutter clean && flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 flutter run
-```
 
-**Code generation** (after modifying models or providers):
-```bash
-# Watch mode (auto-regenerate on file changes)
+# Watch mode for code generation
 dart run build_runner watch
-
-# One-time generation
-dart run build_runner build --delete-conflicting-outputs
 ```
+
+---
 
 ## Project Structure
 
 ```
 customsubs/
 ├── assets/
-│   ├── data/                          # JSON data files
-│   │   ├── subscription_templates.json  # 40+ service templates
-│   │   └── exchange_rates.json         # Currency conversion rates
-│   └── images/                        # Images and logos
-│       └── CustomSubsLOGO.png
+│   ├── data/
+│   │   ├── subscription_templates.json  # 260+ service templates
+│   │   └── exchange_rates.json          # Bundled currency rates
+│   ├── images/                          # App icon and branding
+│   └── logos/                           # Optional local PNG brand logos
 ├── lib/
 │   ├── app/
-│   │   ├── router.dart                # GoRouter configuration
-│   │   └── theme.dart                 # Material 3 theme
+│   │   ├── router.dart                  # GoRouter configuration
+│   │   └── theme.dart                   # Material 3 theme
 │   ├── core/
-│   │   ├── constants/                 # App-wide constants
-│   │   ├── extensions/                # Dart extensions
-│   │   └── utils/                     # Utility classes
+│   │   ├── constants/                   # Colors, sizes, templates
+│   │   ├── extensions/                  # DateTime, currency helpers
+│   │   ├── utils/                       # Currency, export, icon utilities
+│   │   └── widgets/                     # StandardCard, SubscriptionIcon, etc.
 │   ├── data/
-│   │   ├── models/                    # Data models (Hive)
-│   │   ├── repositories/              # Data access layer
-│   │   └── services/                  # Business logic services
+│   │   ├── models/                      # Subscription, ReminderConfig, enums
+│   │   ├── repositories/                # SubscriptionRepository (all CRUD)
+│   │   └── services/                    # Notifications, Backup, Entitlement
 │   └── features/
-│       ├── onboarding/                # First-time user flow
-│       ├── home/                      # Main subscription list
-│       ├── add_subscription/          # Add/edit subscription
-│       ├── subscription_detail/       # Subscription details (TODO)
-│       ├── settings/                  # App settings
-│       └── analytics/                 # Analytics (TODO)
-├── CLAUDE.md                          # Original specification
-├── README.md                          # This file
-└── ARCHITECTURE.md                    # Technical architecture docs
+│       ├── onboarding/                  # First-time user flow
+│       ├── home/                        # Main dashboard
+│       ├── add_subscription/            # Add/edit form + template picker
+│       ├── subscription_detail/         # Detail view + cancellation tools
+│       ├── analytics/                   # Spending analytics
+│       ├── paywall/                     # Premium upgrade screen
+│       └── settings/                   # App settings
+├── CLAUDE.md                            # AI coding specification
+└── README.md                            # This file
 ```
+
+---
 
 ## Key Dependencies
 
-| Package | Purpose |
-|---------|---------|
-| `riverpod` | State management and dependency injection |
-| `hive` | Local NoSQL database |
-| `go_router` | Declarative navigation |
-| `flutter_local_notifications` | Local push notifications |
-| `timezone` | Timezone support for notifications |
-| `google_fonts` | DM Sans font family |
-| `uuid` | Unique ID generation |
-| `intl` | Internationalization and formatting |
-| `url_launcher` | Open URLs and phone numbers |
-| `share_plus` | Share functionality (for backups) |
-| `file_picker` | File selection (for restore) |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `flutter_riverpod` | ^2.5.1 | State management and DI |
+| `hive` + `hive_flutter` | ^2.2.3 | Local NoSQL database |
+| `go_router` | ^14.2.0 | Declarative navigation |
+| `flutter_local_notifications` | ^18.0.1 | Local push notifications |
+| `timezone` + `flutter_timezone` | ^0.9.4 / ^5.0.1 | Timezone-aware scheduling |
+| `simple_icons` | ^14.6.1 | 3,270+ brand SVG icons (offline) |
+| `fl_chart` | ^0.68.0 | Analytics charts |
+| `purchases_flutter` | ^9.0.0 | RevenueCat IAP (iOS 26 compatible) |
+| `google_fonts` | ^6.2.1 | DM Sans typeface |
+| `intl` | ^0.19.0 | Currency formatting |
+| `uuid` | ^4.4.2 | Unique ID generation |
+| `share_plus` | ^12.0.1 | Share sheet for backup export |
+| `file_picker` | ^8.0.6 | File selection for backup import |
+| `url_launcher` | ^6.3.0 | Open URLs and phone numbers |
+
+---
 
 ## Configuration
 
 ### Notifications
-
-Notifications require platform-specific setup:
 
 **iOS** (`ios/Runner/Info.plist`):
 ```xml
@@ -282,24 +248,11 @@ Notifications require platform-specific setup:
 
 The app uses bundled data files for offline operation:
 
-- **Templates**: `assets/data/subscription_templates.json` - 40+ popular subscription services
-- **Exchange Rates**: `assets/data/exchange_rates.json` - Currency conversion rates
-- **Logo**: `assets/images/CustomSubsLOGO.png` - App branding
+- **Templates**: `assets/data/subscription_templates.json` — 260+ popular subscription services
+- **Exchange Rates**: `assets/data/exchange_rates.json` — Currency conversion rates (updated with app releases)
+- **Logos**: `assets/logos/` — Optional local PNG overrides for brand icons
 
-These are loaded once on app startup and cached in memory.
-
-## Testing
-
-```bash
-# Run all tests
-flutter test
-
-# Run tests with coverage
-flutter test --coverage
-
-# Run integration tests
-flutter test integration_test/
-```
+---
 
 ## Building for Release
 
@@ -308,14 +261,9 @@ flutter test integration_test/
 **IMPORTANT:** Always run Flutter commands BEFORE opening Xcode.
 
 ```bash
-# Clean and prepare
 flutter clean
 flutter pub get
-
-# Build iOS (generates all Xcode files - REQUIRED)
 flutter build ios --release --no-codesign
-
-# Open Xcode workspace
 open ios/Runner.xcworkspace
 ```
 
@@ -325,7 +273,7 @@ Then in Xcode:
 3. Product → Archive (⌘⇧B)
 4. Distribute App → App Store Connect
 
-**Common Error:** If Xcode shows "package_config.json does not exist", you skipped the `flutter build ios` step. Close Xcode and run the commands above.
+**Common Error:** If Xcode shows "package_config.json does not exist", you skipped `flutter build ios`. Close Xcode and run the commands above.
 
 ### Android
 
@@ -334,160 +282,80 @@ flutter build apk --release        # For APK
 flutter build appbundle --release  # For Play Store
 ```
 
+---
+
 ## Privacy & Security
 
 CustomSubs is designed with privacy as the top priority:
 
-- ✅ **No Network Access**: The app never makes network calls
+- ✅ **Local-Only Data**: All subscription data stored in Hive on-device
 - ✅ **No Analytics**: Zero tracking or telemetry
-- ✅ **Local-Only Storage**: All data stored in Hive on-device
-- ✅ **No Third-Party Services**: No cloud sync, no servers
-- ✅ **Export Control**: Users can export/import their own data (JSON format)
-- ✅ **Open Source**: Full transparency in code
-
-## Known Issues & Limitations
-
-- Dark mode not yet implemented (light mode only)
-- Notification reliability depends on OS background task limitations
-- Currency exchange rates are bundled (updated with app releases, not real-time)
-- No cloud backup (by design - privacy-first)
-
-## Roadmap
-
-**Overall Progress: ~75% Complete**
-
-See [ROADMAP.md](ROADMAP.md) for the detailed implementation plan with task breakdowns and time estimates.
+- ✅ **No Account Required**: No login, no email, no profile
+- ✅ **No Cloud Sync**: Your data never leaves your device
+- ✅ **Export Control**: You own your data (JSON export/import)
+- ⚠️ **IAP Exception**: RevenueCat communicates with Apple/Google receipt servers for purchase validation only — your subscription tracking data is never transmitted
 
 ---
 
-### ✅ Phase 0: Critical Bug Fixes (COMPLETE)
-**Status:** ✅ Complete (100%)
-**Time:** ~3 hours
+## Known Limitations
 
-- [x] Fixed notification timezone (device local time)
-- [x] Fixed same-day reminder skip bug
-- [x] Fixed month-end billing date drift
-- [x] Fixed edit state preservation (isActive, isPaid, checklist)
-- [x] Fixed multi-currency total conversion
-- [x] Fixed getById null return handling
-- [x] Fixed "Next 30 days" filter accuracy
-
-**Impact:** Core functionality now reliable and production-ready.
+- Light mode only (dark mode planned for a future version)
+- Notification reliability depends on OS background task permissions
+- Currency exchange rates are bundled, not real-time (updated with app releases)
+- No cloud backup (by design — privacy-first)
 
 ---
 
-### ✅ Phase 1: Critical Completions (COMPLETE)
-**Status:** ✅ Complete (100%)
-**Time:** ~5 hours
+## What's Shipped
 
-- [x] Full Subscription Detail Screen (734 lines, 7 sub-widgets)
-- [x] Subscription Detail Controller (paid, active, checklist, delete actions)
-- [x] Settings Provider with Hive persistence
-- [x] Currency Picker Dialog (30+ currencies with search)
-- [x] Dynamic currency switching throughout app
+| Version | Highlights |
+|---------|-----------|
+| v1.0.0 | Core MVP: add/edit, templates, notifications, onboarding |
+| v1.0.3 | UI modernization, collapsible form sections |
+| v1.1.0 | Analytics screen, backup/restore, free trial mode |
+| v1.2.0 | Subscription pause/snooze, cancellation checklists, mark-as-paid |
+| v1.3.0 | Premium IAP via RevenueCat, paywall screen, 3-day free trial |
+| v1.4.0 | Brand icons (80+ services via `simple_icons`), paywall redesign |
+| v1.4.1 | "Later" section, today billing date fix, rich notification actions, notification deep linking |
 
-**Impact:** Core user flow complete (Home → Detail → Actions).
+## Planned (Future Versions)
 
----
-
-### ✅ Phase 2: Data Safety Features (COMPLETE)
-**Status:** ✅ Complete (100%)
-**Time:** ~4 hours
-
-- [x] Backup Service (export to JSON)
-- [x] Import Service (restore from file with duplicate detection)
-- [x] Backup reminder after 3rd subscription
-- [x] Last backup date tracking in Settings
-- [x] Share sheet integration
-
-**Impact:** Data loss prevention - key competitive advantage.
+- 🌙 Dark mode
+- 🏠 Home screen widgets (iOS/Android)
+- 🌍 Localization (i18n)
+- ☁️ iCloud backup option (iOS)
+- 📸 Receipt scanning (OCR)
 
 ---
 
-### ⏳ Phase 3: Analytics Screen (IN PROGRESS)
-**Status:** 🚧 Ready to Start (0%)
-**Estimated Time:** 2-3 hours
+## Documentation
 
-- [ ] Monthly Snapshot Hive model
-- [ ] Analytics Controller with calculations
-- [ ] Analytics Screen UI (simple bar charts)
-- [ ] Category breakdown with percentages
-- [ ] Top 5 subscriptions ranking
-- [ ] Month-over-month comparison
-- [ ] Router integration
-
-**Next Up:** Task 3.1 - Create Monthly Snapshot model
-
----
-
-### 🔜 Phase 4: Full Quality Pass (PENDING)
-**Status:** 🔜 Not Started (0%)
-**Estimated Time:** 4-5 hours
-
-- [ ] Fix all 36 deprecation warnings
-- [ ] Refactor add_subscription_screen.dart (656 → 300 lines)
-- [ ] Refactor home_screen.dart (523 → 250 lines)
-- [ ] Add comprehensive error handling
-- [ ] Performance audit and optimization
-
----
-
-### 🔜 Phase 5: Extended Testing (PENDING)
-**Status:** 🔜 Not Started (0%)
-**Estimated Time:** 2-3 hours
-
-- [ ] Comprehensive feature testing (all screens)
-- [ ] Notification testing on iPhone
-- [ ] Notification testing on Android (LambdaTest)
-- [ ] Edge case and stress testing
-- [ ] Final code review and documentation
-
----
-
-### 🎯 Target Completion
-**Total Remaining:** 8-11 hours of focused development
-**Target Date:** February 9-11, 2026
-**Ready for:** Beta testing → TestFlight → App Store submission
-
----
-
-### Future Versions
-**v1.1** - Dark mode, advanced analytics, home screen widgets
-**v1.2** - Receipt scanning, custom cycles, price change alerts
-**v2.0** - Localization, premium features, social features (opt-in)
-
-## 📚 Complete Documentation
-
-**📋 [Documentation Index](docs/INDEX.md)** - Master navigation for all 35+ documentation files
+**📋 [Documentation Index](docs/INDEX.md)** — Master navigation for all documentation files
 
 ### For Developers & AI Coding Sessions
 
 **Quick Start:**
-- **AI Specifications:** [CLAUDE.md](CLAUDE.md) - Complete project spec for AI assistants
-- **Quick Reference:** [docs/QUICK-REFERENCE.md](docs/QUICK-REFERENCE.md) - Cheat sheet for common tasks
-- **Documentation Index:** [docs/INDEX.md](docs/INDEX.md) - Find any documentation quickly
+- **AI Specifications:** [CLAUDE.md](CLAUDE.md) — Complete project spec for AI assistants
+- **Quick Reference:** [docs/QUICK-REFERENCE.md](docs/QUICK-REFERENCE.md) — Cheat sheet for common tasks
 
 **Architecture & Design:**
-- [Architecture Overview](docs/architecture/overview.md) - System design and principles
-- [State Management (Riverpod)](docs/architecture/state-management.md) - Riverpod patterns and conventions
-- [Data Layer (Hive)](docs/architecture/data-layer.md) - Models, repositories, persistence
-- [Design System](docs/architecture/design-system.md) - Colors, typography, components
+- [Architecture Overview](docs/architecture/overview.md)
+- [State Management (Riverpod)](docs/architecture/state-management.md)
+- [Data Layer (Hive)](docs/architecture/data-layer.md)
+- [Design System](docs/architecture/design-system.md)
 
 **Implementation Guides:**
-- [Adding a Feature](docs/guides/adding-a-feature.md) - Step-by-step feature implementation
-- [Working with Notifications](docs/guides/working-with-notifications.md) ⚠️ **Critical system**
-- [Forms and Validation](docs/guides/forms-and-validation.md) - Form patterns and validation
-- [Multi-Currency Support](docs/guides/multi-currency.md) - Currency conversion and display
-
-**Templates & Examples:**
-- [Feature Template](docs/templates/feature-template.md) - Implementation checklist
-- [Screen with Controller](docs/templates/screen-with-controller.dart) - Annotated code example
-- [Form Screen](docs/templates/form-screen.dart) - Form implementation example
+- [Adding a Feature](docs/guides/adding-a-feature.md)
+- [Working with Notifications](docs/guides/working-with-notifications.md) ⚠️ Critical
+- [IAP & Premium (RevenueCat)](docs/guides/iap-and-premium.md)
+- [Forms and Validation](docs/guides/forms-and-validation.md)
+- [Multi-Currency Support](docs/guides/multi-currency.md)
 
 **Architectural Decision Records:**
-- [ADR 001: Riverpod Code Generation](docs/decisions/001-riverpod-code-generation.md) - Why code generation
-- [ADR 002: Notification ID Strategy](docs/decisions/002-notification-id-strategy.md) - Deterministic IDs
-- [ADR 003: Offline-First Architecture](docs/decisions/003-offline-first-architecture.md) - No cloud, no backend
+- [ADR 001: Riverpod Code Generation](docs/decisions/001-riverpod-code-generation.md)
+- [ADR 002: Notification ID Strategy](docs/decisions/002-notification-id-strategy.md)
+- [ADR 003: Offline-First Architecture](docs/decisions/003-offline-first-architecture.md)
+- [ADR 004: Pause Feature — Reuse of isActive Field](docs/decisions/004-pause-feature-isactive-reuse.md)
 
 ---
 
@@ -498,10 +366,6 @@ This is a personal project, but feedback and suggestions are welcome! Please ope
 ## License
 
 [To be determined]
-
-## Contact
-
-For questions or feedback about CustomSubs, please [open an issue](link-to-issues).
 
 ---
 

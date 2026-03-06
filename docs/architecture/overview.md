@@ -1,7 +1,7 @@
 # CustomSubs Architecture Overview
 
 **Status**: ✅ Complete
-**Last Updated**: February 5, 2026
+**Last Updated**: March 3, 2026
 **Relevant to**: Developers
 
 **High-level system architecture and design principles for CustomSubs.**
@@ -53,6 +53,7 @@ CustomSubs is a **privacy-first, offline-only** subscription tracker for iOS and
 - Exchange rates bundled as static JSON assets
 - No analytics, no crash reporting, no telemetry
 - No permissions except notifications (required for core feature)
+- **Exception**: RevenueCat (IAP) communicates with Apple/Google receipt servers for purchase validation only — subscription tracking data never leaves the device
 
 ### 2. Offline First
 
@@ -118,9 +119,10 @@ lib/
 │   ├── extensions/               # DateTime, currency helpers
 │   ├── utils/                    # Currency, export utilities
 │   └── widgets/                  # Reusable UI components
-│       ├── standard_card.dart    # Consistent card styling (16px radius, 1.5px border)
-│       ├── subtle_pressable.dart # Micro-interaction wrapper
-│       └── empty_state.dart      # Empty state component
+│       ├── standard_card.dart       # Consistent card styling (16px radius, 1.5px border)
+│       ├── subtle_pressable.dart    # Micro-interaction wrapper
+│       ├── subscription_icon.dart   # Brand icon widget (SimpleIcons + letter fallback)
+│       └── empty_state.dart         # Empty state component
 │
 ├── data/                         # Data layer
 │   ├── models/                   # Domain models + Hive adapters
@@ -399,14 +401,37 @@ class SubscriptionRepository {
 - **Type-safe** - Code generation for adapters
 - **Lightweight** - No SQLite overhead
 
+### Why `simple_icons` + local SVGs for Brand Logos?
+
+- **Offline** - Font-based SVG icons bundled with the app, no network needed
+- **Legal** - Open-source icon set with established fair-use precedent for identification UI
+- **Coverage** - 3,270+ brand icons; ~80 subscription services mapped
+- **Quality** - Vector, scales perfectly at any size
+- **Fallback** - Three-tier resolution: local SVG → SimpleIcons → letter avatar — no broken UI
+
+**Trademark removals covered by bundled SVGs (`assets/logos/`):** Adobe, Microsoft, Disney+, LinkedIn, Xbox, Nintendo, Hulu, Bumble were removed from Simple Icons but are covered by hand-crafted SVG logo files bundled in the app. Add more by creating `{iconName}.svg` and registering in `ServiceIcons._localLogoIconNames`.
+
+**Packages:** `simple_icons: ^14.6.1` (SimpleIcons font) + `flutter_svg: ^2.0.0` (for local SVG rendering)
+
 ### Why NOT Firebase/Supabase/Cloud?
 
-- **Privacy** - No data leaves the device
+- **Privacy** - Subscription data never leaves the device
 - **Simplicity** - No auth, no backend to maintain
 - **Reliability** - Works without internet
 - **Trust** - Users control their data
 
 **See:** `docs/decisions/003-offline-first-architecture.md`
+
+### Why RevenueCat for IAP? (v1.3.0+)
+
+- **Cross-platform** - Single API for App Store and Google Play billing
+- **Receipt validation** - Server-side validation without building our own backend
+- **Entitlement management** - Simple `isPremium` check independent of platform
+- **Dashboard** - Real-time subscription analytics and debugging
+
+**Note:** RevenueCat is the only SDK that makes outbound network calls. All subscription tracking data remains local.
+
+**See:** `docs/guides/iap-and-premium.md`
 
 ### Why Local Notifications?
 
@@ -471,6 +496,7 @@ class SubscriptionRepository {
 - ✅ Cancellation helper
 - ✅ Spending analytics
 - ✅ Offline-first mobile app
+- ✅ Freemium model — free tier (up to 3 subscriptions) + optional premium tier via IAP
 
 ### What CustomSubs is NOT
 
@@ -480,7 +506,7 @@ class SubscriptionRepository {
 - ❌ Receipt scanner
 - ❌ Cloud service
 - ❌ Social platform
-- ❌ Freemium/ad-supported app
+- ❌ Ad-supported
 
 ---
 
@@ -585,11 +611,11 @@ class SubscriptionRepository {
 - iOS/Android sandbox prevents access from other apps
 - Consider Hive encryption for sensitive data (future)
 
-### No Network Exposure
+### No Network Exposure (for user data)
 
-- No API keys or secrets needed
-- No authentication to implement
-- No data transmission to secure
+- Subscription tracking data never transmitted
+- No authentication to implement for user data
+- RevenueCat API key is public-side only (safe to ship in binary) — receipt validation is server-side
 
 ### User Privacy
 
@@ -621,4 +647,6 @@ class SubscriptionRepository {
 - `docs/architecture/state-management.md` - Riverpod patterns
 - `docs/architecture/data-layer.md` - Repository and model patterns
 - `docs/architecture/design-system.md` - UI patterns and theme
+- `docs/guides/iap-and-premium.md` - IAP, RevenueCat, and paywall
+- `docs/guides/working-with-notifications.md` - Notification system (critical)
 - `docs/decisions/` - Architectural decision records

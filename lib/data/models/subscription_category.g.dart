@@ -37,6 +37,8 @@ class SubscriptionCategoryAdapter extends TypeAdapter<SubscriptionCategory> {
         return SubscriptionCategory.health;
       case 11:
         return SubscriptionCategory.other;
+      case 12:
+        return SubscriptionCategory.sports;
       default:
         return SubscriptionCategory.entertainment;
     }
@@ -80,6 +82,9 @@ class SubscriptionCategoryAdapter extends TypeAdapter<SubscriptionCategory> {
         break;
       case SubscriptionCategory.other:
         writer.writeByte(11);
+        break;
+      case SubscriptionCategory.sports:
+        writer.writeByte(12);
         break;
     }
   }

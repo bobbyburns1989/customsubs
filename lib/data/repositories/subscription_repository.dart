@@ -330,17 +330,21 @@ class SubscriptionRepository {
   /// they haven't opened the app in a while.
   Future<List<Subscription>> advanceOverdueBillingDates() async {
     final now = DateTime.now();
+    // Compare against start of today (midnight), not the current time.
+    // This prevents subscriptions billing "today" from being advanced —
+    // a midnight-dated sub should still show as "Today" until tomorrow morning.
+    final today = DateTime(now.year, now.month, now.day);
     final updated = <Subscription>[];
 
     for (final subscription in getAll()) {
       // SKIP paused subscriptions - billing dates freeze while paused
       if (!subscription.isActive) continue;
 
-      if (subscription.nextBillingDate.isBefore(now)) {
+      if (subscription.nextBillingDate.isBefore(today)) {
         // Calculate how many cycles have passed
         var newBillingDate = subscription.nextBillingDate;
 
-        while (newBillingDate.isBefore(now)) {
+        while (newBillingDate.isBefore(today)) {
           newBillingDate = _calculateNextDate(newBillingDate, subscription.cycle);
         }
 

@@ -1,7 +1,7 @@
 # Working with Notifications
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: March 4, 2026
 **Relevant to**: Developers
 
 **⚠️ CRITICAL: This is the #1 feature of CustomSubs.**
@@ -17,11 +17,12 @@ Reliable notifications are the app's primary value proposition. This guide expla
 3. [Initialization](#initialization)
 4. [Scheduling Notifications](#scheduling-notifications)
 5. [Notification Types](#notification-types)
-6. [Notification ID Strategy](#notification-id-strategy)
-7. [Testing Notifications](#testing-notifications)
-8. [Platform Differences](#platform-differences)
-9. [Common Issues & Solutions](#common-issues--solutions)
-10. [Critical Rules](#critical-rules)
+6. [Rich Notifications & Action Buttons](#rich-notifications--action-buttons)
+7. [Notification ID Strategy](#notification-id-strategy)
+8. [Testing Notifications](#testing-notifications)
+9. [Platform Differences](#platform-differences)
+10. [Common Issues & Solutions](#common-issues--solutions)
+11. [Critical Rules](#critical-rules)
 
 ---
 
@@ -272,6 +273,90 @@ Body: Free trial ends [date]. You'll be charged $[amount]/[cycle] after.
 
 ---
 
+## Rich Notifications & Action Buttons
+
+Implemented in v1.1.0 (code-complete) and fixed in v1.4.1. Notifications include expandable content and two tappable action buttons.
+
+### Android (BigTextStyle)
+
+```dart
+AndroidNotificationDetails(
+  'customsubs_reminders',
+  'Subscription Reminders',
+  styleInformation: BigTextStyleInformation(
+    longBodyText,
+    contentTitle: '📅 Netflix — Billing in 7 days',
+    summaryText: '\$15.99/mo',
+  ),
+  actions: [
+    AndroidNotificationAction(
+      'mark_paid',
+      'Mark as Paid',
+      showsUserInterface: false,   // background — no app open needed
+    ),
+    AndroidNotificationAction(
+      'view_details',
+      'View Details',
+      showsUserInterface: true,    // foreground — opens app
+    ),
+  ],
+)
+```
+
+### iOS (DarwinNotificationCategory)
+
+```dart
+DarwinNotificationCategory(
+  'subscription_reminder',
+  actions: [
+    DarwinNotificationAction.plain(
+      'mark_paid',
+      'Mark as Paid',
+      options: {DarwinNotificationActionOption.foreground},
+    ),
+    DarwinNotificationAction.plain(
+      'view_details',
+      'View Details',
+      options: {DarwinNotificationActionOption.foreground},  // ← REQUIRED
+    ),
+  ],
+)
+```
+
+> **Critical:** Both iOS actions need `DarwinNotificationActionOption.foreground` because the tap handler always navigates via GoRouter — which requires the app to be in the foreground. Without `foreground` on `view_details`, tapping it on iOS may silently fail.
+
+### Deep Link Flow
+
+```
+User taps action button
+    ↓
+NotificationRouter.handleNotificationResponse(response)
+    ↓
+Parses JSON payload: {"subscriptionId": "uuid", "action": "mark_paid"}
+    ↓
+GoRouter.go('/subscription/uuid', extra: {'autoMarkPaid': true})
+    ↓
+SubscriptionDetailScreen receives autoMarkPaid: true
+    ↓
+initState() → addPostFrameCallback → togglePaid() → snackbar "Marked as paid ✓"
+```
+
+**Files involved:**
+- `lib/core/utils/notification_router.dart` — payload parsing + navigation
+- `lib/data/services/notification_service.dart` — iOS categories + Android actions
+- `lib/app/router.dart` — extracts `autoMarkPaid` from route extras
+- `lib/features/subscription_detail/subscription_detail_screen.dart` — auto-mark logic
+
+### Payload Format
+
+```json
+{"subscriptionId": "550e8400-e29b-41d4-a716-446655440000", "action": "view_detail"}
+```
+
+Actions: `"view_detail"` (default) or `"mark_paid"`.
+
+---
+
 ## Notification ID Strategy
 
 ### Why Deterministic IDs?
@@ -321,18 +406,26 @@ When rescheduling, we cancel all three and recreate with the **same IDs**.
 
 **Location:** Settings screen
 
-**Implementation:**
+**Implementation (permission-aware — updated 2026-03-04):**
 ```dart
-final notificationService = ref.read(notificationServiceProvider);
+final enabled = await notificationService.areNotificationsEnabled();
+if (!enabled) {
+  // Show "Notifications Disabled" dialog with "Open Settings" button
+  // (Android 13+ only — iOS returns true optimistically)
+  return;
+}
 await notificationService.showTestNotification();
+// Then show "Test Sent" dialog with "Open Settings" escape hatch
 ```
 
 **What it does:**
-- Fires immediately (no scheduling)
-- ID: `999999` (fixed, doesn't conflict with subscription IDs)
+- **Android 13+**: checks permission first via `areNotificationsEnabled()`. If disabled, shows actionable dialog before firing — never sends a doomed notification.
+- **iOS**: optimistic check (always true); fires test, then shows a follow-up dialog with "Open Settings" escape hatch in case the notification never arrives.
+- Immediate fire (no scheduling). ID: `999999` (fixed, no conflict with subscription IDs).
 - Content: "✅ Notifications are working! You'll be reminded before every charge."
+- Package: `app_settings` — use `AppSettings.openAppSettings(type: AppSettingsType.notification)` to deep-link to device notification settings on both platforms. (`openNotificationSettings()` was removed in v5.x.)
 
-**User benefit:** Proves notifications work on their device.
+**User benefit:** Closes the trust gap — users with broken permissions get an actionable path to fix it rather than a false "sent!" confirmation.
 
 ### 2. Manual Testing on Device
 

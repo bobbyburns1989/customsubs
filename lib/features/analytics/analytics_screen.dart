@@ -305,7 +305,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
     );
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSizes.lg),
+      // No extra horizontal margin — fills content area consistently with other cards
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
@@ -326,12 +326,12 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
               'Yearly Forecast',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.white.withValues(alpha: 0.95),
+                    color: Colors.white.withValues(alpha: 0.85),
                   ),
             ),
-            const SizedBox(height: AppSizes.md),
+            const SizedBox(height: AppSizes.sm),
 
-            // Large yearly amount with tabular figures - Animated
+            // Primary hero: animated yearly total
             TweenAnimationBuilder<double>(
               duration: const Duration(milliseconds: 800),
               tween: Tween(begin: _displayValue, end: widget.analytics.yearlyForecast),
@@ -350,37 +350,74 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
                 );
               },
             ),
-            const SizedBox(height: AppSizes.md),
 
-            // Subtext
+            // Secondary: monthly equivalent
+            const SizedBox(height: AppSizes.xs),
             Text(
-              'At current rate',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-
-            // Active subscriptions count
-            Text(
-              '${widget.analytics.activeCount} active ${widget.analytics.activeCount == 1 ? 'subscription' : 'subscriptions'}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.85),
-                  ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-
-            // Daily cost breakdown
-            Text(
-              'That\'s ${currencyFormat.format(widget.analytics.yearlyForecast / 365)} per day',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.85),
+              '${currencyFormat.format(widget.analytics.monthlyTotal)}/mo',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.7),
                     fontFeatures: const [FontFeature.tabularFigures()],
                   ),
             ),
+
+            const SizedBox(height: AppSizes.md),
+
+            // Subtle divider separating hero from stats
+            Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
+
+            const SizedBox(height: AppSizes.md),
+
+            // Compact tertiary stats on one line
+            Text(
+              '${widget.analytics.activeCount} ${widget.analytics.activeCount == 1 ? 'subscription' : 'subscriptions'} · ${currencyFormat.format(widget.analytics.yearlyForecast / 365)}/day',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontFeatures: const [FontFeature.tabularFigures()],
+                  ),
+            ),
+
+            // Month-over-month change chip (only if previous month snapshot exists)
+            if (widget.analytics.monthlyChange != null) ...[
+              const SizedBox(height: AppSizes.sm),
+              _buildChangeChip(context, currencyFormat, widget.analytics.monthlyChange!),
+            ],
           ],
         ),
       ),
+    );
+  }
+
+  /// Renders a subtle change indicator showing month-over-month delta.
+  /// Green for decrease (saving money), orange for increase.
+  Widget _buildChangeChip(
+    BuildContext context,
+    NumberFormat fmt,
+    double change,
+  ) {
+    final isIncrease = change > 0;
+    final chipColor =
+        isIncrease ? Colors.orangeAccent : Colors.lightGreenAccent;
+    final icon = isIncrease
+        ? Icons.arrow_upward_rounded
+        : Icons.arrow_downward_rounded;
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 12, color: chipColor),
+        const SizedBox(width: 3),
+        Text(
+          '${fmt.format(change.abs())}/mo from last month',
+          style: TextStyle(
+            color: chipColor,
+            fontSize: 11.5,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

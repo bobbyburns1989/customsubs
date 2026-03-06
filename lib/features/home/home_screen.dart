@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/models/subscription.dart';
-import 'package:custom_subs/core/utils/service_icons.dart';
+import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
@@ -80,6 +81,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     if (state == AppLifecycleState.resumed) {
       // App came back from background - check for overdue dates
       _advanceOverdueDatesIfNeeded();
+      // Refresh premium status — trial may have expired while backgrounded.
+      // Lightweight: RevenueCat reads from its local cache, not the network.
+      ref.invalidate(isPremiumProvider);
     }
   }
 
@@ -163,7 +167,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           }
 
           final homeController = ref.read(homeControllerProvider.notifier);
-          final upcoming = homeController.getUpcomingSubscriptions();
+          // Pass days: 31 so subscriptions billing exactly 30 days from now
+          // are included in Upcoming rather than falling into Later.
+          // (The exclusive upper bound means days=30 would exclude day 30.)
+          final upcoming = homeController.getUpcomingSubscriptions(days: 31);
+          final laterSubscriptions = homeController.getLaterSubscriptions();
           final primaryCurrency = homeController.getPrimaryCurrency();
           final monthlyTotal = homeController.calculateMonthlyTotal();
           final activeCount = homeController.getActiveCount();
@@ -347,6 +355,50 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   ),
                 ),
 
+                // Later Subscriptions Section (billing 30–90 days out)
+                // Ensures no active subscription is ever invisible on Home.
+                if (laterSubscriptions.isNotEmpty) ...[
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSizes.base,
+                        AppSizes.sectionSpacing,
+                        AppSizes.base,
+                        AppSizes.sm,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Later',
+                            style: theme.textTheme.titleLarge,
+                          ),
+                          const SizedBox(width: AppSizes.sm),
+                          Text(
+                            '31–90 days',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        final sub = laterSubscriptions[index];
+                        return _LaterSubscriptionTile(
+                          subscription: sub,
+                          onTap: () => context.push(
+                            '${AppRouter.subscriptionDetail}/${sub.id}',
+                          ),
+                        );
+                      },
+                      childCount: laterSubscriptions.length,
+                    ),
+                  ),
+                ],
+
                 // Paused Subscriptions Section (only show if there are paused subs)
                 if (pausedSubscriptions.isNotEmpty) ...[
                   SliverToBoxAdapter(
@@ -476,6 +528,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 }
 
+// Spending period toggle — Monthly → Yearly → Daily (cycles on tap)
+enum _SpendingPeriod { monthly, yearly, daily }
+
 class _SpendingSummaryCard extends StatefulWidget {
   final double monthlyTotal;
   final int activeCount;
@@ -494,20 +549,60 @@ class _SpendingSummaryCard extends StatefulWidget {
 }
 
 class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
-  double _displayValue = 0.0;
+  _SpendingPeriod _period = _SpendingPeriod.monthly;
 
-  @override
-  void initState() {
-    super.initState();
-    _displayValue = 0.0; // Start from 0 for initial animation
+  // Tracks where the tween animation should start from.
+  // On init: 0 (count-up from zero).
+  // On monthlyTotal change: old period-adjusted value (smooth transition).
+  // On period change: old period's value (so number morphs naturally).
+  double _tweenBegin = 0.0;
+
+  // Amount to display for the current period, derived from monthlyTotal.
+  double get _targetAmount => _amountForPeriod(widget.monthlyTotal, _period);
+
+  // Period label shown below the amount.
+  String get _periodLabel {
+    switch (_period) {
+      case _SpendingPeriod.monthly:
+        return '/month';
+      case _SpendingPeriod.yearly:
+        return '/year';
+      case _SpendingPeriod.daily:
+        return '/day';
+    }
+  }
+
+  // Convert a monthly total to the given period's equivalent.
+  double _amountForPeriod(double monthly, _SpendingPeriod period) {
+    switch (period) {
+      case _SpendingPeriod.monthly:
+        return monthly;
+      case _SpendingPeriod.yearly:
+        return monthly * 12;
+      case _SpendingPeriod.daily:
+        // Same formula used in analytics_screen.dart
+        return monthly * 12 / 365;
+    }
+  }
+
+  // Cycle to the next period and animate from the current displayed amount.
+  void _cyclePeriod() {
+    setState(() {
+      // Capture current target before changing period so tween starts from here.
+      _tweenBegin = _targetAmount;
+      _period = _SpendingPeriod.values[
+        (_period.index + 1) % _SpendingPeriod.values.length
+      ];
+    });
   }
 
   @override
   void didUpdateWidget(_SpendingSummaryCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Only update if value actually changed (prevents re-animation on rebuild)
+    // When the parent pushes a new monthlyTotal, animate from the old
+    // period-adjusted value to prevent a jarring jump.
     if (oldWidget.monthlyTotal != widget.monthlyTotal) {
-      _displayValue = oldWidget.monthlyTotal;
+      _tweenBegin = _amountForPeriod(oldWidget.monthlyTotal, _period);
     }
   }
 
@@ -515,91 +610,131 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.all(AppSizes.lg),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 1.5,
+    return GestureDetector(
+      onTap: _cyclePeriod,
+      child: Container(
+        padding: const EdgeInsets.all(AppSizes.lg),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(AppSizes.radiusLg),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.2),
+            width: 1.5,
+          ),
         ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 800),
-            tween: Tween(begin: _displayValue, end: widget.monthlyTotal),
-            curve: Curves.easeOutCubic,
-            builder: (context, animatedValue, child) {
-              return Text(
-                CurrencyUtils.formatAmount(animatedValue, widget.currency),
-                style: theme.textTheme.displaySmall?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 32,
-                ),
-              );
-            },
-          ),
-          Text(
-            '/month',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
-            ),
-          ),
-          const SizedBox(height: AppSizes.sm),
-          Consumer(
-            builder: (context, ref, child) {
-              final isPremiumAsync = ref.watch(isPremiumProvider);
-              final isPremium = isPremiumAsync.value ?? false;
-
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    widget.pausedCount > 0
-                        ? '${widget.activeCount} active • ${widget.pausedCount} paused'
-                        : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Animated amount — TweenAnimationBuilder handles smooth
+            // transitions both on period toggle and on monthlyTotal updates.
+            TweenAnimationBuilder<double>(
+              duration: const Duration(milliseconds: 800),
+              tween: Tween(begin: _tweenBegin, end: _targetAmount),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedValue, child) {
+                return Text(
+                  CurrencyUtils.formatAmount(animatedValue, widget.currency),
+                  style: theme.textTheme.displaySmall?.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 32,
                   ),
-                  if (isPremium) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(12),
+                );
+              },
+            ),
+
+            // Period label — crossfades on period change.
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              child: Text(
+                _periodLabel,
+                // Key forces AnimatedSwitcher to treat each period as a
+                // different widget, triggering the crossfade animation.
+                key: ValueKey(_period),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.9),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: AppSizes.sm),
+
+            // Dot page indicator — hints that the card is tappable.
+            // Active dot is wider; inactive dots are small and dim.
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: _SpendingPeriod.values.map((p) {
+                final isActive = p == _period;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  curve: Curves.easeInOut,
+                  width: isActive ? 14 : 6,
+                  height: 4,
+                  margin: const EdgeInsets.only(right: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(
+                      alpha: isActive ? 0.85 : 0.30,
+                    ),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: AppSizes.sm),
+
+            // Subscription count + optional premium badge
+            Consumer(
+              builder: (context, ref, child) {
+                final isPremiumAsync = ref.watch(isPremiumProvider);
+                final isPremium = isPremiumAsync.value ?? false;
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      widget.pausedCount > 0
+                          ? '${widget.activeCount} active • ${widget.pausedCount} paused'
+                          : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.9),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.workspace_premium,
-                            size: 12,
-                            color: Colors.white.withValues(alpha: 0.9),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Premium',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
+                    ),
+                    if (isPremium) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.workspace_premium,
+                              size: 12,
                               color: Colors.white.withValues(alpha: 0.9),
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 4),
+                            Text(
+                              'Premium',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
-              );
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -667,45 +802,15 @@ class _SubscriptionTile extends StatelessWidget {
             padding: const EdgeInsets.all(AppSizes.lg),
             child: Row(
               children: [
-                // Color indicator + Icon with Hero animation
+                // Brand icon with Hero animation for shared element transition
                 Hero(
                   tag: 'subscription-icon-${subscription.id}',
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          color.withValues(alpha: 0.15),
-                          color.withValues(alpha: 0.25),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.12),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: ServiceIcons.hasCustomIcon(subscription.name)
-                          ? Icon(
-                              ServiceIcons.getIconForService(subscription.name),
-                              color: color,
-                              size: 26,
-                            )
-                          : Text(
-                              subscription.name[0].toUpperCase(),
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                color: color,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                    ),
+                  child: SubscriptionIcon(
+                    name: subscription.name,
+                    iconName: subscription.iconName,
+                    color: color,
+                    size: 48,
+                    isCircle: true,
                   ),
                 ),
                 const SizedBox(width: AppSizes.base),
@@ -871,38 +976,15 @@ class _PausedSubscriptionTile extends StatelessWidget {
               padding: const EdgeInsets.all(AppSizes.lg),
               child: Row(
                 children: [
-                  // Desaturated icon
+                  // Desaturated brand icon (paused state — 50% opacity)
                   Opacity(
                     opacity: 0.5,
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(
-                          colors: [
-                            color.withValues(alpha: 0.15),
-                            color.withValues(alpha: 0.25),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                      ),
-                      child: Center(
-                        child: ServiceIcons.hasCustomIcon(subscription.name)
-                            ? Icon(
-                                ServiceIcons.getIconForService(subscription.name),
-                                color: color,
-                                size: 26,
-                              )
-                            : Text(
-                                subscription.name[0].toUpperCase(),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: color,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
+                    child: SubscriptionIcon(
+                      name: subscription.name,
+                      iconName: subscription.iconName,
+                      color: color,
+                      size: 48,
+                      isCircle: true,
                     ),
                   ),
                   const SizedBox(width: AppSizes.base),
@@ -960,5 +1042,92 @@ class _PausedSubscriptionTile extends StatelessWidget {
     }
 
     return 'Paused ${subscription.daysPaused} days ago';
+  }
+}
+
+/// Tile for subscriptions billing 30–90 days out ("Later" section).
+///
+/// Deliberately simpler than [_SubscriptionTile]:
+/// - No swipe actions (no urgency — just awareness)
+/// - Muted text colour to stay visually subordinate to "Upcoming"
+/// - Shows absolute date (e.g. "Apr 17") not relative ("in 45 days")
+class _LaterSubscriptionTile extends StatelessWidget {
+  final Subscription subscription;
+  final VoidCallback onTap;
+
+  const _LaterSubscriptionTile({
+    required this.subscription,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = material.Color(subscription.colorValue);
+
+    return SubtlePressable(
+      onPressed: () async {
+        await HapticUtils.light();
+        onTap();
+      },
+      scale: 0.99,
+      child: Card(
+        margin: const EdgeInsets.symmetric(
+          horizontal: AppSizes.base,
+          vertical: AppSizes.xs,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSizes.lg),
+          child: Row(
+            children: [
+              // Brand icon / avatar — slightly muted for "later" section
+              Opacity(
+                opacity: 0.75,
+                child: SubscriptionIcon(
+                  name: subscription.name,
+                  iconName: subscription.iconName,
+                  color: color,
+                  size: 40,
+                  isCircle: true,
+                ),
+              ),
+              const SizedBox(width: AppSizes.base),
+
+              // Name and amount
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      subscription.name,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: AppSizes.xs),
+                    Text(
+                      '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.shortName}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textTertiary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Absolute date (e.g. "Apr 17")
+              Text(
+                DateFormat.MMMd().format(subscription.nextBillingDate),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

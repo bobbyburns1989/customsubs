@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Yellow bg — dark text for contrast -->
+  <rect width="100" height="100" fill="#FFC423"/>
+  <text x="50" y="67" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="46" fill="#1A1A1A">RS</text>
+</svg>

@@ -305,9 +305,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               ),
 
               // ── Fine print ─────────────────────────────────────────────
-              Text(
+              const Text(
                 'Managed through App Store. Free tier: ${RevenueCatConstants.maxFreeSubscriptions} subscriptions.',
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 11, color: AppColors.textTertiary),
                 textAlign: TextAlign.center,
               ),

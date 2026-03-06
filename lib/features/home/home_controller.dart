@@ -23,12 +23,16 @@ class HomeController extends _$HomeController {
   List<Subscription> getUpcomingSubscriptions({int days = 30}) {
     final subs = state.value ?? [];
     final now = DateTime.now();
-    final cutoffDate = now.add(Duration(days: days));
+    // Use start of today so subscriptions billing "today" (midnight date) are
+    // included in the list rather than being silently excluded. The advance
+    // logic in the repository now also uses this same calendar-day boundary.
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final cutoffDate = todayStart.add(Duration(days: days));
 
     // Filter to only ACTIVE subscriptions within the date range
     final filteredSubs = subs.where((sub) {
       return sub.isActive &&
-             sub.nextBillingDate.isAfter(now) &&
+             !sub.nextBillingDate.isBefore(todayStart) &&
              sub.nextBillingDate.isBefore(cutoffDate);
     }).toList();
 
@@ -99,6 +103,27 @@ class HomeController extends _$HomeController {
     return paused;
   }
 
+  /// Get subscriptions billing 30–90 days from now.
+  ///
+  /// These are shown in the "Later" section on Home to ensure no active
+  /// subscription is ever invisible to the user. Excludes paused subs.
+  /// Sorted by billing date (soonest first).
+  List<Subscription> getLaterSubscriptions({int fromDays = 31, int toDays = 90}) {
+    final subs = state.value ?? [];
+    final now = DateTime.now();
+    final todayStart = DateTime(now.year, now.month, now.day);
+    final fromDate = todayStart.add(Duration(days: fromDays));
+    final toDate = todayStart.add(Duration(days: toDays));
+
+    return subs
+        .where((sub) =>
+            sub.isActive &&
+            !sub.nextBillingDate.isBefore(fromDate) &&
+            sub.nextBillingDate.isBefore(toDate))
+        .toList()
+      ..sort((a, b) => a.nextBillingDate.compareTo(b.nextBillingDate));
+  }
+
   /// Get trials ending soon (within 7 days)
   List<Subscription> getTrialsEndingSoon() {
     final subs = state.value ?? [];
@@ -115,10 +140,28 @@ class HomeController extends _$HomeController {
   }
 
   /// Mark subscription as paid
+  ///
+  /// Uses an optimistic in-place state update instead of calling refresh() to
+  /// avoid flashing the loading skeleton. The sort order (unpaid first) is
+  /// re-applied automatically when getUpcomingSubscriptions() reads state.value.
   Future<void> markAsPaid(String subscriptionId, bool isPaid) async {
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     await repository.markAsPaid(subscriptionId, isPaid);
-    await refresh();
+
+    // Patch only the affected item in the current list.
+    // Avoids setting AsyncValue.loading() (which flashes the skeleton screen).
+    final currentSubs = state.value ?? [];
+    state = AsyncValue.data(
+      currentSubs.map((sub) {
+        if (sub.id == subscriptionId) {
+          return sub.copyWith(
+            isPaid: isPaid,
+            lastMarkedPaidDate: isPaid ? DateTime.now() : null,
+          );
+        }
+        return sub;
+      }).toList(),
+    );
   }
 
   /// Delete subscription

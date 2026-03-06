@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
-import 'package:custom_subs/core/utils/service_icons.dart';
+import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/data/services/template_service.dart';
 
@@ -19,7 +19,6 @@ class TemplateGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final color = Color(template.color);
-    final hasCustomIcon = ServiceIcons.hasCustomIcon(template.name);
 
     return SubtlePressable(
       onPressed: onTap,
@@ -34,23 +33,13 @@ class TemplateGridItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Colored avatar with icon or first letter
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: color.withValues(alpha: 0.2),
-                child: hasCustomIcon
-                    ? Icon(
-                        ServiceIcons.getIconForService(template.name),
-                        color: color,
-                        size: 30,
-                      )
-                    : Text(
-                        template.name[0].toUpperCase(),
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: color,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+              // Brand icon or letter avatar
+              SubscriptionIcon(
+                name: template.name,
+                iconName: template.iconName,
+                color: color,
+                size: 56,
+                isCircle: true,
               ),
               const SizedBox(height: AppSizes.sm),
 

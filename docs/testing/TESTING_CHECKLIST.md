@@ -1,7 +1,7 @@
 # CustomSubs Testing Checklist
 
 **Status**: ✅ Complete
-**Last Updated**: February 4, 2026
+**Last Updated**: March 3, 2026
 **Relevant to**: Testers
 
 ## Phase 5: Comprehensive Testing
@@ -168,6 +168,22 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Recalculates totals
 - [ ] Re-sorts subscriptions
 - [ ] Animation is smooth
+
+### Later Section (subscriptions billing 31–90 days out)
+- [ ] Subscription with billing date 45 days away → appears in "Later" section below "Upcoming"
+- [ ] "Later" section header shows "31–90 days" label
+- [ ] Later tiles show absolute date (e.g. "Apr 17"), not relative ("in 45 days")
+- [ ] Later tiles are muted (lower opacity than upcoming tiles)
+- [ ] Tapping a later tile → navigates to detail screen
+- [ ] Subscription billing in 95 days → does NOT appear in Later (beyond 90 days)
+- [ ] Subscription billing in 15 days → does NOT appear in Later (shows in Upcoming instead)
+- [ ] No swipe-to-delete on later tiles (no swipe actions)
+
+### Today Billing Date
+- [ ] Add subscription with billing date = today → appears in "Upcoming" labeled "Today" *(Fixed v1.4.1)*
+- [ ] Kill and reopen app → subscription stays as "Today", not advanced to next cycle
+- [ ] Next day: open app → subscription shows as "Overdue" briefly then advances to next cycle
+- [ ] isPaid resets to false when billing date advances
 
 ### Edge Cases
 - [ ] 1 subscription → singular text "1 active subscription"
@@ -384,17 +400,28 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Reinstall app → notifications reschedule on first data sync
 - [ ] Notification dismissed → doesn't reschedule incorrectly
 
+### Rich Notification Actions *(Real device required — simulators don't support this)*
+- [ ] **Android**: Expand notification → "Mark as Paid" + "View Details" buttons visible
+- [ ] **Android**: Tap "View Details" → app opens to that subscription's detail screen
+- [ ] **Android**: Tap "Mark as Paid" → app opens, snackbar "Marked as paid ✓" appears, isPaid toggled
+- [ ] **iOS**: Long-press notification → "Mark as Paid" + "View Details" appear
+- [ ] **iOS**: Tap "View Details" → app comes to foreground, navigates to detail screen
+- [ ] **iOS**: Tap "Mark as Paid" → app comes to foreground, snackbar confirms, isPaid toggled
+- [ ] Both platforms: Tap notification body → navigates to detail screen
+- [ ] Both platforms: Tapping action for a deleted subscription → no crash (graceful fail)
+- [ ] **Android**: BigTextStyle expands with full body text when expanded
+
 ### iOS Specific
 - [ ] Notifications appear in Notification Center
 - [ ] Notifications appear on lock screen
 - [ ] Notification sound plays (if not silenced)
-- [ ] Tapping notification opens app (deep link optional)
+- [ ] Tapping notification opens app and navigates to detail screen
 
 ### Android Specific
 - [ ] Notification channel: "Subscription Reminders"
 - [ ] Notifications appear in status bar
 - [ ] Notifications grouped if multiple
-- [ ] Tapping notification opens app
+- [ ] Tapping notification opens app and navigates to detail screen
 
 ---
 
@@ -546,7 +573,100 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 14. Performance & Polish
+## 14. Subscription Pause / Snooze
+
+### Pausing a Subscription
+- [ ] Swipe left on an Upcoming tile → "Pause" action visible
+- [ ] Tap "Pause" → subscription moves from Upcoming to Paused section immediately
+- [ ] Paused section appears on Home when at least one subscription is paused
+- [ ] Paused tile shows subscription name, paused date, and resume date (if set)
+- [ ] Setting a resume date → tile displays "Resumes on [date]"
+- [ ] No resume date → tile displays "Resume manually"
+- [ ] Paused subscription no longer appears in Upcoming or Later sections
+- [ ] Spending summary total correctly excludes paused subscriptions
+
+### Resuming a Subscription
+- [ ] Swipe on paused tile → "Resume" action visible
+- [ ] Tap "Resume" → subscription moves back to Upcoming/Later immediately
+- [ ] Notifications are rescheduled on resume (verify via Settings → Test Notification flow)
+- [ ] Billing date unchanged after pause/resume cycle
+
+### Auto-Resume
+- [ ] Set a resume date in the past → on next app open, subscription auto-resumes
+- [ ] Set a resume date in the past → on app foreground from background, subscription auto-resumes
+- [ ] Set a resume date in the past → on pull-to-refresh, subscription auto-resumes
+- [ ] Auto-resumed subscription appears in correct section (Upcoming or Later) based on billing date
+
+### Notifications While Paused
+- [ ] Pause a subscription with a billing date in the next 7 days → no notification fires
+- [ ] Resume the same subscription → notifications are scheduled again
+
+### Edge Cases
+- [ ] Pause all subscriptions → Upcoming and Later sections show empty states, only Paused section visible
+- [ ] Pause subscription → edit it → still shows as paused after edit
+- [ ] Pause subscription with trial → trial reminders do not fire while paused
+- [ ] Export backup while subscriptions are paused → pause state preserved in JSON
+- [ ] Import backup with paused subscriptions → pause state restored correctly
+
+---
+
+## 15. Paywall / Premium Upgrade Screen
+
+### Layout
+- [ ] Entire screen visible without scrolling on iPhone 14+ (no overscroll needed)
+- [ ] iPhone SE: content accessible with minimal scroll (SingleChildScrollView present)
+- [ ] AppBar title shows "Go Premium"
+- [ ] 56px premium icon centered below AppBar
+- [ ] Price + trial shown inline (e.g., "$0.99/month · 3 days free trial") in green bold text
+- [ ] 4 compact checkmark rows visible (green `check_circle_rounded` icon):
+  - [ ] "Unlimited subscriptions"
+  - [ ] "All reminders — 7-day, 1-day, day-of"
+  - [ ] "Spending analytics & yearly forecast"
+  - [ ] "Backup & restore your data"
+- [ ] Subscribe button full-width, green, shows dynamic price: "Subscribe for $X.XX/month"
+- [ ] Trial terms line below button (e.g., "Free for 3 days, then $0.99/month...")
+- [ ] Bottom row: Restore · Terms · Privacy — all three on one line
+- [ ] Fine print: "Managed through App Store. Free tier: 5 subscriptions."
+- [ ] No amber warning banner (removed — context in fine print)
+
+### Loading State
+- [ ] Small inline spinner visible below price line while StoreKit loads (`_isLoadingOffering`)
+- [ ] Subscribe button shows spinner and is disabled during loading
+- [ ] After loading: price updates to real StoreKit value
+
+### Error State (simulate by disabling network)
+- [ ] Inline warning row appears: amber icon + "Could not load pricing." + "Retry" link
+- [ ] Subscribe button remains **enabled** (never gated on `_offeringError`)
+- [ ] Tapping Retry re-fetches offering
+
+### Purchase Flow
+- [ ] Tapping Subscribe triggers StoreKit purchase sheet
+- [ ] Success: snackbar "✅ Premium activated!", paywall closes
+- [ ] Cancel (user taps Cancel in sheet): no error shown, button re-enables
+- [ ] Failure: snackbar with error message + "Details" button
+- [ ] "Details" button opens dialog with structured error info
+
+### Restore Flow
+- [ ] Tapping "Restore" in bottom row triggers restore
+- [ ] Success: snackbar "✅ Purchases restored successfully!", paywall closes
+- [ ] No prior purchase: snackbar "No purchases found to restore."
+
+### Legal Links
+- [ ] Tapping "Terms" opens https://customsubs.us/terms in external browser
+- [ ] Tapping "Privacy" opens https://customsubs.us/privacy in external browser
+
+### Close
+- [ ] X button in AppBar closes paywall (navigates back)
+- [ ] Back gesture closes paywall
+
+### Premium Badge Freshness *(Fixed v1.4.1)*
+- [ ] After trial expires (or purchase lapses), background then foreground the app → Premium badge disappears
+- [ ] Settings screen reflects correct status (Free Tier) after foreground
+- [ ] Add subscription limit re-activates (blocked at 5) after premium lapses + foreground
+
+---
+
+## 16. Performance & Polish
 
 ### Performance
 - [ ] App launches in < 2 seconds
@@ -578,7 +698,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 15. Visual Design
+## 17. Visual Design
 
 ### Typography
 - [ ] DM Sans font loads correctly
@@ -608,7 +728,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 16. Accessibility
+## 18. Accessibility
 
 ### Semantic Labels
 - [ ] All buttons have labels
@@ -627,7 +747,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 17. Platform-Specific Testing
+## 19. Platform-Specific Testing
 
 ### iOS
 - [ ] Runs on iOS 16+
@@ -649,7 +769,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 18. Critical User Flows (End-to-End)
+## 20. Critical User Flows (End-to-End)
 
 ### Flow 1: New User
 1. [ ] Launch app → sees onboarding
@@ -689,7 +809,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 19. Stress Testing
+## 21. Stress Testing
 
 ### Data Volume
 - [ ] 1 subscription → works
@@ -712,7 +832,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 20. Final Checklist
+## 22. Final Checklist
 
 ### Pre-Release
 - [ ] All critical features tested

@@ -52,6 +52,21 @@ This folder contains detailed completion reports for each development phase, doc
 |----------|-------|--------|
 | [APP_STORE_LAUNCH.md](APP_STORE_LAUNCH.md) | **🎉 LIVE ON APP STORE - v1.0.12+14** | ✅ **RELEASED** |
 
+### Post-Launch Maintenance
+
+| Document | Focus | Status |
+|----------|-------|--------|
+| [ICON_BASED_EMPTY_STATES.md](ICON_BASED_EMPTY_STATES.md) | Icon-based empty states across all screens | ✅ Complete |
+| [POLISH_PHASE_2_EMPTY_STATES_RICH_NOTIFICATIONS.md](POLISH_PHASE_2_EMPTY_STATES_RICH_NOTIFICATIONS.md) | Rich notification actions (mark paid, view details) | ✅ Complete |
+| [PREMIUM_POLISH_ANIMATIONS.md](PREMIUM_POLISH_ANIMATIONS.md) | Premium badge animations and paywall polish | ✅ Complete |
+| [BRAND_ICONS.md](BRAND_ICONS.md) | `simple_icons` integration, ~80 services mapped | ✅ Complete |
+| [BUG_FIXES_V141.md](BUG_FIXES_V141.md) | 4 bug fixes: today billing, later section, premium badge, iOS actions | ✅ Complete |
+| [ANALYTICS_SCREEN_POLISH_2026-03-03.md](ANALYTICS_SCREEN_POLISH_2026-03-03.md) | Donut chart center overlay, forecast card monthly/day stats | ✅ Complete |
+| [PAYWALL_REDESIGN.md](PAYWALL_REDESIGN.md) | Compact single-screen paywall layout | ✅ Complete |
+| [TEMPLATE_PRICE_VERIFICATION.md](TEMPLATE_PRICE_VERIFICATION.md) | 260 templates audited, 32 prices updated to March 2026 rates | ✅ Complete |
+| [HOME_SPENDING_TOGGLE_2026-03-04.md](HOME_SPENDING_TOGGLE_2026-03-04.md) | Home spending card tap-to-toggle monthly/yearly/daily | ✅ Complete |
+| [NEW_TEMPLATES_AND_SPORTS_CATEGORY_2026-03-05.md](NEW_TEMPLATES_AND_SPORTS_CATEGORY_2026-03-05.md) | 30 new templates (260→290), Sports category added | ✅ Complete |
+
 ---
 
 ## 🎯 Purpose
@@ -72,4 +87,4 @@ These documents serve as:
 
 ---
 
-**Last Updated**: February 16, 2026 - 🎉 **APP STORE LAUNCH**
+**Last Updated**: March 5, 2026 — 30 new templates (290 total), Sports analytics category

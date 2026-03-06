@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
-import 'package:custom_subs/core/utils/service_icons.dart';
+import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/status_badge.dart';
 
@@ -84,31 +84,15 @@ class HeaderCard extends StatelessWidget {
         padding: const EdgeInsets.all(AppSizes.lg),
         child: Column(
           children: [
-            // Icon with Hero animation
+            // Brand icon with Hero animation for shared element transition
             Hero(
               tag: 'subscription-icon-${subscription.id}',
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: subscriptionColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-                ),
-                child: Center(
-                  child: subscription.iconName != null
-                      ? Icon(
-                          ServiceIcons.getIconForService(subscription.iconName!),
-                          size: 40,
-                          color: subscriptionColor,
-                        )
-                      : Text(
-                          subscription.name.substring(0, 1).toUpperCase(),
-                          style: theme.textTheme.headlineLarge?.copyWith(
-                            color: subscriptionColor,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                ),
+              child: SubscriptionIcon(
+                name: subscription.name,
+                iconName: subscription.iconName,
+                color: subscriptionColor,
+                size: 80,
+                isCircle: false, // Rounded rect for the detail header
               ),
             ),
 
