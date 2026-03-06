@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - 2026-03-06
+
+### Added
+- **Smart Insights** — new card at the bottom of the Analytics screen with 4 offline-only optimization insights:
+  - **Overlap detection**: flags 2+ music streaming or 3+ video/cloud subscriptions by matching `iconName` against hardcoded service groups
+  - **Annual billing savings**: estimates 15–20% savings across all monthly-cycle subscriptions; disappears when no monthly subs exist
+  - **Bundle opportunities**: detects known bundles (Apple One, Disney Bundle, etc.) from `assets/data/bundles.json`; only shown when user would save money vs. paying separately
+  - **High-spend category flag**: highlights any single category ≥ 40% of total spend
+  - Card hides entirely when no insights apply; each row opens a detail bottom sheet
+  - Files: `lib/features/analytics/smart_insights_controller.dart`, `lib/features/analytics/widgets/smart_insights_card.dart`, `assets/data/bundles.json` (13 bundle definitions)
+
+### Fixed
+- **Smart Insights — 5 post-review bug fixes**:
+  - `_videoServices` iconName mismatches: `'youtube_premium'`→`'youtube'`, `'max'`→`'hbo'` — overlap detection was silently failing for Max and YouTube Premium users
+  - `bundles.json` iconName mismatches corrected: YouTube Premium Family (`youtube_premium`→`youtube`), Max+Discovery+ (`max`→`hbo`, `discovery_plus`→`discovery`), Amazon Prime (`amazon_prime`→`amazon`, `amazon_kindle`→`kindle`)
+  - Removed 4 bundles with no valid multi-template scenarios (Xbox Game Pass Ultimate, PlayStation Plus Premium, Microsoft 365 Family, Paramount+ with Showtime) — bundle count 20→13
+  - Removed unused `fmtLong` variable in `_showAnnualSavingsSheet` (analyzer warning)
+  - Bottom sheet content now wrapped in `SingleChildScrollView` — prevents overflow on small phones with many subscriptions
+  - Added `clipBehavior: Clip.antiAlias` to card container — press highlight no longer bleeds outside rounded corners
+- **23 new templates** — cell carriers, internet/cable providers, insurance, and roadside assistance (290 → 313 total)
+  - Cell carriers (utilities): T-Mobile, Verizon, AT&T Wireless, Xfinity Mobile, Google Fi Wireless, Mint Mobile, Cricket Wireless, Visible, Boost Mobile
+  - Internet/cable (utilities): Xfinity Internet, Spectrum Internet, AT&T Internet, Cox Internet, Google Fiber, Frontier Internet, Optimum
+  - Insurance/roadside (finance): GEICO, Progressive, State Farm, Allstate, USAA, Lemonade Insurance, AAA Membership
+- **4 new SimpleIcons mappings** in `service_icons.dart`: `verizon`, `att_wireless`, `att_internet`, `boost`
+- **16 more templates** — missing tiers, family plans, and new services (313 → 329 total)
+  - New services: Wyze Cam Plus, AppleCare+, Adobe Acrobat, LinkedIn Learning, Coursera Certificate, LastPass, Keeper Security
+  - Family/business tiers: YouTube Premium Family, Microsoft 365 Family, Duolingo Family, Dropbox Business, Dashlane Friends & Family
+  - Storage tiers: iCloud+ 50GB, iCloud+ 2TB, Google One 100GB, Google One 200GB
+- **3 new SimpleIcons mappings**: `wyze`, `lastpass`, `keeper`
+
+---
+
 ## [1.4.0] - 2026-02-26
 
 **Build**: 43

@@ -1,0 +1,134 @@
+{
+  "bundles": [
+    {
+      "id": "apple_one_individual",
+      "name": "Apple One Individual",
+      "amount": 19.95,
+      "currency": "USD",
+      "components": ["apple_music", "apple_tv", "icloud", "apple_arcade"],
+      "minComponentsRequired": 2,
+      "description": "Apple Music, Apple TV+, Arcade & iCloud+",
+      "url": "https://www.apple.com/apple-one/"
+    },
+    {
+      "id": "apple_one_family",
+      "name": "Apple One Family",
+      "amount": 25.95,
+      "currency": "USD",
+      "components": ["apple_music", "apple_tv", "icloud", "apple_arcade"],
+      "minComponentsRequired": 2,
+      "description": "Apple Music, TV+, Arcade & iCloud+ for up to 6 people",
+      "url": "https://www.apple.com/apple-one/"
+    },
+    {
+      "id": "disney_bundle_duo_basic",
+      "name": "Disney Bundle Duo Basic",
+      "amount": 9.99,
+      "currency": "USD",
+      "components": ["disney", "hulu"],
+      "minComponentsRequired": 2,
+      "description": "Disney+ (With Ads) & Hulu (With Ads)",
+      "url": "https://www.disneyplus.com/offers/bundle"
+    },
+    {
+      "id": "disney_bundle_duo_premium",
+      "name": "Disney Bundle Duo Premium",
+      "amount": 19.99,
+      "currency": "USD",
+      "components": ["disney", "hulu"],
+      "minComponentsRequired": 2,
+      "description": "Disney+ (No Ads) & Hulu (No Ads)",
+      "url": "https://www.disneyplus.com/offers/bundle"
+    },
+    {
+      "id": "disney_bundle_trio_basic",
+      "name": "Disney Bundle Trio Basic",
+      "amount": 14.99,
+      "currency": "USD",
+      "components": ["disney", "hulu", "espn"],
+      "minComponentsRequired": 2,
+      "description": "Disney+ (Ads), Hulu (Ads) & ESPN+",
+      "url": "https://www.disneyplus.com/offers/bundle"
+    },
+    {
+      "id": "disney_bundle_trio_premium",
+      "name": "Disney Bundle Trio Premium",
+      "amount": 24.99,
+      "currency": "USD",
+      "components": ["disney", "hulu", "espn"],
+      "minComponentsRequired": 2,
+      "description": "Disney+ (No Ads), Hulu (No Ads) & ESPN+",
+      "url": "https://www.disneyplus.com/offers/bundle"
+    },
+    {
+      "id": "youtube_premium_family",
+      "name": "YouTube Premium Family",
+      "amount": 22.99,
+      "currency": "USD",
+      "components": ["youtube", "youtube_music"],
+      "minComponentsRequired": 2,
+      "description": "YouTube Premium + YouTube Music for up to 6 people",
+      "url": "https://www.youtube.com/premium"
+    },
+    {
+      "id": "max_discovery_bundle",
+      "name": "Max + Discovery+",
+      "amount": 15.99,
+      "currency": "USD",
+      "components": ["hbo", "discovery"],
+      "minComponentsRequired": 2,
+      "description": "Max (With Ads) & Discovery+ in one subscription",
+      "url": "https://www.max.com"
+    },
+    {
+      "id": "amazon_prime",
+      "name": "Amazon Prime",
+      "amount": 14.99,
+      "currency": "USD",
+      "components": ["amazon", "amazon_music", "kindle"],
+      "minComponentsRequired": 2,
+      "description": "Prime Video, Music, Reading & free shipping in one",
+      "url": "https://www.amazon.com/prime"
+    },
+    {
+      "id": "google_one_2tb",
+      "name": "Google One (2TB)",
+      "amount": 9.99,
+      "currency": "USD",
+      "components": ["google_one", "google_drive"],
+      "minComponentsRequired": 2,
+      "description": "2TB Google storage shared across Drive, Gmail & Photos",
+      "url": "https://one.google.com"
+    },
+    {
+      "id": "hulu_live_tv",
+      "name": "Hulu + Live TV",
+      "amount": 82.99,
+      "currency": "USD",
+      "components": ["hulu", "sling", "disney", "espn"],
+      "minComponentsRequired": 3,
+      "description": "Hulu + Live TV includes Disney+ and ESPN+ at no extra cost",
+      "url": "https://www.hulu.com/live-tv"
+    },
+    {
+      "id": "verizon_plus_play",
+      "name": "Verizon +play Bundle",
+      "amount": 14.99,
+      "currency": "USD",
+      "components": ["netflix", "hulu", "disney", "peacock"],
+      "minComponentsRequired": 3,
+      "description": "Verizon customers can bundle streaming services at a discount",
+      "url": "https://www.verizon.com/plus-play/"
+    },
+    {
+      "id": "peloton_app_plus",
+      "name": "Peloton App+",
+      "amount": 24.00,
+      "currency": "USD",
+      "components": ["peloton", "apple_fitness"],
+      "minComponentsRequired": 2,
+      "description": "Consider consolidating fitness apps into one platform",
+      "url": "https://www.onepeloton.com/app"
+    }
+  ]
+}

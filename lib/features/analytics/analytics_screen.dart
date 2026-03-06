@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:custom_subs/features/analytics/analytics_controller.dart';
+import 'package:custom_subs/features/analytics/widgets/smart_insights_card.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
@@ -145,8 +146,8 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
       duration: const Duration(milliseconds: 600),
     );
 
-    // 5 cards: Forecast, Active vs Paused, Category, Top Subs, Currency
-    _fadeAnimations = List.generate(5, (index) {
+    // 6 cards: Forecast, Active vs Paused, Category, Top Subs, Currency, Smart Insights
+    _fadeAnimations = List.generate(6, (index) {
       return Tween<double>(begin: 0.0, end: 1.0).animate(
         CurvedAnimation(
           parent: _controller,
@@ -159,7 +160,7 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
       );
     });
 
-    _slideAnimations = List.generate(5, (index) {
+    _slideAnimations = List.generate(6, (index) {
       return Tween<Offset>(
         begin: const Offset(0, 0.15), // Start 15% below
         end: Offset.zero,
@@ -260,8 +261,19 @@ class _AnalyticsContentState extends State<_AnalyticsContent>
                   child: _CurrencyBreakdownCard(analytics: widget.analytics),
                 ),
               ),
-              const SizedBox(height: AppSizes.base),
+              const SizedBox(height: AppSizes.sectionSpacing),
             ],
+
+            // Card 5: Smart Insights — always mounted; hides itself when no insights.
+            // Handles its own loading/empty states to keep analytics screen decoupled.
+            SlideTransition(
+              position: _slideAnimations[cardIndex],
+              child: FadeTransition(
+                opacity: _fadeAnimations[cardIndex++],
+                child: const SmartInsightsCard(),
+              ),
+            ),
+            const SizedBox(height: AppSizes.base),
           ],
         ),
       ),

@@ -1,7 +1,7 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: March 4, 2026
-**Version**: 1.4.2 (Build 46 — Live on App Store)
+**Last Updated**: March 6, 2026
+**Version**: 1.4.3 (Build 47 — In Development)
 **Status**: ✅ Live — Active post-launch improvements
 
 Welcome to the CustomSubs documentation! This index helps you find exactly what you need.
@@ -68,6 +68,7 @@ Welcome to the CustomSubs documentation! This index helps you find exactly what 
 | [completion/ANALYTICS_SCREEN_POLISH_2026-03-03.md](completion/ANALYTICS_SCREEN_POLISH_2026-03-03.md) | Donut chart center overlay, forecast card | ✅ Complete |
 | [completion/PAYWALL_REDESIGN.md](completion/PAYWALL_REDESIGN.md) | Compact single-screen paywall layout | ✅ Complete |
 | [completion/TEMPLATE_PRICE_VERIFICATION.md](completion/TEMPLATE_PRICE_VERIFICATION.md) | 32 template price updates, March 2026 | ✅ Complete |
+| [completion/SMART_INSIGHTS_2026-03-06.md](completion/SMART_INSIGHTS_2026-03-06.md) | Smart Insights card — overlap, savings, bundles, high-spend | ✅ Complete |
 
 ### For App Store Submission
 
@@ -256,6 +257,7 @@ If you only read 10 documents, read these:
 ### Analytics
 - [completion/PHASE_3_COMPLETE.md](completion/PHASE_3_COMPLETE.md) - Complete implementation
 - [completion/ANALYTICS_AESTHETIC_IMPROVEMENTS.md](completion/ANALYTICS_AESTHETIC_IMPROVEMENTS.md) - UI polish
+- [completion/SMART_INSIGHTS_2026-03-06.md](completion/SMART_INSIGHTS_2026-03-06.md) - Smart Insights (overlap, savings, bundles, high-spend)
 
 ### Design System
 - [architecture/design-system.md](architecture/design-system.md) - Colors, typography, spacing
@@ -382,13 +384,16 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ---
 
-**Last Updated**: March 4, 2026
+**Last Updated**: March 6, 2026
 **Maintained By**: Project Documentation System
 **Feedback**: Update this file or create issues
 
 ---
 
 ## 🆕 Recent Updates
+
+**March 6, 2026 (v1.4.3)**:
+- ✅ [Smart Insights](completion/SMART_INSIGHTS_2026-03-06.md) — Analytics optimization card (overlap detection, annual savings, bundle opportunities, high-spend flag)
 
 **March 4, 2026**:
 - ✅ Documentation reorganized and optimized (fixed broken refs in CLAUDE.md, updated doc counts)

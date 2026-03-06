@@ -496,6 +496,20 @@ class ServiceIcons {
 
     // --- Automation & Productivity Tools ---
     'make': SimpleIcons.make,              // Make.com (formerly Integromat)
+
+    // --- Cell Phone Carriers ---
+    // SimpleIcons.spectrum is the dev framework (purple), NOT Charter Spectrum ISP — omitted
+    'verizon': SimpleIcons.verizon,
+    'att_wireless': SimpleIcons.atandt,    // AT&T Wireless → AT&T brand icon
+    'att_internet': SimpleIcons.atandt,    // AT&T Internet → same brand icon
+    'boost': SimpleIcons.boost,            // Boost Mobile (orange #F7901E confirmed)
+
+    // --- Smart Home ---
+    'wyze': SimpleIcons.wyze,
+
+    // --- Password Managers ---
+    'lastpass': SimpleIcons.lastpass,
+    'keeper': SimpleIcons.keeper,
   };
 
   // ---------------------------------------------------------------------------

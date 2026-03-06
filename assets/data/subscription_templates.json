@@ -3188,5 +3188,395 @@
     "cancelUrl": "https://my.arlo.com/#/account",
     "color": "0xFF18AEBF",
     "iconName": "arlo"
+  },
+  {
+    "name": "T-Mobile",
+    "defaultAmount": 70.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://account.t-mobile.com",
+    "color": "0xFFE20074",
+    "iconName": "tmobile"
+  },
+  {
+    "name": "Verizon",
+    "defaultAmount": 80.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.verizon.com/my-account",
+    "color": "0xFFCD040B",
+    "iconName": "verizon"
+  },
+  {
+    "name": "AT&T Wireless",
+    "defaultAmount": 75.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.att.com/my-account",
+    "color": "0xFF009FDB",
+    "iconName": "att_wireless"
+  },
+  {
+    "name": "Xfinity Mobile",
+    "defaultAmount": 25.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.xfinity.com/mobile/account",
+    "color": "0xFF6E1F86",
+    "iconName": "xfinity_mobile"
+  },
+  {
+    "name": "Google Fi Wireless",
+    "defaultAmount": 20.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://fi.google.com/account",
+    "color": "0xFF4285F4",
+    "iconName": "googlefi"
+  },
+  {
+    "name": "Mint Mobile",
+    "defaultAmount": 30.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://account.mintmobile.com",
+    "color": "0xFF00AF66",
+    "iconName": "mintmobile"
+  },
+  {
+    "name": "Cricket Wireless",
+    "defaultAmount": 55.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.cricketwireless.com/account/my-account.html",
+    "color": "0xFF2D8653",
+    "iconName": "cricket"
+  },
+  {
+    "name": "Visible",
+    "defaultAmount": 25.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.visible.com/account",
+    "color": "0xFF7B2EFF",
+    "iconName": "visible"
+  },
+  {
+    "name": "Boost Mobile",
+    "defaultAmount": 25.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.boostmobile.com/account",
+    "color": "0xFFF7901E",
+    "iconName": "boost"
+  },
+  {
+    "name": "Xfinity Internet",
+    "defaultAmount": 60.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.xfinity.com/account",
+    "color": "0xFF6E1F86",
+    "iconName": "xfinity"
+  },
+  {
+    "name": "Spectrum Internet",
+    "defaultAmount": 50.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.spectrum.net/account",
+    "color": "0xFF0063A3",
+    "iconName": "spectrum_isp"
+  },
+  {
+    "name": "AT&T Internet",
+    "defaultAmount": 55.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.att.com/my-account",
+    "color": "0xFF009FDB",
+    "iconName": "att_internet"
+  },
+  {
+    "name": "Cox Internet",
+    "defaultAmount": 50.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.cox.com/account",
+    "color": "0xFFE05206",
+    "iconName": "cox"
+  },
+  {
+    "name": "Google Fiber",
+    "defaultAmount": 70.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://fiber.google.com/account",
+    "color": "0xFF34A853",
+    "iconName": "googlefiber"
+  },
+  {
+    "name": "Frontier Internet",
+    "defaultAmount": 50.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://frontier.com/account",
+    "color": "0xFFD32F2F",
+    "iconName": "frontier"
+  },
+  {
+    "name": "Optimum",
+    "defaultAmount": 50.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.optimum.com/account",
+    "color": "0xFF5B2D8E",
+    "iconName": "optimum"
+  },
+  {
+    "name": "GEICO",
+    "defaultAmount": 120.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://www.geico.com/account",
+    "color": "0xFF2E7D32",
+    "iconName": "geico"
+  },
+  {
+    "name": "Progressive",
+    "defaultAmount": 110.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://www.progressive.com/account",
+    "color": "0xFF0057A8",
+    "iconName": "progressive"
+  },
+  {
+    "name": "State Farm",
+    "defaultAmount": 115.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://www.statefarm.com/account",
+    "color": "0xFFCC0000",
+    "iconName": "statefarm"
+  },
+  {
+    "name": "Allstate",
+    "defaultAmount": 125.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://myaccount.allstate.com",
+    "color": "0xFF003B8E",
+    "iconName": "allstate"
+  },
+  {
+    "name": "USAA",
+    "defaultAmount": 95.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://www.usaa.com/account",
+    "color": "0xFF003087",
+    "iconName": "usaa"
+  },
+  {
+    "name": "Lemonade Insurance",
+    "defaultAmount": 12.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "finance",
+    "cancelUrl": "https://www.lemonade.com/account",
+    "color": "0xFFFF0082",
+    "iconName": "lemonade"
+  },
+  {
+    "name": "AAA Membership",
+    "defaultAmount": 129.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "yearly",
+    "category": "finance",
+    "cancelUrl": "https://www.aaa.com/account",
+    "color": "0xFF0033A0",
+    "iconName": "aaa"
+  },
+  {
+    "name": "Wyze Cam Plus",
+    "defaultAmount": 3.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://www.wyze.com/account",
+    "color": "0xFF1DF0BB",
+    "iconName": "wyze"
+  },
+  {
+    "name": "AppleCare+",
+    "defaultAmount": 9.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "utilities",
+    "cancelUrl": "https://support.apple.com/billing",
+    "color": "0xFF007AFF",
+    "iconName": "applecare"
+  },
+  {
+    "name": "Adobe Acrobat",
+    "defaultAmount": 19.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://account.adobe.com/plans",
+    "color": "0xFFDA1F26",
+    "iconName": "adobe"
+  },
+  {
+    "name": "LinkedIn Learning",
+    "defaultAmount": 32.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "education",
+    "cancelUrl": "https://www.linkedin.com/learning/settings",
+    "color": "0xFF0A66C2",
+    "iconName": "linkedin"
+  },
+  {
+    "name": "Coursera Certificate",
+    "defaultAmount": 49.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "education",
+    "cancelUrl": "https://www.coursera.org/user-settings",
+    "color": "0xFF0056D2",
+    "iconName": "coursera"
+  },
+  {
+    "name": "LastPass",
+    "defaultAmount": 3.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://www.lastpass.com/settings",
+    "color": "0xFFD32D27",
+    "iconName": "lastpass"
+  },
+  {
+    "name": "Keeper Security",
+    "defaultAmount": 2.92,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://keepersecurity.com/account",
+    "color": "0xFFFFC700",
+    "iconName": "keeper"
+  },
+  {
+    "name": "YouTube Premium Family",
+    "defaultAmount": 22.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "entertainment",
+    "cancelUrl": "https://www.youtube.com/paid_memberships",
+    "color": "0xFFFF0000",
+    "iconName": "youtube"
+  },
+  {
+    "name": "Microsoft 365 Family",
+    "defaultAmount": 12.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://account.microsoft.com/services/",
+    "color": "0xFFF25022",
+    "iconName": "microsoft"
+  },
+  {
+    "name": "Duolingo Family",
+    "defaultAmount": 9.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "education",
+    "cancelUrl": "https://www.duolingo.com/settings/plus",
+    "color": "0xFF58CC02",
+    "iconName": "duolingo"
+  },
+  {
+    "name": "Dropbox Business",
+    "defaultAmount": 20.00,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://www.dropbox.com/account/plan",
+    "color": "0xFF0061FF",
+    "iconName": "dropbox"
+  },
+  {
+    "name": "Dashlane Friends & Family",
+    "defaultAmount": 7.49,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "productivity",
+    "cancelUrl": "https://www.dashlane.com/account",
+    "color": "0xFF00BB6E",
+    "iconName": "dashlane"
+  },
+  {
+    "name": "iCloud+ 50GB",
+    "defaultAmount": 0.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "cloud",
+    "cancelUrl": "https://support.apple.com/en-us/HT201238",
+    "color": "0xFF3B82F6",
+    "iconName": "icloud"
+  },
+  {
+    "name": "iCloud+ 2TB",
+    "defaultAmount": 9.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "cloud",
+    "cancelUrl": "https://support.apple.com/en-us/HT201238",
+    "color": "0xFF3B82F6",
+    "iconName": "icloud"
+  },
+  {
+    "name": "Google One 100GB",
+    "defaultAmount": 1.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "cloud",
+    "cancelUrl": "https://one.google.com/about",
+    "color": "0xFF4285F4",
+    "iconName": "google_one"
+  },
+  {
+    "name": "Google One 200GB",
+    "defaultAmount": 2.99,
+    "defaultCurrency": "USD",
+    "defaultCycle": "monthly",
+    "category": "cloud",
+    "cancelUrl": "https://one.google.com/about",
+    "color": "0xFF4285F4",
+    "iconName": "google_one"
   }
 ]
