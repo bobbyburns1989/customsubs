@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased] - 2026-03-06
+## [1.4.4] - 2026-03-06
+
+**Build**: 48
+**Status**: Release Candidate
 
 ### Added
 - **Smart Insights** — new card at the bottom of the Analytics screen with 4 offline-only optimization insights:
