@@ -1,19 +1,22 @@
 # Brand Icons — Implementation Complete
 
 **Status**: ✅ Complete (updated March 2026)
-**Date**: March 3, 2026 | **Last updated**: March 2026
+**Date**: March 3, 2026 | **Last updated**: March 6, 2026
 **Version**: v1.4.0+
 
 ---
 
 ## Summary
 
-Replaced generic Material Design icons with real brand logos for ~97 popular
-subscription services, using the `simple_icons` Flutter package. Fully offline
-(font-based SVG). Three-tier fallback: local SVG asset → SimpleIcons font icon → letter avatar.
+Replaced generic Material Design icons with real brand logos for all 290 subscription
+templates. Three-tier fallback: local SVG asset → SimpleIcons font icon → letter avatar.
 
-11 brands are covered by hand-crafted SVG files in `assets/logos/` rendered via `flutter_svg`
-(8 removed from Simple Icons for trademark reasons + 3 not in Simple Icons at all: ESPN, Hinge, SiriusXM).
+**Current coverage (0 letter avatars remaining):**
+- **174 local SVG lettermarks** in `assets/logos/` — services not in SimpleIcons (trademark
+  removals, niche/regional services, fitness, telehealth, meal kits, etc.)
+- **~115 SimpleIcons** — mainstream services (Netflix, Spotify, Discord, YouTube, etc.)
+  use the real brand icon from the `simple_icons` font package
+- **0 letter avatar fallbacks** — all gaps filled as of March 6, 2026
 
 ---
 
@@ -122,9 +125,22 @@ Tesla, Ring, HelloFresh
 | Hinge | `assets/logos/hinge.svg` | #FF0075 pink, white "H" | Not in Simple Icons |
 | SiriusXM | `assets/logos/siriusxm.svg` | #0036A0 blue, white "SXM" | Not in Simple Icons |
 
-Still falling back to letter avatars (not in Simple Icons, no SVG created):
-MyFitnessPal, FreshBooks, DocuSign, Monday.com, WSJ, Washington Post,
-Midjourney, Discovery, and ~130 niche/regional services (subscription boxes, gyms, etc.)
+**Batch 6 (March 6, 2026) — zero-coverage gap fills:**
+
+| Brand | File | Design | Reason |
+|---|---|---|---|
+| Arlo Secure | `arlo.svg` | #1DB4B4 teal, white "AR" | Not in Simple Icons |
+| ActiveCampaign | `activecampaign.svg` | #356AE6 blue, white "AC" | Not in Simple Icons |
+| Care.com | `care.svg` | #E31837 red, white "CA" | Not in Simple Icons |
+| Cocktail | `cocktail.svg` | #8B5CF6 purple, white "CK" | Not in Simple Icons |
+| Cocotique | `cocotique.svg` | #E91E8C pink, white "CO" | Not in Simple Icons |
+| DHC Skincare | `dhc.svg` | #C8102E red, white "DHC" | Not in Simple Icons |
+| FreshBooks | `freshbooks.svg` | #1DA462 green, white "FB" | Not in Simple Icons |
+| Garmin | `garmin.svg` | #007DC5 blue, white "G" | Not in Simple Icons |
+| Hemper | `hemper.svg` | #2D6A4F dark green, white "HE" | Not in Simple Icons |
+| LingoKids | `lingokids.svg` | #FF6B35 orange, white "LK" | Not in Simple Icons |
+| Shaker | `shaker.svg` | #FF6B35 orange, white "SK" | Not in Simple Icons |
+| Shine | `shine.svg` | #8B5CF6 purple, white "SH" | Not in Simple Icons |
 
 ---
 
