@@ -51,23 +51,24 @@ CustomSubs is part of the **Custom\*** app family. The brand is:
 
 ### Primary Colors
 
-**Brand Green** - Represents growth, money, trust
+**Sage Green** - Matched to app icon. Refined, calm, trustworthy.
 
 ```dart
 // lib/core/constants/app_colors.dart
 
-AppColors.primary        // #16A34A - Green 600 (main brand color)
-AppColors.primaryLight   // #22C55E - Green 500 (hover, active states)
-AppColors.primaryDark    // #15803D - Green 700 (pressed states)
-AppColors.primarySurface // #F0FDF4 - Green 50  (subtle backgrounds)
+AppColors.primary        // #7DA68A - Sage green (main brand color)
+AppColors.primaryLight   // #9DB5A0 - Light sage (hover, active states)
+AppColors.primaryDark    // #5F8A6F - Dark sage (pressed states)
+AppColors.primarySurface // #F2F5F1 - Very light sage (subtle backgrounds)
 ```
 
 **Usage:**
 - Primary buttons
 - Active states
-- Success indicators
 - Amount displays
 - Progress indicators
+- Form section icons
+- Empty state icons
 
 ### Neutral Colors
 
@@ -93,7 +94,7 @@ AppColors.divider        // #F1F5F9 - Slate 100 (subtle dividers)
 **State indicators** - Success, warning, error
 
 ```dart
-AppColors.success  // #16A34A - Green (same as primary)
+AppColors.success  // #16A34A - Bright green (decoupled from primary)
 AppColors.warning  // #F59E0B - Amber 500
 AppColors.error    // #EF4444 - Red 500
 AppColors.trial    // #F59E0B - Amber 500 (trial badges)
@@ -101,7 +102,7 @@ AppColors.inactive // #94A3B8 - Slate 400 (disabled/muted UI elements)
 ```
 
 **Usage:**
-- Success: Completed actions, "paid" badges
+- Success: Completed actions, "paid" badges, success snackbars, mark-as-paid swipe
 - Warning: Trial ending soon, attention needed
 - Error: Validation errors, failed operations
 - Trial: Free trial badges

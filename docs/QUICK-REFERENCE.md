@@ -1,7 +1,7 @@
 # Quick Reference
 
 **Status**: ✅ Complete
-**Last Updated**: March 5, 2026 (v1.4.3 — 290 templates, Sports category)
+**Last Updated**: March 14, 2026 (v1.4.4 — 329 templates, Sports category)
 **Relevant to**: Developers
 
 **Fast lookup for common tasks and patterns in CustomSubs.**
@@ -631,26 +631,43 @@ date.addMonths(1) // DateTime (handles month overflow)
 
 ## 🎯 Navigation
 
-### GoRouter Routes
+### GoRouter Routes — Page Transition Patterns
 
 ```dart
-// In lib/app/router.dart
+// Content push — iOS slide (CupertinoPage)
+// Use for: screens the user drills into (detail, add, edit, analytics)
 GoRoute(
   path: '/my-screen',
-  name: 'myScreen',
-  pageBuilder: (context, state) => MaterialPage(
-    child: MyScreen(),
+  pageBuilder: (context, state) => CupertinoPage(
+    key: state.pageKey,
+    child: const MyScreen(),
   ),
+),
+
+// Modal-style — Fade (AppRouter._fadePage)
+// Use for: utility/overlay screens (settings, paywall)
+GoRoute(
+  path: '/my-modal',
+  pageBuilder: (context, state) => AppRouter._fadePage(
+    key: state.pageKey,
+    child: const MyModalScreen(),
+  ),
+),
+
+// Root/stack-replacement — Default (builder)
+// Use for: home, onboarding (no visible transition needed)
+GoRoute(
+  path: '/',
+  builder: (context, state) => const HomeScreen(),
 ),
 ```
 
 ### Navigate
 
 ```dart
-context.push('/my-screen');
-context.pushNamed('myScreen');
-context.go('/my-screen');
-Navigator.pop(context);  // Go back
+context.push('/my-screen');   // Push onto stack (shows transition)
+context.go('/my-screen');     // Replace stack (no transition)
+context.pop();                // Go back
 ```
 
 ---
@@ -988,7 +1005,7 @@ dart run build_runner build --delete-conflicting-outputs
 
 ## 📦 Subscription Templates
 
-**File:** `assets/data/subscription_templates.json` — 290 services
+**File:** `assets/data/subscription_templates.json` — 329 services
 
 ### Price Convention (established March 2026)
 - **Tier:** Most popular individual paid plan (not cheapest, not premium)

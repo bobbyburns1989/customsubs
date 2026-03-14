@@ -48,8 +48,8 @@
 
 **Core philosophy:** Do one thing perfectly — track subscriptions and remind users before they get charged.
 
-**Current version:** v1.4.2+46. All build phases complete. Active post-launch improvements only.
-**Templates:** 290 pre-built templates (as of March 2026), including a `sports` analytics category.
+**Current version:** v1.4.5+49. All build phases complete. Active post-launch improvements only.
+**Templates:** 329 pre-built templates (as of March 2026), including a `sports` analytics category.
 
 ---
 

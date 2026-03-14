@@ -626,7 +626,7 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Subscribe button full-width, green, shows dynamic price: "Subscribe for $X.XX/month"
 - [ ] Trial terms line below button (e.g., "Free for 3 days, then $0.99/month...")
 - [ ] Bottom row: Restore · Terms · Privacy — all three on one line
-- [ ] Fine print: "Managed through App Store. Free tier: 5 subscriptions."
+- [ ] Fine print: "Managed through App Store. Free tier: 7 subscriptions."
 - [ ] No amber warning banner (removed — context in fine print)
 
 ### Loading State

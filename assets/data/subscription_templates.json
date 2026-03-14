@@ -189,7 +189,7 @@
   {
     "id": "notion",
     "name": "Notion",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -200,7 +200,7 @@
   {
     "id": "chatgpt_plus",
     "name": "ChatGPT Plus",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -211,7 +211,7 @@
   {
     "id": "claude_pro",
     "name": "Claude Pro",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -222,7 +222,7 @@
   {
     "id": "midjourney",
     "name": "Midjourney",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -233,7 +233,7 @@
   {
     "id": "github_copilot",
     "name": "GitHub Copilot",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -244,7 +244,7 @@
   {
     "id": "figma",
     "name": "Figma",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -387,7 +387,7 @@
   {
     "id": "coursera_plus",
     "name": "Coursera Plus",
-    "defaultAmount": 59.00,
+    "defaultAmount": 59.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "education",
@@ -409,7 +409,7 @@
   {
     "id": "medium",
     "name": "Medium",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "news",
@@ -420,7 +420,7 @@
   {
     "id": "substack",
     "name": "Substack",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "news",
@@ -442,7 +442,7 @@
   {
     "id": "nyt",
     "name": "New York Times",
-    "defaultAmount": 17.00,
+    "defaultAmount": 17.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "news",
@@ -453,7 +453,7 @@
   {
     "id": "gym",
     "name": "Gym Membership",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -475,7 +475,7 @@
   {
     "id": "washington_post",
     "name": "Washington Post",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "news",
@@ -508,7 +508,7 @@
   {
     "id": "grammarly_premium",
     "name": "Grammarly Pro",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -530,7 +530,7 @@
   {
     "id": "hellofresh",
     "name": "HelloFresh",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "shopping",
@@ -596,7 +596,7 @@
   {
     "id": "x_premium",
     "name": "X Premium",
-    "defaultAmount": 8.00,
+    "defaultAmount": 8.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -706,7 +706,7 @@
   {
     "id": "blue_apron",
     "name": "Blue Apron",
-    "defaultAmount": 55.00,
+    "defaultAmount": 55.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "shopping",
@@ -717,7 +717,7 @@
   {
     "id": "factor",
     "name": "Factor",
-    "defaultAmount": 90.00,
+    "defaultAmount": 90.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "shopping",
@@ -772,7 +772,7 @@
   {
     "id": "rocket_money",
     "name": "Rocket Money",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -827,7 +827,7 @@
   {
     "id": "noom",
     "name": "Noom",
-    "defaultAmount": 42.00,
+    "defaultAmount": 42.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -871,7 +871,7 @@
   {
     "id": "match",
     "name": "Match.com",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -882,7 +882,7 @@
   {
     "id": "classpass",
     "name": "ClassPass",
-    "defaultAmount": 35.00,
+    "defaultAmount": 35.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -915,7 +915,7 @@
   {
     "id": "nest_aware",
     "name": "Nest Aware",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -926,7 +926,7 @@
   {
     "id": "busuu_premium",
     "name": "Busuu Premium",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "education",
@@ -937,7 +937,7 @@
   {
     "id": "beachbody",
     "name": "Beachbody On Demand",
-    "defaultAmount": 179.00,
+    "defaultAmount": 179.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "fitness",
@@ -1069,7 +1069,7 @@
   {
     "id": "perplexity_pro",
     "name": "Perplexity Pro",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1091,7 +1091,7 @@
   {
     "id": "jasper",
     "name": "Jasper AI",
-    "defaultAmount": 59.00,
+    "defaultAmount": 59.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1102,7 +1102,7 @@
   {
     "id": "cursor",
     "name": "Cursor",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1113,7 +1113,7 @@
   {
     "id": "windsurf",
     "name": "Windsurf IDE",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1124,7 +1124,7 @@
   {
     "id": "replit_core",
     "name": "Replit Core",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1135,7 +1135,7 @@
   {
     "id": "runwayml_pro",
     "name": "RunwayML Pro",
-    "defaultAmount": 28.00,
+    "defaultAmount": 28.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1146,7 +1146,7 @@
   {
     "id": "elevenlabs",
     "name": "ElevenLabs Starter",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1157,7 +1157,7 @@
   {
     "id": "synthesia",
     "name": "Synthesia Creator",
-    "defaultAmount": 64.00,
+    "defaultAmount": 64.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1168,7 +1168,7 @@
   {
     "id": "jetbrains",
     "name": "JetBrains All Products",
-    "defaultAmount": 27.00,
+    "defaultAmount": 27.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1179,7 +1179,7 @@
   {
     "id": "linear",
     "name": "Linear Standard",
-    "defaultAmount": 8.00,
+    "defaultAmount": 8.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1190,7 +1190,7 @@
   {
     "id": "webflow",
     "name": "Webflow CMS",
-    "defaultAmount": 23.00,
+    "defaultAmount": 23.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1201,7 +1201,7 @@
   {
     "id": "framer",
     "name": "Framer Basic",
-    "defaultAmount": 14.00,
+    "defaultAmount": 14.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1212,7 +1212,7 @@
   {
     "id": "sketch",
     "name": "Sketch Standard",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1223,7 +1223,7 @@
   {
     "id": "monday",
     "name": "Monday.com Standard",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1245,7 +1245,7 @@
   {
     "id": "clickup",
     "name": "ClickUp Unlimited",
-    "defaultAmount": 7.00,
+    "defaultAmount": 7.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1256,7 +1256,7 @@
   {
     "id": "airtable",
     "name": "Airtable Team",
-    "defaultAmount": 24.00,
+    "defaultAmount": 24.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1267,7 +1267,7 @@
   {
     "id": "trello_premium",
     "name": "Trello Premium",
-    "defaultAmount": 6.00,
+    "defaultAmount": 6.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1278,7 +1278,7 @@
   {
     "id": "quickbooks",
     "name": "QuickBooks Online Essentials",
-    "defaultAmount": 37.50,
+    "defaultAmount": 37.5,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -1289,7 +1289,7 @@
   {
     "id": "xero",
     "name": "Xero Early",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -1300,7 +1300,7 @@
   {
     "id": "freshbooks",
     "name": "FreshBooks Plus",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -1311,7 +1311,7 @@
   {
     "id": "hubspot_starter",
     "name": "HubSpot Starter",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1322,7 +1322,7 @@
   {
     "id": "salesforce_starter",
     "name": "Salesforce Starter",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1333,7 +1333,7 @@
   {
     "id": "intercom",
     "name": "Intercom Essential",
-    "defaultAmount": 29.00,
+    "defaultAmount": 29.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1344,7 +1344,7 @@
   {
     "id": "zendesk",
     "name": "Zendesk Suite Team",
-    "defaultAmount": 55.00,
+    "defaultAmount": 55.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1355,7 +1355,7 @@
   {
     "id": "shopify",
     "name": "Shopify Basic",
-    "defaultAmount": 29.00,
+    "defaultAmount": 29.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -1366,7 +1366,7 @@
   {
     "id": "squarespace",
     "name": "Squarespace Core",
-    "defaultAmount": 23.00,
+    "defaultAmount": 23.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1377,7 +1377,7 @@
   {
     "id": "loom",
     "name": "Loom Business",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1388,7 +1388,7 @@
   {
     "id": "calendly",
     "name": "Calendly Standard",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1399,7 +1399,7 @@
   {
     "id": "docusign",
     "name": "DocuSign Standard",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1421,7 +1421,7 @@
   {
     "id": "make",
     "name": "Make Core",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1432,7 +1432,7 @@
   {
     "id": "miro",
     "name": "Miro Starter",
-    "defaultAmount": 8.00,
+    "defaultAmount": 8.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1443,7 +1443,7 @@
   {
     "id": "typeform",
     "name": "Typeform Basic",
-    "defaultAmount": 29.00,
+    "defaultAmount": 29.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1454,7 +1454,7 @@
   {
     "id": "surveymonkey",
     "name": "SurveyMonkey Standard",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1465,7 +1465,7 @@
   {
     "id": "mailchimp",
     "name": "Mailchimp Essentials",
-    "defaultAmount": 13.00,
+    "defaultAmount": 13.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1476,7 +1476,7 @@
   {
     "id": "activecampaign",
     "name": "ActiveCampaign Lite",
-    "defaultAmount": 29.00,
+    "defaultAmount": 29.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1487,7 +1487,7 @@
   {
     "id": "convertkit",
     "name": "ConvertKit Creator",
-    "defaultAmount": 29.00,
+    "defaultAmount": 29.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1498,7 +1498,7 @@
   {
     "id": "basecamp",
     "name": "Basecamp",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -1509,7 +1509,7 @@
   {
     "id": "equinox",
     "name": "Equinox",
-    "defaultAmount": 285.00,
+    "defaultAmount": 285.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1520,7 +1520,7 @@
   {
     "id": "lifetime_fitness",
     "name": "Life Time Fitness",
-    "defaultAmount": 159.00,
+    "defaultAmount": 159.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1542,7 +1542,7 @@
   {
     "id": "la_fitness",
     "name": "LA Fitness",
-    "defaultAmount": 40.00,
+    "defaultAmount": 40.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1564,7 +1564,7 @@
   {
     "id": "anytime_fitness",
     "name": "Anytime Fitness",
-    "defaultAmount": 45.00,
+    "defaultAmount": 45.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1575,7 +1575,7 @@
   {
     "id": "orangetheory",
     "name": "Orangetheory Fitness",
-    "defaultAmount": 119.00,
+    "defaultAmount": 119.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1586,7 +1586,7 @@
   {
     "id": "f45_training",
     "name": "F45 Training",
-    "defaultAmount": 199.00,
+    "defaultAmount": 199.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1597,7 +1597,7 @@
   {
     "id": "barrys_bootcamp",
     "name": "Barry's Bootcamp",
-    "defaultAmount": 350.00,
+    "defaultAmount": 350.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1608,7 +1608,7 @@
   {
     "id": "soulcycle",
     "name": "SoulCycle",
-    "defaultAmount": 250.00,
+    "defaultAmount": 250.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -1619,7 +1619,7 @@
   {
     "id": "ipsy",
     "name": "Ipsy Glam Bag",
-    "defaultAmount": 14.00,
+    "defaultAmount": 14.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -1630,7 +1630,7 @@
   {
     "id": "birchbox",
     "name": "Birchbox",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -1652,7 +1652,7 @@
   {
     "id": "stitch_fix",
     "name": "Stitch Fix",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -1685,7 +1685,7 @@
   {
     "id": "costco",
     "name": "Costco Gold Star",
-    "defaultAmount": 65.00,
+    "defaultAmount": 65.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "shopping",
@@ -1696,7 +1696,7 @@
   {
     "id": "sams_club",
     "name": "Sam's Club",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "shopping",
@@ -1707,7 +1707,7 @@
   {
     "id": "target_circle_360",
     "name": "Target Circle 360",
-    "defaultAmount": 99.00,
+    "defaultAmount": 99.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "shopping",
@@ -1718,7 +1718,7 @@
   {
     "id": "bjs_wholesale",
     "name": "BJ's Wholesale Club",
-    "defaultAmount": 55.00,
+    "defaultAmount": 55.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "shopping",
@@ -1762,7 +1762,7 @@
   {
     "id": "boosteroid",
     "name": "Boosteroid",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "gaming",
@@ -1806,7 +1806,7 @@
   {
     "id": "patreon_adult",
     "name": "Patreon (Adult Tier)",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -1817,7 +1817,7 @@
   {
     "id": "fancentro",
     "name": "FanCentro",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -1850,7 +1850,7 @@
   {
     "id": "premium_snapchat",
     "name": "Premium Snapchat",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -1872,7 +1872,7 @@
   {
     "id": "betterhelp",
     "name": "BetterHelp",
-    "defaultAmount": 340.00,
+    "defaultAmount": 340.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1883,7 +1883,7 @@
   {
     "id": "talkspace",
     "name": "Talkspace",
-    "defaultAmount": 336.00,
+    "defaultAmount": 336.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1894,7 +1894,7 @@
   {
     "id": "cerebral",
     "name": "Cerebral",
-    "defaultAmount": 85.00,
+    "defaultAmount": 85.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1905,7 +1905,7 @@
   {
     "id": "teladoc",
     "name": "Teladoc Health",
-    "defaultAmount": 99.00,
+    "defaultAmount": 99.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1916,7 +1916,7 @@
   {
     "id": "hims",
     "name": "Hims",
-    "defaultAmount": 49.00,
+    "defaultAmount": 49.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1927,7 +1927,7 @@
   {
     "id": "roman",
     "name": "Roman",
-    "defaultAmount": 45.00,
+    "defaultAmount": 45.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1938,7 +1938,7 @@
   {
     "id": "hers",
     "name": "Hers",
-    "defaultAmount": 49.00,
+    "defaultAmount": 49.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1949,7 +1949,7 @@
   {
     "id": "nurx",
     "name": "Nurx",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1960,7 +1960,7 @@
   {
     "id": "mdlive",
     "name": "MDLive",
-    "defaultAmount": 89.00,
+    "defaultAmount": 89.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1971,7 +1971,7 @@
   {
     "id": "k_health",
     "name": "K Health",
-    "defaultAmount": 19.00,
+    "defaultAmount": 19.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "health",
@@ -1982,7 +1982,7 @@
   {
     "id": "boxycharm",
     "name": "BoxyCharm",
-    "defaultAmount": 28.00,
+    "defaultAmount": 28.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -1993,7 +1993,7 @@
   {
     "id": "dollar_shave_club",
     "name": "Dollar Shave Club",
-    "defaultAmount": 9.00,
+    "defaultAmount": 9.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2004,7 +2004,7 @@
   {
     "id": "harrys",
     "name": "Harry's",
-    "defaultAmount": 16.00,
+    "defaultAmount": 16.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2015,7 +2015,7 @@
   {
     "id": "birchbox_grooming",
     "name": "Birchbox Grooming",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2048,7 +2048,7 @@
   {
     "id": "sephora_play",
     "name": "Sephora Play!",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2059,7 +2059,7 @@
   {
     "id": "glossybox",
     "name": "Glossybox",
-    "defaultAmount": 21.00,
+    "defaultAmount": 21.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2070,7 +2070,7 @@
   {
     "id": "bombas",
     "name": "Bombas Socks",
-    "defaultAmount": 15.00,
+    "defaultAmount": 15.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2081,7 +2081,7 @@
   {
     "id": "cocotique",
     "name": "Cocotique",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2092,7 +2092,7 @@
   {
     "id": "allure_beauty_box",
     "name": "Allure Beauty Box",
-    "defaultAmount": 23.00,
+    "defaultAmount": 23.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2125,7 +2125,7 @@
   {
     "id": "trugreen",
     "name": "TruGreen",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2136,7 +2136,7 @@
   {
     "id": "lawnstarter",
     "name": "LawnStarter",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2147,7 +2147,7 @@
   {
     "id": "terminix",
     "name": "Terminix",
-    "defaultAmount": 40.00,
+    "defaultAmount": 40.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2158,7 +2158,7 @@
   {
     "id": "orkin",
     "name": "Orkin",
-    "defaultAmount": 45.00,
+    "defaultAmount": 45.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2169,7 +2169,7 @@
   {
     "id": "american_home_shield",
     "name": "American Home Shield",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2180,7 +2180,7 @@
   {
     "id": "choice_home_warranty",
     "name": "Choice Home Warranty",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2191,7 +2191,7 @@
   {
     "id": "handy",
     "name": "Handy",
-    "defaultAmount": 99.00,
+    "defaultAmount": 99.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2202,7 +2202,7 @@
   {
     "id": "taskrabbit",
     "name": "TaskRabbit",
-    "defaultAmount": 75.00,
+    "defaultAmount": 75.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2213,7 +2213,7 @@
   {
     "id": "freshly",
     "name": "Freshly",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "shopping",
@@ -2224,7 +2224,7 @@
   {
     "id": "sunbasket",
     "name": "Sunbasket",
-    "defaultAmount": 11.00,
+    "defaultAmount": 11.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2235,7 +2235,7 @@
   {
     "id": "gobble",
     "name": "Gobble",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2246,7 +2246,7 @@
   {
     "id": "naked_wines",
     "name": "Naked Wines",
-    "defaultAmount": 40.00,
+    "defaultAmount": 40.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2268,7 +2268,7 @@
   {
     "id": "craft_beer_club",
     "name": "Craft Beer Club",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2279,7 +2279,7 @@
   {
     "id": "firstleaf",
     "name": "Firstleaf",
-    "defaultAmount": 90.00,
+    "defaultAmount": 90.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2301,7 +2301,7 @@
   {
     "id": "shaker_spoon",
     "name": "Shaker & Spoon",
-    "defaultAmount": 37.50,
+    "defaultAmount": 37.5,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2312,7 +2312,7 @@
   {
     "id": "tasters_club",
     "name": "Taster's Club",
-    "defaultAmount": 58.00,
+    "defaultAmount": 58.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2334,7 +2334,7 @@
   {
     "id": "daily_high_club",
     "name": "Daily High Club",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -2345,7 +2345,7 @@
   {
     "id": "butcherbox",
     "name": "ButcherBox",
-    "defaultAmount": 149.00,
+    "defaultAmount": 149.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2356,7 +2356,7 @@
   {
     "id": "thrive_market",
     "name": "Thrive Market",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "shopping",
@@ -2367,7 +2367,7 @@
   {
     "id": "chewy_autoship",
     "name": "Chewy Autoship",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -2378,7 +2378,7 @@
   {
     "id": "barkbox",
     "name": "BarkBox",
-    "defaultAmount": 35.00,
+    "defaultAmount": 35.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -2389,7 +2389,7 @@
   {
     "id": "petplate",
     "name": "PetPlate",
-    "defaultAmount": 80.00,
+    "defaultAmount": 80.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "other",
@@ -2400,7 +2400,7 @@
   {
     "id": "ollie",
     "name": "Ollie",
-    "defaultAmount": 75.00,
+    "defaultAmount": 75.0,
     "defaultCurrency": "USD",
     "defaultCycle": "weekly",
     "category": "other",
@@ -2444,7 +2444,7 @@
   {
     "id": "credit_karma",
     "name": "Credit Karma",
-    "defaultAmount": 0.00,
+    "defaultAmount": 0.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -2488,7 +2488,7 @@
   {
     "id": "privacy",
     "name": "Privacy Pro",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -2521,7 +2521,7 @@
   {
     "id": "nebula",
     "name": "Nebula",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -2598,7 +2598,7 @@
   {
     "id": "masterclass",
     "name": "MasterClass",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "education",
@@ -2631,7 +2631,7 @@
   {
     "id": "chargepoint",
     "name": "ChargePoint",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2653,7 +2653,7 @@
   {
     "id": "shine_car_wash",
     "name": "Shine Car Wash Unlimited",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2664,7 +2664,7 @@
   {
     "id": "care_com",
     "name": "Care.com",
-    "defaultAmount": 35.00,
+    "defaultAmount": 35.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -2675,7 +2675,7 @@
   {
     "id": "sittercity",
     "name": "Sittercity",
-    "defaultAmount": 35.00,
+    "defaultAmount": 35.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "other",
@@ -2697,7 +2697,7 @@
   {
     "id": "whoop",
     "name": "WHOOP",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -2730,7 +2730,7 @@
   {
     "id": "alo_moves",
     "name": "Alo Moves",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -2741,7 +2741,7 @@
   {
     "id": "obe_fitness",
     "name": "Obé Fitness",
-    "defaultAmount": 27.00,
+    "defaultAmount": 27.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -2774,7 +2774,7 @@
   {
     "id": "future_training",
     "name": "Future",
-    "defaultAmount": 149.00,
+    "defaultAmount": 149.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "fitness",
@@ -2785,7 +2785,7 @@
   {
     "id": "public_storage",
     "name": "Public Storage",
-    "defaultAmount": 150.00,
+    "defaultAmount": 150.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2796,7 +2796,7 @@
   {
     "id": "clutter",
     "name": "Clutter",
-    "defaultAmount": 120.00,
+    "defaultAmount": 120.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2807,7 +2807,7 @@
   {
     "id": "pods",
     "name": "PODS Storage",
-    "defaultAmount": 200.00,
+    "defaultAmount": 200.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2818,7 +2818,7 @@
   {
     "id": "copy_ai",
     "name": "Copy.ai Pro",
-    "defaultAmount": 49.00,
+    "defaultAmount": 49.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -2840,7 +2840,7 @@
   {
     "id": "descript_pro",
     "name": "Descript Pro",
-    "defaultAmount": 24.00,
+    "defaultAmount": 24.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -2851,7 +2851,7 @@
   {
     "id": "superhuman",
     "name": "Superhuman",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -2939,7 +2939,7 @@
   {
     "id": "mullvad_vpn",
     "name": "Mullvad VPN",
-    "defaultAmount": 5.50,
+    "defaultAmount": 5.5,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -2961,7 +2961,7 @@
   {
     "id": "fastmail",
     "name": "Fastmail",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3005,7 +3005,7 @@
   {
     "id": "philo",
     "name": "Philo",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "entertainment",
@@ -3093,7 +3093,7 @@
   {
     "id": "todoist_pro",
     "name": "Todoist Pro",
-    "defaultAmount": 5.00,
+    "defaultAmount": 5.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3115,7 +3115,7 @@
   {
     "id": "obsidian_sync",
     "name": "Obsidian Sync",
-    "defaultAmount": 8.00,
+    "defaultAmount": 8.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3126,7 +3126,7 @@
   {
     "id": "kagi",
     "name": "Kagi Search",
-    "defaultAmount": 10.00,
+    "defaultAmount": 10.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3137,7 +3137,7 @@
   {
     "id": "raycast_pro",
     "name": "Raycast Pro",
-    "defaultAmount": 8.00,
+    "defaultAmount": 8.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3190,8 +3190,9 @@
     "iconName": "arlo"
   },
   {
+    "id": "t_mobile",
     "name": "T-Mobile",
-    "defaultAmount": 70.00,
+    "defaultAmount": 70.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3200,8 +3201,9 @@
     "iconName": "tmobile"
   },
   {
+    "id": "verizon",
     "name": "Verizon",
-    "defaultAmount": 80.00,
+    "defaultAmount": 80.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3210,8 +3212,9 @@
     "iconName": "verizon"
   },
   {
+    "id": "att_wireless",
     "name": "AT&T Wireless",
-    "defaultAmount": 75.00,
+    "defaultAmount": 75.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3220,8 +3223,9 @@
     "iconName": "att_wireless"
   },
   {
+    "id": "xfinity_mobile",
     "name": "Xfinity Mobile",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3230,8 +3234,9 @@
     "iconName": "xfinity_mobile"
   },
   {
+    "id": "google_fi",
     "name": "Google Fi Wireless",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3240,8 +3245,9 @@
     "iconName": "googlefi"
   },
   {
+    "id": "mint_mobile",
     "name": "Mint Mobile",
-    "defaultAmount": 30.00,
+    "defaultAmount": 30.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3250,8 +3256,9 @@
     "iconName": "mintmobile"
   },
   {
+    "id": "cricket_wireless",
     "name": "Cricket Wireless",
-    "defaultAmount": 55.00,
+    "defaultAmount": 55.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3260,8 +3267,9 @@
     "iconName": "cricket"
   },
   {
+    "id": "visible",
     "name": "Visible",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3270,8 +3278,9 @@
     "iconName": "visible"
   },
   {
+    "id": "boost_mobile",
     "name": "Boost Mobile",
-    "defaultAmount": 25.00,
+    "defaultAmount": 25.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3280,8 +3289,9 @@
     "iconName": "boost"
   },
   {
+    "id": "xfinity_internet",
     "name": "Xfinity Internet",
-    "defaultAmount": 60.00,
+    "defaultAmount": 60.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3290,8 +3300,9 @@
     "iconName": "xfinity"
   },
   {
+    "id": "spectrum_internet",
     "name": "Spectrum Internet",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3300,8 +3311,9 @@
     "iconName": "spectrum_isp"
   },
   {
+    "id": "att_internet",
     "name": "AT&T Internet",
-    "defaultAmount": 55.00,
+    "defaultAmount": 55.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3310,8 +3322,9 @@
     "iconName": "att_internet"
   },
   {
+    "id": "cox_internet",
     "name": "Cox Internet",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3320,8 +3333,9 @@
     "iconName": "cox"
   },
   {
+    "id": "google_fiber",
     "name": "Google Fiber",
-    "defaultAmount": 70.00,
+    "defaultAmount": 70.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3330,8 +3344,9 @@
     "iconName": "googlefiber"
   },
   {
+    "id": "frontier_internet",
     "name": "Frontier Internet",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3340,8 +3355,9 @@
     "iconName": "frontier"
   },
   {
+    "id": "optimum",
     "name": "Optimum",
-    "defaultAmount": 50.00,
+    "defaultAmount": 50.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "utilities",
@@ -3350,8 +3366,9 @@
     "iconName": "optimum"
   },
   {
+    "id": "geico",
     "name": "GEICO",
-    "defaultAmount": 120.00,
+    "defaultAmount": 120.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3360,8 +3377,9 @@
     "iconName": "geico"
   },
   {
+    "id": "progressive",
     "name": "Progressive",
-    "defaultAmount": 110.00,
+    "defaultAmount": 110.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3370,8 +3388,9 @@
     "iconName": "progressive"
   },
   {
+    "id": "state_farm",
     "name": "State Farm",
-    "defaultAmount": 115.00,
+    "defaultAmount": 115.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3380,8 +3399,9 @@
     "iconName": "statefarm"
   },
   {
+    "id": "allstate",
     "name": "Allstate",
-    "defaultAmount": 125.00,
+    "defaultAmount": 125.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3390,8 +3410,9 @@
     "iconName": "allstate"
   },
   {
+    "id": "usaa",
     "name": "USAA",
-    "defaultAmount": 95.00,
+    "defaultAmount": 95.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3400,8 +3421,9 @@
     "iconName": "usaa"
   },
   {
+    "id": "lemonade_insurance",
     "name": "Lemonade Insurance",
-    "defaultAmount": 12.00,
+    "defaultAmount": 12.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "finance",
@@ -3410,8 +3432,9 @@
     "iconName": "lemonade"
   },
   {
+    "id": "aaa_membership",
     "name": "AAA Membership",
-    "defaultAmount": 129.00,
+    "defaultAmount": 129.0,
     "defaultCurrency": "USD",
     "defaultCycle": "yearly",
     "category": "finance",
@@ -3420,6 +3443,7 @@
     "iconName": "aaa"
   },
   {
+    "id": "wyze_cam_plus",
     "name": "Wyze Cam Plus",
     "defaultAmount": 3.99,
     "defaultCurrency": "USD",
@@ -3430,6 +3454,7 @@
     "iconName": "wyze"
   },
   {
+    "id": "applecare_plus",
     "name": "AppleCare+",
     "defaultAmount": 9.99,
     "defaultCurrency": "USD",
@@ -3440,6 +3465,7 @@
     "iconName": "applecare"
   },
   {
+    "id": "adobe_acrobat",
     "name": "Adobe Acrobat",
     "defaultAmount": 19.99,
     "defaultCurrency": "USD",
@@ -3450,6 +3476,7 @@
     "iconName": "adobe"
   },
   {
+    "id": "linkedin_learning",
     "name": "LinkedIn Learning",
     "defaultAmount": 32.99,
     "defaultCurrency": "USD",
@@ -3460,8 +3487,9 @@
     "iconName": "linkedin"
   },
   {
+    "id": "coursera_certificate",
     "name": "Coursera Certificate",
-    "defaultAmount": 49.00,
+    "defaultAmount": 49.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "education",
@@ -3470,8 +3498,9 @@
     "iconName": "coursera"
   },
   {
+    "id": "lastpass",
     "name": "LastPass",
-    "defaultAmount": 3.00,
+    "defaultAmount": 3.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3480,6 +3509,7 @@
     "iconName": "lastpass"
   },
   {
+    "id": "keeper_security",
     "name": "Keeper Security",
     "defaultAmount": 2.92,
     "defaultCurrency": "USD",
@@ -3490,6 +3520,7 @@
     "iconName": "keeper"
   },
   {
+    "id": "youtube_premium_family",
     "name": "YouTube Premium Family",
     "defaultAmount": 22.99,
     "defaultCurrency": "USD",
@@ -3500,6 +3531,7 @@
     "iconName": "youtube"
   },
   {
+    "id": "microsoft_365_family",
     "name": "Microsoft 365 Family",
     "defaultAmount": 12.99,
     "defaultCurrency": "USD",
@@ -3510,6 +3542,7 @@
     "iconName": "microsoft"
   },
   {
+    "id": "duolingo_family",
     "name": "Duolingo Family",
     "defaultAmount": 9.99,
     "defaultCurrency": "USD",
@@ -3520,8 +3553,9 @@
     "iconName": "duolingo"
   },
   {
+    "id": "dropbox_business",
     "name": "Dropbox Business",
-    "defaultAmount": 20.00,
+    "defaultAmount": 20.0,
     "defaultCurrency": "USD",
     "defaultCycle": "monthly",
     "category": "productivity",
@@ -3530,6 +3564,7 @@
     "iconName": "dropbox"
   },
   {
+    "id": "dashlane_family",
     "name": "Dashlane Friends & Family",
     "defaultAmount": 7.49,
     "defaultCurrency": "USD",
@@ -3540,6 +3575,7 @@
     "iconName": "dashlane"
   },
   {
+    "id": "icloud_50gb",
     "name": "iCloud+ 50GB",
     "defaultAmount": 0.99,
     "defaultCurrency": "USD",
@@ -3550,6 +3586,7 @@
     "iconName": "icloud"
   },
   {
+    "id": "icloud_2tb",
     "name": "iCloud+ 2TB",
     "defaultAmount": 9.99,
     "defaultCurrency": "USD",
@@ -3560,6 +3597,7 @@
     "iconName": "icloud"
   },
   {
+    "id": "google_one_100gb",
     "name": "Google One 100GB",
     "defaultAmount": 1.99,
     "defaultCurrency": "USD",
@@ -3570,6 +3608,7 @@
     "iconName": "google_one"
   },
   {
+    "id": "google_one_200gb",
     "name": "Google One 200GB",
     "defaultAmount": 2.99,
     "defaultCurrency": "USD",

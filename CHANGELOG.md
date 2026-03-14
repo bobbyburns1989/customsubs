@@ -7,12 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.5] - 2026-03-14
+
+**Build**: 49
+**Status**: Release
+
+### Changed
+- **Deep sage green brand palette** — primary color darkened from #7DA68A to #5F8A6F for stronger contrast on buttons and interactive elements
+
+---
+
 ## [1.4.4] - 2026-03-06
 
 **Build**: 48
-**Status**: Release Candidate
+**Status**: Previous Release
 
 ### Added
+- **Sage green brand palette** — shifted primary colors from bright green (#16A34A) to sage green (#7DA68A) to match app icon:
+  - Updated `AppColors.primary`, `primaryLight`, `primaryDark`, `primarySurface` in `app_colors.dart`
+  - Decoupled `AppColors.success` (stays bright green #16A34A) from `AppColors.primary` so paid badges, success snackbars, and mark-as-paid swipe retain positive feedback color
+  - All buttons, FAB, input focus borders, form icons, empty states, and paywall accents automatically inherit sage via theme
+- **Custom page transitions** — per-route transitions in `router.dart` for premium navigation feel:
+  - iOS-native slide (CupertinoPage) for content push routes: Analytics, Add/Edit Subscription, Subscription Detail
+  - Fade (250ms in / 200ms out) for modal-style screens: Settings, Paywall
+  - Preserves existing Hero animation on subscription icon (home tile → detail header)
+  - Swipe-to-go-back gesture enabled on all CupertinoPage routes
 - **Smart Insights** — new card at the bottom of the Analytics screen with 4 offline-only optimization insights:
   - **Overlap detection**: flags 2+ music streaming or 3+ video/cloud subscriptions by matching `iconName` against hardcoded service groups
   - **Annual billing savings**: estimates 15–20% savings across all monthly-cycle subscriptions; disappears when no monthly subs exist
@@ -22,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files: `lib/features/analytics/smart_insights_controller.dart`, `lib/features/analytics/widgets/smart_insights_card.dart`, `assets/data/bundles.json` (13 bundle definitions)
 
 ### Fixed
+- **Template loading crash** — 39 templates from Batches 7–8 were missing the required `id` field in `subscription_templates.json`, causing `SubscriptionTemplate.fromJson()` to throw a null cast error and showing "Error loading templates" on the Add Subscription screen
 - **Smart Insights — 5 post-review bug fixes**:
   - `_videoServices` iconName mismatches: `'youtube_premium'`→`'youtube'`, `'max'`→`'hbo'` — overlap detection was silently failing for Max and YouTube Premium users
   - `bundles.json` iconName mismatches corrected: YouTube Premium Family (`youtube_premium`→`youtube`), Max+Discovery+ (`max`→`hbo`, `discovery_plus`→`discovery`), Amazon Prime (`amazon_prime`→`amazon`, `amazon_kindle`→`kindle`)

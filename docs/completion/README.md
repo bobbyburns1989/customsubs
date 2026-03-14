@@ -87,4 +87,4 @@ These documents serve as:
 
 ---
 
-**Last Updated**: March 5, 2026 — 30 new templates (290 total), Sports analytics category
+**Last Updated**: March 14, 2026 — 329 templates total (fixed missing id fields in Batches 7–8)

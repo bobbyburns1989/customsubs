@@ -37,7 +37,7 @@ class RevenueCatConstants {
 
   /// Premium entitlement identifier.
   /// This entitlement unlocks:
-  /// - Unlimited subscriptions (beyond 5 free)
+  /// - Unlimited subscriptions (beyond 7 free)
   /// - Future premium features
   static const String premiumEntitlementId = 'premium';
 
@@ -46,7 +46,7 @@ class RevenueCatConstants {
   // ============================================================
 
   /// Maximum number of subscriptions allowed on free tier.
-  static const int maxFreeSubscriptions = 5;
+  static const int maxFreeSubscriptions = 7;
 
   // ============================================================
   // OFFERING IDS (Optional - for A/B testing)

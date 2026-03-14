@@ -349,14 +349,24 @@ class AnalyticsScreen extends ConsumerWidget {
 
 **Location:** `lib/app/router.dart`
 
+Choose the right transition for your screen:
+
 ```dart
-// Add to routes list
+// Content push screen (detail, form, analytics) — iOS slide
 GoRoute(
   path: '/analytics',
-  name: 'analytics',
-  pageBuilder: (context, state) => MaterialPage(
+  pageBuilder: (context, state) => CupertinoPage(
     key: state.pageKey,
     child: const AnalyticsScreen(),
+  ),
+),
+
+// Modal/utility screen (settings, paywall) — fade
+GoRoute(
+  path: '/my-settings',
+  pageBuilder: (context, state) => AppRouter._fadePage(
+    key: state.pageKey,
+    child: const MySettingsScreen(),
   ),
 ),
 ```

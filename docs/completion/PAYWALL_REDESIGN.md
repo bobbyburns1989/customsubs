@@ -66,7 +66,7 @@ Only `build()` and helper methods were rewritten. All logic (`_handlePurchase`, 
 Free for 3 days, then $0.99/month. Renews monthly. Cancel anytime.
 
 Restore  ·  Terms  ·  Privacy       ← single row
-Managed through App Store. Free tier: 5 subscriptions.
+Managed through App Store. Free tier: 7 subscriptions.
 ────────────────────────────────────
 ```
 

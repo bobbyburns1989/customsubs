@@ -52,7 +52,7 @@ class _SmartInsightsCardContent extends StatelessWidget {
     // Build insight rows in priority order, inserting dividers between them
     void addRow(Widget row) {
       if (rows.isNotEmpty) {
-        rows.add(Divider(
+        rows.add(const Divider(
           height: 1,
           thickness: 1,
           color: AppColors.divider,
@@ -113,7 +113,7 @@ class _SmartInsightsCardContent extends StatelessWidget {
             ),
           ),
 
-          Divider(height: 1, thickness: 1, color: AppColors.divider),
+          const Divider(height: 1, thickness: 1, color: AppColors.divider),
 
           // Insight rows
           ...rows,
@@ -761,7 +761,7 @@ class _BottomSheet extends StatelessWidget {
             ),
           ),
 
-          Divider(height: 1, color: AppColors.divider),
+          const Divider(height: 1, color: AppColors.divider),
 
           // Sheet content — scrollable so it doesn't overflow on small phones
           SingleChildScrollView(

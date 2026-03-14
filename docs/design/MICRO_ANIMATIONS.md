@@ -795,7 +795,7 @@ All animations must:
 **Avoid animating:**
 - ❌ Text size changes (accessibility issue)
 - ❌ Critical actions (delete, payments) - needs confirmation first
-- ❌ Navigation transitions (let GoRouter handle it)
+- ❌ Custom navigation transitions in screen files (page transitions are defined per-route in `router.dart` using `CupertinoPage` for slides and `CustomTransitionPage` for fades)
 - ❌ Loading states (use static spinners)
 - ❌ Error messages (show immediately)
 

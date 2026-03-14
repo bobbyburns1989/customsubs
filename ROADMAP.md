@@ -712,11 +712,11 @@ Completed three-phase UI modernization of the Add Subscription screen:
 **Focus:** RevenueCat integration with 3-day free trial + $0.99/month premium
 
 ### Business Model
-- **Free tier:** Up to 5 subscriptions with full notifications
+- **Free tier:** Up to 7 subscriptions with full notifications
 - **Premium ($0.99/month):** Unlimited subscriptions + future features
 - **Product ID:** `customsubs_premium_monthly`
 - **Entitlement:** `premium`
-- **No grandfathering:** All users subject to 5 subscription limit
+- **No grandfathering:** All users subject to 7 subscription limit
 
 ---
 
@@ -834,7 +834,7 @@ Completed three-phase UI modernization of the Add Subscription screen:
 
 ### Impact
 - App now has monetization strategy in place
-- Free tier provides value (5 subscriptions)
+- Free tier provides value (7 subscriptions)
 - Clear upgrade path for power users
 - Cross-platform subscription management
 

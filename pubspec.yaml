@@ -1,7 +1,7 @@
 name: custom_subs
 description: "CustomSubs — Privacy-first subscription tracker"
 publish_to: "none"
-version: 1.4.4+48
+version: 1.4.5+49
 
 environment:
   sdk: ">=3.4.0 <4.0.0"

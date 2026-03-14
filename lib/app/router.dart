@@ -2,6 +2,7 @@ library;
 
 /// Navigation configuration using GoRouter.
 
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:custom_subs/features/onboarding/onboarding_screen.dart';
 import 'package:custom_subs/features/home/home_screen.dart';
@@ -16,6 +17,11 @@ import 'package:custom_subs/core/utils/notification_router.dart';
 ///
 /// Uses GoRouter for declarative, type-safe navigation.
 /// All route paths are defined as constants for easy reference.
+///
+/// Transitions:
+/// - CupertinoPage (iOS slide) for content push routes
+/// - Fade (250ms) for modal-style screens (Settings, Paywall)
+/// - Default MaterialPage for root/onboarding
 class AppRouter {
   // Route path constants
   static const String onboarding = '/onboarding';
@@ -27,6 +33,27 @@ class AppRouter {
   static const String subscriptionDetail = '/subscription';
   static const String paywall = '/paywall';
 
+  /// Creates a fade transition page for modal-style screens.
+  /// Used by Settings and Paywall to distinguish them from
+  /// hierarchical push navigation.
+  static CustomTransitionPage<void> _fadePage({
+    required LocalKey key,
+    required Widget child,
+  }) {
+    return CustomTransitionPage<void>(
+      key: key,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 250),
+      reverseTransitionDuration: const Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        return FadeTransition(
+          opacity: CurveTween(curve: Curves.easeInOut).animate(animation),
+          child: child,
+        );
+      },
+    );
+  }
+
   /// Creates the app's router configuration.
   ///
   /// The initial route depends on [hasSeenOnboarding]:
@@ -36,12 +63,12 @@ class AppRouter {
   /// Routes:
   /// - `/onboarding` - First-time user introduction
   /// - `/` - Main home screen with subscription list
-  /// - `/settings` - App settings and preferences
-  /// - `/analytics` - Spending analytics and insights
-  /// - `/add-subscription` - Create new subscription
-  /// - `/edit-subscription?id=<id>` - Edit existing subscription
-  /// - `/subscription/:id` - View subscription details
-  /// - `/paywall` - Premium subscription upgrade screen
+  /// - `/settings` - App settings and preferences (fade)
+  /// - `/analytics` - Spending analytics and insights (iOS slide)
+  /// - `/add-subscription` - Create new subscription (iOS slide)
+  /// - `/edit-subscription?id=<id>` - Edit existing subscription (iOS slide)
+  /// - `/subscription/:id` - View subscription details (iOS slide + Hero)
+  /// - `/paywall` - Premium subscription upgrade screen (fade)
   static GoRouter router(bool hasSeenOnboarding) {
     final router = GoRouter(
       initialLocation: hasSeenOnboarding ? home : onboarding,
@@ -56,38 +83,56 @@ class AppRouter {
         ),
         GoRoute(
           path: settings,
-          builder: (context, state) => const SettingsScreen(),
+          pageBuilder: (context, state) => _fadePage(
+            key: state.pageKey,
+            child: const SettingsScreen(),
+          ),
         ),
         GoRoute(
           path: analytics,
-          builder: (context, state) => const AnalyticsScreen(),
+          pageBuilder: (context, state) => CupertinoPage(
+            key: state.pageKey,
+            child: const AnalyticsScreen(),
+          ),
         ),
         GoRoute(
           path: paywall,
-          builder: (context, state) => const PaywallScreen(),
+          pageBuilder: (context, state) => _fadePage(
+            key: state.pageKey,
+            child: const PaywallScreen(),
+          ),
         ),
         GoRoute(
           path: addSubscription,
-          builder: (context, state) => const AddSubscriptionScreen(),
+          pageBuilder: (context, state) => CupertinoPage(
+            key: state.pageKey,
+            child: const AddSubscriptionScreen(),
+          ),
         ),
         // Edit subscription route uses query parameter for ID
         GoRoute(
           path: editSubscription,
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final subscriptionId = state.uri.queryParameters['id'];
-            return AddSubscriptionScreen(subscriptionId: subscriptionId);
+            return CupertinoPage(
+              key: state.pageKey,
+              child: AddSubscriptionScreen(subscriptionId: subscriptionId),
+            );
           },
         ),
         // Detail route uses path parameter for ID
         GoRoute(
           path: '$subscriptionDetail/:id',
-          builder: (context, state) {
+          pageBuilder: (context, state) {
             final id = state.pathParameters['id']!;
             final extra = state.extra as Map<String, dynamic>?;
             final autoMarkPaid = extra?['autoMarkPaid'] as bool? ?? false;
-            return SubscriptionDetailScreen(
-              subscriptionId: id,
-              autoMarkPaid: autoMarkPaid,
+            return CupertinoPage(
+              key: state.pageKey,
+              child: SubscriptionDetailScreen(
+                subscriptionId: id,
+                autoMarkPaid: autoMarkPaid,
+              ),
             );
           },
         ),

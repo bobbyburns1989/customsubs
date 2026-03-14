@@ -4,11 +4,11 @@ class AppColors {
   // Private constructor to prevent instantiation
   AppColors._();
 
-  // Primary
-  static const Color primary = Color(0xFF16A34A); // Green 600
-  static const Color primaryLight = Color(0xFF22C55E); // Green 500
-  static const Color primaryDark = Color(0xFF15803D); // Green 700
-  static const Color primarySurface = Color(0xFFF0FDF4); // Green 50
+  // Primary — deep sage green, matched to app icon
+  static const Color primary = Color(0xFF5F8A6F); // Deep sage green
+  static const Color primaryLight = Color(0xFF7DA68A); // Sage green
+  static const Color primaryDark = Color(0xFF4A7359); // Dark sage
+  static const Color primarySurface = Color(0xFFEFF3F0); // Very light sage tint
 
   // Neutrals
   static const Color background = Color(0xFFFAFAFA); // Near-white

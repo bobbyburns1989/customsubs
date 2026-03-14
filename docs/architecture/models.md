@@ -113,7 +113,7 @@ class ReminderConfig {
 
 ## Template JSON Format
 
-`assets/data/subscription_templates.json` — 290 services bundled (as of March 2026).
+`assets/data/subscription_templates.json` — 329 services bundled (as of March 2026).
 
 ```json
 {
