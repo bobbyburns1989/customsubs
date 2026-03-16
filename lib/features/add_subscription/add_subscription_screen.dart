@@ -22,6 +22,7 @@ import 'package:custom_subs/data/services/template_service.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -52,6 +53,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   List<String> _cancelChecklist = [];
   bool _showTemplates = true;
   String _searchQuery = '';
+  String? _selectedTemplateName; // Tracks template selection for analytics
 
   @override
   void initState() {
@@ -93,12 +95,19 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
   Future<void> _selectTemplate(SubscriptionTemplate template) async {
     await HapticUtils.light(); // Template selection feedback
+
+    ref.read(analyticsServiceProvider).capture('template_selected', {
+      'template_name': template.name,
+      'category': template.category.name,
+    });
+
     setState(() {
       _formState.loadFromTemplate(template);
       _currencyCode = template.defaultCurrency;
       _cycle = template.defaultCycle;
       _category = template.category;
       _colorValue = template.color;
+      _selectedTemplateName = template.name;
       _showTemplates = false;
     });
   }
@@ -154,6 +163,19 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
       await HapticUtils.medium(); // Save success feedback
 
+      // Track subscription create/edit event
+      final analytics = ref.read(analyticsServiceProvider);
+      analytics.capture(
+        isEditing ? 'subscription_edited' : 'subscription_created',
+        {
+          'category': _category.name,
+          'cycle': _cycle.name,
+          if (!isEditing) 'is_from_template': _selectedTemplateName != null,
+          if (!isEditing && _selectedTemplateName != null)
+            'template_name': _selectedTemplateName!,
+        },
+      );
+
       // Invalidate home controller to refresh the list
       ref.invalidate(homeControllerProvider);
 
@@ -182,6 +204,10 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
   /// Show upgrade prompt when user hits subscription limit.
   Future<void> _showUpgradePrompt() async {
+    ref.read(analyticsServiceProvider).capture('paywall_viewed', {
+      'source': 'limit_reached',
+    });
+
     // Navigate to full paywall screen
     await context.push('/paywall');
 

@@ -12,6 +12,7 @@ import 'package:custom_subs/features/subscription_detail/subscription_detail_scr
 import 'package:custom_subs/features/analytics/analytics_screen.dart';
 import 'package:custom_subs/features/paywall/paywall_screen.dart';
 import 'package:custom_subs/core/utils/notification_router.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 
 /// Centralized app routing configuration.
 ///
@@ -72,6 +73,7 @@ class AppRouter {
   static GoRouter router(bool hasSeenOnboarding) {
     final router = GoRouter(
       initialLocation: hasSeenOnboarding ? home : onboarding,
+      observers: [PosthogObserver()],
       routes: [
         GoRoute(
           path: onboarding,

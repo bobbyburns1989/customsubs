@@ -12,16 +12,43 @@ import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/data/services/backup_service.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
+import 'package:custom_subs/data/services/demo_data_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
+import 'package:custom_subs/features/settings/widgets/custom_apps_promo_card.dart';
 import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  /// Easter egg tap counter — unlocks Developer Tools at 11 taps
+  int _tapCount = 0;
+  DateTime? _lastTapTime;
+  bool _devToolsUnlocked = false;
+  bool _isLoadingDemo = false;
+  bool _isAnalyticsOptedOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAnalyticsOptOut();
+  }
+
+  Future<void> _loadAnalyticsOptOut() async {
+    final analytics = ref.read(analyticsServiceProvider);
+    final optedOut = await analytics.isOptedOut();
+    if (mounted) setState(() => _isAnalyticsOptedOut = optedOut);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final primaryCurrency = ref.watch(primaryCurrencyProvider);
 
     return Scaffold(
@@ -189,6 +216,10 @@ class SettingsScreen extends ConsumerWidget {
                           ? null
                           : () async {
                               await HapticUtils.light();
+                              ref.read(analyticsServiceProvider).capture(
+                                'paywall_viewed',
+                                {'source': 'settings'},
+                              );
                               if (context.mounted) {
                                 context.push('/paywall');
                               }
@@ -338,6 +369,24 @@ class SettingsScreen extends ConsumerWidget {
                 color: AppColors.textSecondary,
               ),
             ),
+          ),
+
+          const Divider(height: 1),
+
+          // Privacy section
+          const _SectionHeader(title: 'Privacy'),
+          SwitchListTile(
+            secondary: const Icon(Icons.analytics_outlined),
+            title: const Text('Share Anonymous Usage Data'),
+            subtitle: const Text(
+              'Helps us improve the app. No personal data is collected.',
+            ),
+            value: !_isAnalyticsOptedOut,
+            onChanged: (value) async {
+              final analytics = ref.read(analyticsServiceProvider);
+              await analytics.setOptOut(!value);
+              setState(() => _isAnalyticsOptedOut = !value);
+            },
           ),
 
           const Divider(height: 1),
@@ -613,10 +662,11 @@ class SettingsScreen extends ConsumerWidget {
 
           // About section
           const _SectionHeader(title: 'About'),
-          const ListTile(
-            leading: Icon(Icons.info_outline),
-            title: Text('Version'),
-            subtitle: Text('1.0.0'),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Version'),
+            subtitle: const Text('1.4.6'),
+            onTap: _handleVersionTap,
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
@@ -640,13 +690,207 @@ class SettingsScreen extends ConsumerWidget {
               }
             },
           ),
+          const SizedBox(height: AppSizes.sm),
+          const CustomAppsPromoCard(),
+          const SizedBox(height: AppSizes.sm),
           const ListTile(
             leading: Icon(Icons.favorite_outline),
             title: Text('Made with love by CustomApps LLC'),
           ),
+
+          // Developer Tools section — hidden until version tile tapped 11 times
+          if (_devToolsUnlocked) ...[
+            const Divider(height: 1),
+            const _SectionHeader(title: 'Developer Tools'),
+            ListTile(
+              leading: const Icon(Icons.science_outlined),
+              title: const Text('Load Demo Data'),
+              subtitle: const Text('Add 18 sample subscriptions'),
+              enabled: !_isLoadingDemo,
+              onTap: _handleLoadDemoData,
+            ),
+            ListTile(
+              leading: const Icon(Icons.cleaning_services_outlined),
+              title: const Text('Clear Demo Data'),
+              subtitle: const Text('Remove only demo subscriptions'),
+              enabled: !_isLoadingDemo,
+              onTap: _handleClearDemoData,
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  /// Handles taps on the version tile. After 11 rapid taps (within 3 seconds
+  /// of each other), unlocks the hidden Developer Tools section. Provides
+  /// subtle haptic hints starting at 7 taps.
+  void _handleVersionTap() async {
+    final now = DateTime.now();
+
+    // Reset counter if more than 3 seconds since last tap
+    if (_lastTapTime != null &&
+        now.difference(_lastTapTime!).inSeconds > 3) {
+      _tapCount = 0;
+    }
+
+    _lastTapTime = now;
+    _tapCount++;
+
+    if (_tapCount >= 11 && !_devToolsUnlocked) {
+      await HapticUtils.heavy();
+      setState(() => _devToolsUnlocked = true);
+      if (mounted) {
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.info('Developer tools unlocked'),
+        );
+      }
+    } else if (_tapCount >= 7 && !_devToolsUnlocked) {
+      // Subtle hint that something is happening
+      await HapticUtils.light();
+    }
+  }
+
+  /// Loads 18 demo subscriptions tagged with [DEMO] in notes.
+  /// Additive — does not remove existing subscriptions.
+  Future<void> _handleLoadDemoData() async {
+    await HapticUtils.light();
+    if (!mounted) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Load Demo Data?'),
+        content: const Text(
+          'This will add 18 sample subscriptions to your app. '
+          'Existing subscriptions will not be affected.\n\n'
+          'Demo subscriptions are tagged and can be removed '
+          'with "Clear Demo Data".',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Load'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isLoadingDemo = true);
+
+    try {
+      final repository = await ref.read(subscriptionRepositoryProvider.future);
+      final notificationService =
+          await ref.read(notificationServiceProvider.future);
+      final demoSubs = DemoDataService.generateDemoSubscriptions();
+
+      for (final sub in demoSubs) {
+        await repository.upsert(sub);
+        // Only schedule notifications for active (non-paused) subs
+        if (sub.isActive) {
+          await notificationService
+              .scheduleNotificationsForSubscription(sub);
+        }
+      }
+
+      if (mounted) {
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.success('Loaded ${demoSubs.length} demo subscriptions'),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.error('Failed to load demo data: $e'),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingDemo = false);
+    }
+  }
+
+  /// Removes only subscriptions tagged with [DEMO] in notes.
+  /// Real user subscriptions are not affected.
+  Future<void> _handleClearDemoData() async {
+    await HapticUtils.light();
+    if (!mounted) return;
+
+    final repository = await ref.read(subscriptionRepositoryProvider.future);
+    if (!mounted) return;
+
+    final allSubs = repository.getAll();
+    final demoSubs =
+        allSubs.where(DemoDataService.isDemoSubscription).toList();
+
+    if (demoSubs.isEmpty) {
+      SnackBarUtils.show(
+        context,
+        SnackBarUtils.info('No demo subscriptions found'),
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Clear Demo Data?'),
+        content: Text(
+          'This will remove ${demoSubs.length} demo subscription${demoSubs.length == 1 ? '' : 's'}. '
+          'Your real subscriptions will not be affected.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            child: const Text('Clear'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isLoadingDemo = true);
+
+    try {
+      final notificationService =
+          await ref.read(notificationServiceProvider.future);
+
+      for (final sub in demoSubs) {
+        await notificationService.cancelNotificationsForSubscription(sub.id);
+        await repository.delete(sub.id);
+      }
+
+      if (mounted) {
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.success(
+              'Cleared ${demoSubs.length} demo subscription${demoSubs.length == 1 ? '' : 's'}'),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBarUtils.show(
+          context,
+          SnackBarUtils.error('Failed to clear demo data: $e'),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoadingDemo = false);
+    }
   }
 }
 

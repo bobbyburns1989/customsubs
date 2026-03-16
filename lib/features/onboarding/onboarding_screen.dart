@@ -7,6 +7,7 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Single-screen onboarding that introduces key features.
 ///
@@ -73,6 +74,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
     // Mark onboarding as complete
     final settingsBox = await Hive.openBox('settings');
     await settingsBox.put('hasSeenOnboarding', true);
+
+    ref.read(analyticsServiceProvider).capture('onboarding_completed');
 
     if (mounted) {
       context.go(AppRouter.home);

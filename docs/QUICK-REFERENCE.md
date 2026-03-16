@@ -1,7 +1,7 @@
 # Quick Reference
 
 **Status**: ✅ Complete
-**Last Updated**: March 14, 2026 (v1.4.4 — 329 templates, Sports category)
+**Last Updated**: March 16, 2026 (v1.4.7 — PostHog analytics, CustomApps promo card, mark-as-paid UX)
 **Relevant to**: Developers
 
 **Fast lookup for common tasks and patterns in CustomSubs.**
@@ -601,6 +601,69 @@ if (previous != null) {
 
 ---
 
+## 📊 Analytics (PostHog)
+
+**Added in v1.4.7** — Anonymous, privacy-first event tracking with opt-out toggle
+
+### Track an Event
+
+```dart
+import 'package:custom_subs/data/services/analytics_service.dart';
+
+// In a ConsumerWidget/ConsumerStatefulWidget
+ref.read(analyticsServiceProvider).capture('event_name', {
+  'category': 'entertainment',
+  'cycle': 'monthly',
+});
+
+// Fire-and-forget — PostHog batches internally
+// No-ops if not initialized or user opted out
+```
+
+### Event Schema (18 events)
+
+| Event | Properties | Location |
+|-------|-----------|----------|
+| `app_launched` | `subscription_count`, `active_count`, `paused_count`, `premium_status`, `app_version` | `main.dart` |
+| `paywall_viewed` | `source: 'limit_reached' \| 'settings'` | call sites |
+| `purchase_started` | `price` | `paywall_screen.dart` |
+| `purchase_completed` | `price` | `paywall_screen.dart` |
+| `purchase_failed` | `error` | `paywall_screen.dart` |
+| `purchase_cancelled` | — | `paywall_screen.dart` |
+| `restore_started` | — | `paywall_screen.dart` |
+| `restore_completed` | — | `paywall_screen.dart` |
+| `restore_failed` | `error` | `paywall_screen.dart` |
+| `subscription_created` | `category`, `cycle`, `is_from_template`, `template_name` | `add_subscription_screen.dart` |
+| `subscription_edited` | `category`, `cycle` | `add_subscription_screen.dart` |
+| `subscription_deleted` | — | `home_controller.dart` |
+| `subscription_marked_paid` | `is_paid` | `home_controller.dart` |
+| `subscription_paused` | `has_resume_date` | `home_controller.dart` |
+| `subscription_resumed` | — | `home_controller.dart` |
+| `template_selected` | `template_name`, `category` | `add_subscription_screen.dart` |
+| `onboarding_completed` | — | `onboarding_screen.dart` |
+
+**Automatic events** (no code needed): `Application Opened`, `Application Backgrounded`, `$screen` (all GoRouter navigations)
+
+### Opt-Out Toggle
+
+```dart
+// Check opt-out status
+final isOptedOut = await ref.read(analyticsServiceProvider).isOptedOut();
+
+// Set opt-out (persists in Hive, immediately disables PostHog SDK)
+await ref.read(analyticsServiceProvider).setOptOut(true);
+```
+
+### Rules
+
+- **No PII** — never include subscription names, amounts, or user-entered text in properties
+- **Categorical properties only** — category names, cycle types, booleans, template names
+- **Opt-out respected** — `capture()` no-ops when user has opted out
+- **Constants**: `lib/core/constants/posthog_constants.dart` (API key, host, debug flag)
+- **Service**: `lib/data/services/analytics_service.dart` (wrapper + opt-out)
+
+---
+
 ## 📅 Date Extensions
 
 ```dart
@@ -867,7 +930,7 @@ The Home screen has **three subscription list sections** — all must stay in sy
 
 | Section | Method | Range | Notes |
 |---|---|---|---|
-| **Upcoming** | `getUpcomingSubscriptions(days: 31)` | Today → +30 days (inclusive) | Sortable, swipe actions |
+| **Upcoming** | `getUpcomingSubscriptions(days: 31)` | Today → +30 days (inclusive) | Swipe actions; paid tiles at 55% opacity with "Paid · N of M" divider |
 | **Later** | `getLaterSubscriptions(fromDays: 31)` | +31 → +90 days | Read-only, muted tile |
 | **Paused** | `getPausedSubscriptions()` | N/A | Sorted by pause date |
 
@@ -1055,6 +1118,8 @@ dart run build_runner build --delete-conflicting-outputs
 | **SnackBar Utils** | `lib/core/utils/snackbar_utils.dart` |
 | **Undo Service** | `lib/data/services/undo_service.dart` |
 | **Date Extensions** | `lib/core/extensions/date_extensions.dart` |
+| **Analytics Service** | `lib/data/services/analytics_service.dart` |
+| **PostHog Constants** | `lib/core/constants/posthog_constants.dart` |
 | **Notification Service** | `lib/data/services/notification_service.dart` |
 | **Subscription Repository** | `lib/data/repositories/subscription_repository.dart` |
 | **Exchange Rates** | `assets/data/exchange_rates.json` |
@@ -1140,6 +1205,8 @@ dart run build_runner build --delete-conflicting-outputs
 **Mark as Paid causes a skeleton flash + jarring list reorder?** *(Fixed post-v1.4.1)*
 - `markAsPaid()` in `home_controller.dart` was calling `refresh()` which sets `AsyncValue.loading()`, triggering the skeleton screen before re-rendering the reordered list
 - Fix: use an optimistic in-place state update (see "Optimistic State Update" pattern above) — patches only the affected item, no loading state, smooth single-frame reorder
+- Paid tiles now fade to 55% opacity, sort below a "Paid · N of M" divider, and show an undo snackbar (2s)
+- Notifications are cancelled for paid subs; swipe indicator changes to amber/undo on paid tiles
 
 **NotificationService not initialized?** *(Fixed in v0.1.1)*
 ```dart

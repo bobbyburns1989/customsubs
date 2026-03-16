@@ -1,7 +1,7 @@
 name: custom_subs
 description: "CustomSubs — Privacy-first subscription tracker"
 publish_to: "none"
-version: 1.4.5+49
+version: 1.4.7+51
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -44,6 +44,9 @@ dependencies:
   # RevenueCat for subscription management
   # Updated to 9.x for iOS 26 compatibility (8.x failed to initialize on iOS 26.3)
   purchases_flutter: ^9.0.0
+
+  # Analytics (anonymous, privacy-first)
+  posthog_flutter: ^5.20.0
 
 dev_dependencies:
   flutter_test:

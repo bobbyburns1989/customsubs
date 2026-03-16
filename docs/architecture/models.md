@@ -160,8 +160,20 @@ Pause uses `isActive` (HiveField 8): `true` = active, `false` = paused.
 - `isPaid` (HiveField 21) + `lastMarkedPaidDate` (HiveField 22)
 - Set `isPaid = true` + `lastMarkedPaidDate = DateTime.now()` on tap
 - Reset `isPaid = false` when `nextBillingDate` advances (via `advanceOverdueBillingDates()`)
-- Paid subs show green "Paid" badge; sort to bottom of Upcoming list
 - Use **optimistic state update** in `home_controller.dart` — do NOT call `refresh()` (causes skeleton flash)
+
+### Home Screen Behavior
+- Paid tiles fade to **55% opacity** (`AnimatedOpacity`, 300ms) and mute date urgency coloring
+- A **"Paid · N of M" divider** separates unpaid and paid tiles within the Upcoming section (hidden when all paid or none paid)
+- Section header switches from "next 30 days" to **"N of M paid"** (green) when any are paid
+- Spending card shows **"N of M paid this cycle"** subtitle
+- Swipe-right indicator changes from green/check to **amber/undo** on paid tiles
+- **Undo snackbar** (2s) appears after swipe-to-pay with UNDO button
+
+### Notification Behavior
+- Paid subs **skip notification scheduling** — cancel existing, don't schedule new
+- `markAsPaid()` in `home_controller.dart` explicitly cancels/reschedules notifications
+- Notifications resume automatically next cycle when `isPaid` resets on billing date advance
 
 ---
 

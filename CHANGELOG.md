@@ -7,13 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.5] - 2026-03-14
+## [1.4.7] - 2026-03-16
 
-**Build**: 49
+**Build**: 51
+**Status**: In development
+
+### Added
+- **PostHog analytics** — anonymous, privacy-first event tracking with opt-out toggle in Settings
+  - **AnalyticsService** wrapper: thin Riverpod-provided service around `posthog_flutter` SDK with opt-out support via Hive settings box
+  - **Automatic screen tracking**: `PosthogObserver` on GoRouter captures all screen views
+  - **18 tracked events**: app launch context, monetization funnel (paywall viewed/purchase/restore), core engagement (subscription CRUD, mark paid, pause/resume), onboarding completed
+  - **Opt-out toggle**: "Share Anonymous Usage Data" switch in Settings > Privacy section — default on, immediately disables SDK when toggled off
+  - **No PII**: only categorical properties (category names, cycle types, booleans) — never subscription names, amounts, or user text
+  - Files: `lib/data/services/analytics_service.dart` (new), `lib/core/constants/posthog_constants.dart` (new), `lib/main.dart`, `lib/app/router.dart`, `lib/features/paywall/paywall_screen.dart`, `lib/features/add_subscription/add_subscription_screen.dart`, `lib/features/home/home_controller.dart`, `lib/features/onboarding/onboarding_screen.dart`, `lib/features/settings/settings_screen.dart`
+- **CustomApps Portfolio card** — collapsible cross-promotion card in Settings (above "Made with love" footer) showcasing CustomBank, CustomCrypto, and CustomWorth with logos, descriptions, and website links. Collapsed by default; expands with animated chevron + haptic feedback. Uses `StandardCard` styling and `errorBuilder` fallback for missing logo assets.
+  - Files: `lib/features/settings/widgets/custom_apps_promo_card.dart` (new), `lib/features/settings/settings_screen.dart` (modified)
+  - Assets: `assets/images/custombank_logo.png`, `customcrypto_logo.png`, `customworth_logo.png`
+
+### Improved
+- **Mark as Paid — UX overhaul**
+  - Paid subscription tiles now fade to 55% opacity with muted date coloring, making unpaid items visually prominent
+  - "Paid · N of M" divider separates unpaid and paid tiles within the Upcoming section
+  - Section header dynamically switches from "next 30 days" to "N of M paid" (green) when any subs are paid
+  - Spending summary card shows "N of M paid this cycle" subtitle for at-a-glance progress
+  - Swipe indicator changes from green/check to amber/undo on already-paid tiles
+  - Undo snackbar (2s) with UNDO button appears after swipe-to-pay
+
+### Fixed
+- **Paid subs no longer receive notification reminders** — marking a subscription as paid now cancels its scheduled notifications for the current cycle; notifications resume automatically when billing date advances to the next cycle
+
+---
+
+## [1.4.6] - 2026-03-14
+
+**Build**: 50
 **Status**: Release
+
+### Added
+- **Hidden Developer Tools** — tap the version number in Settings 11 times to unlock a "Developer Tools" section with:
+  - **Load Demo Data**: inserts 18 realistic sample subscriptions covering all categories, billing cycles, icon tiers, trial/paused/paid states, and "Later" section entries — useful for App Store reviewer demos and QA testing
+  - **Clear Demo Data**: removes only demo-tagged subscriptions (tagged via `[DEMO]` in notes field), leaving real user data untouched
+  - Not gated behind debug mode — works in release builds for reviewer demos
+  - Files: `lib/data/services/demo_data_service.dart` (new), `lib/features/settings/settings_screen.dart` (modified)
 
 ### Changed
 - **Deep sage green brand palette** — primary color darkened from #7DA68A to #5F8A6F for stronger contrast on buttons and interactive elements
+- **Settings screen** converted from `ConsumerWidget` to `ConsumerStatefulWidget` to support easter egg state
+- **Version number** in Settings updated from hardcoded `1.0.0` to `1.4.5`
 
 ---
 

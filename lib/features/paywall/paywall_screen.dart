@@ -15,6 +15,7 @@ import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 class PaywallScreen extends ConsumerStatefulWidget {
   const PaywallScreen({super.key});
@@ -345,6 +346,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     setState(() => _isPurchasing = true);
     await HapticUtils.medium();
 
+    final analytics = ref.read(analyticsServiceProvider);
+    final priceString = _monthlyPackage?.storeProduct.priceString ?? 'unknown';
+
     // If pre-load failed, attempt one more fetch before going to purchase.
     // This handles the case where the paywall opened during a sandbox hiccup
     // but the user taps Subscribe after connectivity recovers.
@@ -353,6 +357,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       await _preloadOffering();
     }
 
+    analytics.capture('purchase_started', {'price': priceString});
+
     try {
       final service = ref.read(entitlementServiceProvider);
       final success = await service.purchaseMonthlySubscription();
@@ -360,6 +366,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       if (!mounted) return;
 
       if (success) {
+        analytics.capture('purchase_completed', {'price': priceString});
+
         // Invalidate premium provider to refresh state
         ref.invalidate(isPremiumProvider);
 
@@ -437,6 +445,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           detailsText += 'Please try again or contact support.';
         }
 
+        analytics.capture('purchase_failed', {'error': errorMsg});
+
         // Show snackbar with Details button
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -471,7 +481,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       if (mounted) {
         final errorCode = PurchasesErrorHelper.getErrorCode(e);
         if (errorCode == PurchasesErrorCode.purchaseCancelledError) {
-          // User cancelled - no error message needed
+          analytics.capture('purchase_cancelled');
           debugPrint('Purchase cancelled by user');
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -531,6 +541,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
     setState(() => _isPurchasing = true);
     await HapticUtils.medium();
 
+    final analytics = ref.read(analyticsServiceProvider);
+    analytics.capture('restore_started');
+
     try {
       final service = ref.read(entitlementServiceProvider);
       final success = await service.restorePurchases();
@@ -538,6 +551,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       if (!mounted) return;
 
       if (success) {
+        analytics.capture('restore_completed');
         ref.invalidate(isPremiumProvider);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -556,6 +570,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         );
       }
     } catch (e) {
+      analytics.capture('restore_failed', {'error': e.toString()});
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

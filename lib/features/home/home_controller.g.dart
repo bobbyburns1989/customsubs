@@ -6,7 +6,7 @@ part of 'home_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$homeControllerHash() => r'65ad19a2d5c007057002b06d979fe4f1f31c4d15';
+String _$homeControllerHash() => r'869653830ca85823b5d01f814b4044dbec1f39c5';
 
 /// See also [HomeController].
 @ProviderFor(HomeController)

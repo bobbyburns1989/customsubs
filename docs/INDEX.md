@@ -1,7 +1,7 @@
 # 📚 CustomSubs Documentation Index
 
-**Last Updated**: March 6, 2026
-**Version**: 1.4.3 (Build 47 — In Development)
+**Last Updated**: March 16, 2026
+**Version**: 1.4.7 (Build 51 — In Development)
 **Status**: ✅ Live — Active post-launch improvements
 
 Welcome to the CustomSubs documentation! This index helps you find exactly what you need.
@@ -384,13 +384,16 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ---
 
-**Last Updated**: March 6, 2026
+**Last Updated**: March 16, 2026
 **Maintained By**: Project Documentation System
 **Feedback**: Update this file or create issues
 
 ---
 
 ## 🆕 Recent Updates
+
+**March 16, 2026 (v1.4.7)**:
+- ✅ CustomApps Portfolio card — collapsible cross-promotion card in Settings showcasing CustomBank, CustomCrypto, and CustomWorth (`lib/features/settings/widgets/custom_apps_promo_card.dart`)
 
 **March 6, 2026 (v1.4.3)**:
 - ✅ [Smart Insights](completion/SMART_INSIGHTS_2026-03-06.md) — Analytics optimization card (overlap detection, annual savings, bundle opportunities, high-spend flag)

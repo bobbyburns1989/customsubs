@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 
@@ -145,27 +146,41 @@ class HomeController extends _$HomeController {
   /// avoid flashing the loading skeleton. The sort order (unpaid first) is
   /// re-applied automatically when getUpcomingSubscriptions() reads state.value.
   Future<void> markAsPaid(String subscriptionId, bool isPaid) async {
+    ref.read(analyticsServiceProvider).capture('subscription_marked_paid', {
+      'is_paid': isPaid,
+    });
+
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     await repository.markAsPaid(subscriptionId, isPaid);
 
     // Patch only the affected item in the current list.
     // Avoids setting AsyncValue.loading() (which flashes the skeleton screen).
     final currentSubs = state.value ?? [];
-    state = AsyncValue.data(
-      currentSubs.map((sub) {
-        if (sub.id == subscriptionId) {
-          return sub.copyWith(
-            isPaid: isPaid,
-            lastMarkedPaidDate: isPaid ? DateTime.now() : null,
-          );
-        }
-        return sub;
-      }).toList(),
-    );
+    final updatedSubs = currentSubs.map((sub) {
+      if (sub.id == subscriptionId) {
+        return sub.copyWith(
+          isPaid: isPaid,
+          lastMarkedPaidDate: isPaid ? DateTime.now() : null,
+        );
+      }
+      return sub;
+    }).toList();
+    state = AsyncValue.data(updatedSubs);
+
+    // Cancel notifications when paid (no more nagging); reschedule when un-marking.
+    final notificationService = await ref.read(notificationServiceProvider.future);
+    if (isPaid) {
+      await notificationService.cancelNotificationsForSubscription(subscriptionId);
+    } else {
+      final sub = updatedSubs.firstWhere((s) => s.id == subscriptionId);
+      await notificationService.scheduleNotificationsForSubscription(sub);
+    }
   }
 
   /// Delete subscription
   Future<void> deleteSubscription(String subscriptionId) async {
+    ref.read(analyticsServiceProvider).capture('subscription_deleted');
+
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     await repository.delete(subscriptionId);
     await refresh();
@@ -176,6 +191,10 @@ class HomeController extends _$HomeController {
     String subscriptionId, {
     DateTime? resumeDate,
   }) async {
+    ref.read(analyticsServiceProvider).capture('subscription_paused', {
+      'has_resume_date': resumeDate != null,
+    });
+
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     final notificationService = await ref.read(notificationServiceProvider.future);
 
@@ -190,6 +209,8 @@ class HomeController extends _$HomeController {
 
   /// Resume a paused subscription
   Future<void> resumeSubscription(String subscriptionId) async {
+    ref.read(analyticsServiceProvider).capture('subscription_resumed');
+
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     final notificationService = await ref.read(notificationServiceProvider.future);
 

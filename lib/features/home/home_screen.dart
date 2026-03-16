@@ -15,6 +15,7 @@ import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/features/home/home_controller.dart';
+import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
@@ -171,6 +172,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           // are included in Upcoming rather than falling into Later.
           // (The exclusive upper bound means days=30 would exclude day 30.)
           final upcoming = homeController.getUpcomingSubscriptions(days: 31);
+          final unpaidUpcoming = upcoming.where((s) => !s.isPaid).toList();
+          final paidUpcoming = upcoming.where((s) => s.isPaid).toList();
           final laterSubscriptions = homeController.getLaterSubscriptions();
           final primaryCurrency = homeController.getPrimaryCurrency();
           final monthlyTotal = homeController.calculateMonthlyTotal();
@@ -196,6 +199,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       activeCount: activeCount,
                       pausedCount: pausedCount,
                       currency: primaryCurrency,
+                      paidUpcomingCount: paidUpcoming.length,
+                      upcomingCount: upcoming.length,
                     ),
                   ),
                 ),
@@ -301,20 +306,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(width: AppSizes.sm),
+                        // Show paid progress when any are paid, otherwise default label
                         Text(
-                          'next 30 days',
-                          style: theme.textTheme.bodySmall,
+                          paidUpcoming.isNotEmpty
+                              ? '${paidUpcoming.length} of ${upcoming.length} paid'
+                              : 'next 30 days',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: paidUpcoming.isNotEmpty
+                                ? AppColors.success
+                                : null,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                // Upcoming Subscriptions List with staggered fade-in
+                // Upcoming Subscriptions List with paid divider
+                // Layout: [unpaid tiles] → [paid divider] → [paid tiles]
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final subscription = upcoming[index];
+                      // Only show divider when there are both unpaid AND paid subs
+                      final hasDivider = paidUpcoming.isNotEmpty && unpaidUpcoming.isNotEmpty;
+                      final dividerIndex = unpaidUpcoming.length;
 
                       // Initialize animations on first build
                       if (_tileAnimations == null || _tileAnimations!.length != upcoming.length) {
@@ -325,16 +340,43 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         });
                       }
 
+                      // Divider between unpaid and paid groups
+                      if (hasDivider && index == dividerIndex) {
+                        return _PaidDivider(
+                          paidCount: paidUpcoming.length,
+                          totalCount: upcoming.length,
+                        );
+                      }
+
+                      // Resolve actual subscription from the combined list
+                      final subIndex = (hasDivider && index > dividerIndex)
+                          ? index - 1  // offset past divider
+                          : index;
+                      final subscription = upcoming[subIndex];
+
                       final tile = _SubscriptionTile(
                         subscription: subscription,
                         onTap: () {
                           context.push('${AppRouter.subscriptionDetail}/${subscription.id}');
                         },
                         onMarkPaid: () {
+                          final newPaidState = !subscription.isPaid;
                           homeController.markAsPaid(
                             subscription.id,
-                            !subscription.isPaid,
+                            newPaidState,
                           );
+                          // Show undo snackbar only when marking AS paid
+                          if (newPaidState) {
+                            SnackBarUtils.show(
+                              context,
+                              SnackBarUtils.success(
+                                '${subscription.name} marked as paid',
+                                onUndo: () {
+                                  homeController.markAsPaid(subscription.id, false);
+                                },
+                              ),
+                            );
+                          }
                         },
                         onDelete: () {
                           _showDeleteDialog(context, subscription, homeController);
@@ -342,16 +384,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       );
 
                       // Wrap in FadeTransition if animations ready
-                      if (_tileAnimations != null && index < _tileAnimations!.length) {
+                      if (_tileAnimations != null && subIndex < _tileAnimations!.length) {
                         return FadeTransition(
-                          opacity: _tileAnimations![index],
+                          opacity: _tileAnimations![subIndex],
                           child: tile,
                         );
                       }
 
                       return tile;
                     },
-                    childCount: upcoming.length,
+                    // +1 for the divider widget when both unpaid and paid subs exist
+                    childCount: upcoming.length + (paidUpcoming.isNotEmpty && unpaidUpcoming.isNotEmpty ? 1 : 0),
                   ),
                 ),
 
@@ -536,12 +579,16 @@ class _SpendingSummaryCard extends StatefulWidget {
   final int activeCount;
   final int pausedCount;
   final String currency;
+  final int paidUpcomingCount;
+  final int upcomingCount;
 
   const _SpendingSummaryCard({
     required this.monthlyTotal,
     required this.activeCount,
     required this.pausedCount,
     required this.currency,
+    required this.paidUpcomingCount,
+    required this.upcomingCount,
   });
 
   @override
@@ -733,6 +780,17 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
                 );
               },
             ),
+
+            // Paid cycle progress — only shown when at least one upcoming sub is paid
+            if (widget.paidUpcomingCount > 0 && widget.upcomingCount > 0) ...[
+              const SizedBox(height: AppSizes.xs),
+              Text(
+                '${widget.paidUpcomingCount} of ${widget.upcomingCount} paid this cycle',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.7),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -760,11 +818,15 @@ class _SubscriptionTile extends StatelessWidget {
 
     return Dismissible(
       key: Key(subscription.id),
+      // Change 5: Swipe indicator — green/check when unpaid, amber/undo when paid
       background: Container(
-        color: AppColors.success,
+        color: subscription.isPaid ? AppColors.warning : AppColors.success,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSizes.xl),
-        child: const Icon(Icons.check, color: Colors.white),
+        child: Icon(
+          subscription.isPaid ? Icons.undo : Icons.check,
+          color: Colors.white,
+        ),
       ),
       secondaryBackground: Container(
         color: AppColors.error,
@@ -793,14 +855,18 @@ class _SubscriptionTile extends StatelessWidget {
           onTap();
         },
         scale: 0.99, // Extra subtle 1% scale for cards
-        child: Card(
-          margin: const EdgeInsets.symmetric(
-            horizontal: AppSizes.base,
-            vertical: AppSizes.xs,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(AppSizes.lg),
-            child: Row(
+        child: AnimatedOpacity(
+          opacity: subscription.isPaid ? 0.55 : 1.0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+          child: Card(
+            margin: const EdgeInsets.symmetric(
+              horizontal: AppSizes.base,
+              vertical: AppSizes.xs,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSizes.lg),
+              child: Row(
               children: [
                 // Brand icon with Hero animation for shared element transition
                 Hero(
@@ -854,11 +920,14 @@ class _SubscriptionTile extends StatelessWidget {
                     Text(
                       subscription.nextBillingDate.toShortRelativeString(),
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: subscription.isOverdue
-                            ? AppColors.error
-                            : subscription.daysUntilBilling <= 1
-                                ? AppColors.warning
-                                : AppColors.textPrimary,
+                        // Mute urgency coloring when already paid
+                        color: subscription.isPaid
+                            ? AppColors.textTertiary
+                            : subscription.isOverdue
+                                ? AppColors.error
+                                : subscription.daysUntilBilling <= 1
+                                    ? AppColors.warning
+                                    : AppColors.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -922,6 +991,54 @@ class _SubscriptionTile extends StatelessWidget {
             ),
           ),
         ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Divider between unpaid and paid subscriptions in the Upcoming section.
+/// Shows a thin line with "Paid · 3 of 8" label in muted green.
+class _PaidDivider extends StatelessWidget {
+  final int paidCount;
+  final int totalCount;
+
+  const _PaidDivider({
+    required this.paidCount,
+    required this.totalCount,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSizes.base,
+        vertical: AppSizes.md,
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.check_circle,
+            size: 14,
+            color: AppColors.success.withValues(alpha: 0.5),
+          ),
+          const SizedBox(width: AppSizes.xs),
+          Text(
+            'Paid · $paidCount of $totalCount',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.success.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(width: AppSizes.sm),
+          Expanded(
+            child: Divider(
+              color: AppColors.success.withValues(alpha: 0.2),
+              thickness: 1,
+            ),
+          ),
+        ],
       ),
     );
   }

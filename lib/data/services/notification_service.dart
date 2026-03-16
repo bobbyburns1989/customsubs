@@ -305,6 +305,12 @@ class NotificationService {
       return; // Paused subscriptions get no notifications
     }
 
+    // SKIP scheduling if subscription is already paid for this cycle.
+    // Notifications will resume next cycle when isPaid resets on billing date advance.
+    if (subscription.isPaid) {
+      return;
+    }
+
     final reminders = subscription.reminders;
 
     // Handle trial-specific notifications

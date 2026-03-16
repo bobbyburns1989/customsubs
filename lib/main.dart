@@ -27,6 +27,7 @@ import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/data/services/entitlement_service.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Application entry point.
 ///
@@ -77,6 +78,10 @@ void main() async {
   // Initialize RevenueCat for subscription management
   await EntitlementService.instance.initialize();
 
+  // Initialize PostHog analytics (anonymous, privacy-first)
+  final analyticsService = AnalyticsService();
+  await analyticsService.init();
+
   // Create Riverpod container for dependency injection
   final container = ProviderContainer();
 
@@ -91,6 +96,17 @@ void main() async {
   // Initialize notification service (sets up platform-specific handlers)
   // The provider now auto-initializes the service
   final notificationService = await container.read(notificationServiceProvider.future);
+
+  // Track app launch with context properties for PostHog segmentation
+  final isPremium = await EntitlementService.instance.hasPremiumEntitlement();
+  final allSubs = repository.getAll();
+  analyticsService.capture('app_launched', {
+    'subscription_count': allSubs.length,
+    'active_count': allSubs.where((s) => s.isActive).length,
+    'paused_count': allSubs.where((s) => !s.isActive).length,
+    'premium_status': isPremium,
+    'app_version': '1.4.7',
+  });
 
   // Advance billing dates that are in the past to prevent outdated reminders
   // This ensures the app catches up if it hasn't been opened in a while

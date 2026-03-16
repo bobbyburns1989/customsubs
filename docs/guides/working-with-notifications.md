@@ -136,8 +136,9 @@ Future<void> scheduleNotificationsForSubscription(Subscription subscription) asy
 ### How It Works
 
 1. **Cancels existing notifications** - Prevents duplicates
-2. **Checks if subscription is active** - Inactive subs get no notifications
-3. **Routes to appropriate scheduler:**
+2. **Checks if subscription is active** - Inactive (paused) subs get no notifications
+3. **Checks if subscription is paid** - Paid subs skip scheduling (reminders resume next cycle when `isPaid` resets)
+4. **Routes to appropriate scheduler:**
    - Trial subscriptions → `_scheduleTrialNotifications()`
    - Regular subscriptions → Individual reminder schedulers
 
@@ -732,6 +733,14 @@ if (!subscription.isActive) return;
 
 **Why:** Paused/inactive subscriptions shouldn't send notifications.
 
+### 6b. Check Paid Status
+
+```dart
+if (subscription.isPaid) return;
+```
+
+**Why:** If the user already marked this cycle as paid, stop nagging. Notifications resume automatically next cycle when `advanceOverdueBillingDates()` resets `isPaid = false`.
+
 ### 7. Handle Trial Subscriptions Separately
 
 ```dart
@@ -843,6 +852,7 @@ class SettingsScreen extends ConsumerWidget {
 - ✅ Check if reminder date is in the future before scheduling
 - ✅ Use `AndroidScheduleMode.exactAllowWhileIdle` for Android
 - ✅ Handle trials separately with trial-specific notifications
+- ✅ Skip paid subscriptions — no notifications while `isPaid` is true
 - ✅ Test on real devices, not simulators
 - ✅ Provide test notification feature in Settings
 

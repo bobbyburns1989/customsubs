@@ -47,13 +47,15 @@ CustomSubs is a **privacy-first, offline-only** subscription tracker for iOS and
 
 ### 1. Privacy First
 
-**No network calls. No cloud sync. No third-party tracking.**
+**No network calls for user data. No cloud sync.**
 
-- All data stored locally in Hive (encrypted NoSQL database)
+- All subscription data stored locally in Hive (encrypted NoSQL database)
 - Exchange rates bundled as static JSON assets
-- No analytics, no crash reporting, no telemetry
+- No crash reporting, no telemetry
 - No permissions except notifications (required for core feature)
-- **Exception**: RevenueCat (IAP) communicates with Apple/Google receipt servers for purchase validation only — subscription tracking data never leaves the device
+- **Two outbound SDKs** (neither transmits user subscription data):
+  - **RevenueCat** (IAP) — communicates with Apple/Google receipt servers for purchase validation only
+  - **PostHog** (analytics) — anonymous event tracking with opt-out toggle in Settings. No PII, no subscription names/amounts — only categorical properties (category names, cycle types, booleans)
 
 ### 2. Offline First
 
@@ -429,9 +431,18 @@ class SubscriptionRepository {
 - **Entitlement management** - Simple `isPremium` check independent of platform
 - **Dashboard** - Real-time subscription analytics and debugging
 
-**Note:** RevenueCat is the only SDK that makes outbound network calls. All subscription tracking data remains local.
+**Note:** RevenueCat and PostHog are the only SDKs that make outbound network calls. All subscription tracking data remains local.
 
 **See:** `docs/guides/iap-and-premium.md`
+
+### Why PostHog for Analytics? (v1.4.7+)
+
+- **Privacy-first** — anonymous-only (no user IDs, no PII), with opt-out toggle
+- **Consistent** — same analytics platform used across CustomBank, CustomCrypto, and CustomSubs
+- **Lightweight** — Dart-side configuration only, no native platform config needed
+- **Self-serve** — dashboards, funnels, and retention analysis without building custom tooling
+
+**Note:** PostHog is the second outbound SDK. It tracks 18 events (monetization funnel, core engagement, screen views) with categorical properties only. Users can disable via Settings > Privacy.
 
 ### Why Local Notifications?
 
@@ -619,9 +630,10 @@ class SubscriptionRepository {
 
 ### User Privacy
 
-- No telemetry or analytics
+- Anonymous analytics only (PostHog) — opt-out toggle available in Settings
 - No crash reporting
-- No third-party SDKs (except essentials: Riverpod, Hive, notifications)
+- No PII collected — event properties are categorical only (category names, cycle types, booleans)
+- Two outbound SDKs: RevenueCat (IAP) and PostHog (analytics) — neither transmits subscription data
 - User owns their data
 
 ---

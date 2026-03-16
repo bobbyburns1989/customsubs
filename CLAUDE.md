@@ -48,7 +48,7 @@
 
 **Core philosophy:** Do one thing perfectly — track subscriptions and remind users before they get charged.
 
-**Current version:** v1.4.5+49. All build phases complete. Active post-launch improvements only.
+**Current version:** v1.4.6+50. All build phases complete. Active post-launch improvements only.
 **Templates:** 329 pre-built templates (as of March 2026), including a `sports` analytics category.
 
 ---
@@ -62,7 +62,8 @@
 - **Navigation:** GoRouter (declarative routing)
 - **Currency:** `intl` NumberFormat. Exchange rates are **bundled JSON** — never fetched from network.
 - **Brand Icons:** `simple_icons` (font-based) + local SVGs in `assets/logos/`. Widget: `lib/core/widgets/subscription_icon.dart`. Mapping: `lib/core/utils/service_icons.dart`.
-- **IAP:** RevenueCat (`purchases_flutter: ^9.0.0`). Only SDK making outbound calls — user data stays local.
+- **IAP:** RevenueCat (`purchases_flutter: ^9.0.0`). Outbound calls for IAP validation only — user data stays local.
+- **Analytics:** PostHog (`posthog_flutter: ^5.20.0`). Anonymous-only, no PII. Opt-out toggle in Settings. Second outbound SDK after RevenueCat.
 - **IDs:** `uuid` package for subscription UUIDs.
 
 ### Key Dependencies
@@ -76,6 +77,7 @@ google_fonts: ^6.2.1                  # DM Sans + DM Mono
 simple_icons: ^14.6.1
 flutter_svg: ^2.0.0                   # local SVG logos
 purchases_flutter: ^9.0.0             # RevenueCat IAP
+posthog_flutter: ^5.20.0              # Anonymous analytics (opt-out in Settings)
 fl_chart: ^0.68.0
 app_settings: ^5.1.1                  # notification settings deep-link (iOS + Android)
 ```
@@ -95,7 +97,8 @@ lib/
 │   ├── constants/
 │   │   ├── app_colors.dart         # All color constants
 │   │   ├── app_sizes.dart          # Spacing, radius + sectionSpacing (20px)
-│   │   └── revenue_cat_constants.dart # IAP product/entitlement IDs
+│   │   ├── revenue_cat_constants.dart # IAP product/entitlement IDs
+│   │   └── posthog_constants.dart  # PostHog API key + host
 │   ├── extensions/
 │   │   └── date_extensions.dart    # DateTime helpers (nextBillingDate calc)
 │   ├── utils/
@@ -121,7 +124,9 @@ lib/
 │       ├── notification_service.dart
 │       ├── backup_service.dart
 │       ├── entitlement_service.dart  # RevenueCat / IAP
-│       └── template_service.dart
+│       ├── analytics_service.dart   # PostHog wrapper + opt-out
+│       ├── template_service.dart
+│       └── demo_data_service.dart  # Hidden dev tools: 18 sample subs
 │
 ├── features/
 │   ├── onboarding/
@@ -130,10 +135,10 @@ lib/
 │   ├── subscription_detail/
 │   ├── cancellation/
 │   ├── analytics/
-│   ├── settings/
+│   ├── settings/                    # settings_screen.dart + widgets/custom_apps_promo_card.dart
 │   └── paywall/                    # paywall_screen.dart (RevenueCat)
 │
-└── main.dart                       # Entry: Hive init, notifications init, runApp
+└── main.dart                       # Entry: Hive init, PostHog init, notifications init, runApp
 ```
 
 ---
@@ -144,7 +149,7 @@ lib/
 2. **Repository pattern** — widgets never touch Hive directly. All DB ops through `SubscriptionRepository`.
 3. **Models are immutable** — use `copyWith`. Generate TypeAdapters with `hive_generator`.
 4. **No singletons** — wrap all services in Riverpod providers.
-5. **No network calls** — 100% offline. Exchange rates are bundled JSON. RevenueCat is the only exception (IAP validation only).
+5. **No network calls for user data** — 100% offline. Exchange rates are bundled JSON. Two outbound SDKs: RevenueCat (IAP validation) and PostHog (anonymous analytics, opt-out available).
 
 ---
 
@@ -198,6 +203,8 @@ if (nextBillingDate.isBefore(DateTime.now())) { }
 ### Mark as Paid
 - Use **optimistic state update** in `home_controller.dart` — patch only the affected item, do NOT call `refresh()` (causes skeleton flash + jarring reorder)
 - `isPaid` resets automatically when billing date advances
+- Paid subs skip notification scheduling (cancel on mark, reschedule on un-mark)
+- Home screen: paid tiles fade to 55% opacity, "Paid · N of M" divider, undo snackbar, amber/undo swipe indicator
 
 ### Pause / Auto-Resume
 Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app foreground (`didChangeAppLifecycleState`), pull-to-refresh. Paused subs skip billing date advancement and notification scheduling entirely.
@@ -217,6 +224,7 @@ Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app f
 4. Notification ID: `('$subscriptionId:$type'.hashCode).abs() % 2147483647`
    - Types: `'reminder1'`, `'reminder2'`, `'dayof'`, `'trial_end'`
 5. Skip paused subscriptions entirely — no notifications while paused.
+5b. Skip paid subscriptions — no reminders until `isPaid` resets on next billing cycle.
 6. iOS action buttons require `DarwinNotificationActionOption.foreground` to bring app to front.
 7. Android channel: ID `customsubs_reminders`, importance Max, priority High.
 
