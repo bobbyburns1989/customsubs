@@ -57,30 +57,34 @@ void main() async {
   // This loads timezone data for all regions worldwide
   tz.initializeTimeZones();
 
-  // Set local timezone to device's actual timezone
+  // Initialize PostHog analytics (anonymous, privacy-first)
+  final analyticsService = AnalyticsService();
+
+  // Parallelize 4 independent async operations for faster startup.
+  // All depend only on Hive.initFlutter() (above) — none depend on each other.
+  late final dynamic timezoneResult;
+  await Future.wait([
+    // Detect device timezone for notification scheduling
+    FlutterTimezone.getLocalTimezone().then((v) => timezoneResult = v),
+    // Load bundled exchange rates from assets/data/exchange_rates.json
+    CurrencyUtils.loadExchangeRates(),
+    // Initialize RevenueCat for subscription management
+    EntitlementService.instance.initialize(),
+    // Initialize PostHog analytics
+    analyticsService.init(),
+  ]);
+
+  // Set local timezone from detected result
   // CRITICAL: Without this, all notifications schedule in UTC!
   try {
     // flutter_timezone 5.0.1+ returns TimezoneInfo instead of String
-    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-    // Extract the timezone name from TimezoneInfo object
-    final String timeZoneName = timezoneInfo.identifier;
+    final String timeZoneName = timezoneResult.identifier;
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   } catch (e) {
     // Fallback to UTC if timezone detection fails
     debugPrint('⚠️ Failed to get local timezone: $e. Falling back to UTC.');
     tz.setLocalLocation(tz.getLocation('UTC'));
   }
-
-  // Load bundled currency exchange rates from assets/data/exchange_rates.json
-  // This enables multi-currency support without network calls
-  await CurrencyUtils.loadExchangeRates();
-
-  // Initialize RevenueCat for subscription management
-  await EntitlementService.instance.initialize();
-
-  // Initialize PostHog analytics (anonymous, privacy-first)
-  final analyticsService = AnalyticsService();
-  await analyticsService.init();
 
   // Create Riverpod container for dependency injection
   final container = ProviderContainer();

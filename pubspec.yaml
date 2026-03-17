@@ -1,7 +1,7 @@
 name: custom_subs
 description: "CustomSubs — Privacy-first subscription tracker"
 publish_to: "none"
-version: 1.4.7+51
+version: 1.4.8+52
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -27,7 +27,6 @@ dependencies:
   flutter_timezone: ^5.0.1
 
   # UI
-  google_fonts: ^6.2.1
   intl: ^0.19.0
   fl_chart: ^0.68.0
   simple_icons: ^14.6.1
@@ -64,6 +63,11 @@ flutter:
     - assets/data/
     - assets/images/
     - assets/logos/
+
+  fonts:
+    - family: DM Sans
+      fonts:
+        - asset: assets/fonts/DMSans/DMSans-Variable.ttf
 
 flutter_launcher_icons:
   android: true

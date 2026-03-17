@@ -54,6 +54,14 @@ android {
         release {
             // Sign with release keystore for production builds
             signingConfig = signingConfigs.getByName("release")
+            // R8 minification — strips unused code (~30-40% APK reduction)
+            // ProGuard rules preserve RevenueCat + PostHog reflection APIs
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

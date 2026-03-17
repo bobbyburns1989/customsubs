@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 
 class AppTheme {
   // Private constructor to prevent instantiation
   AppTheme._();
+
+  // Bundled font family — loaded from assets/fonts/DMSans/DMSans-Variable.ttf
+  // Replaced google_fonts package to eliminate runtime font download and reduce binary size.
+  static const String _fontFamily = 'DM Sans';
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -24,78 +27,93 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
 
       // Typography
-      textTheme: TextTheme(
-        displayLarge: GoogleFonts.dmSans(
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 57,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        displayMedium: GoogleFonts.dmSans(
+        displayMedium: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 45,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        displaySmall: GoogleFonts.dmSans(
+        displaySmall: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 36,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        headlineLarge: GoogleFonts.dmSans(
+        headlineLarge: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 32,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        headlineMedium: GoogleFonts.dmSans(
+        headlineMedium: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 28,
           fontWeight: FontWeight.bold,
           color: AppColors.textPrimary,
         ),
-        headlineSmall: GoogleFonts.dmSans(
+        headlineSmall: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 24,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
-        titleLarge: GoogleFonts.dmSans(
+        titleLarge: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 22,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
-        titleMedium: GoogleFonts.dmSans(
+        titleMedium: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 16,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
-        titleSmall: GoogleFonts.dmSans(
+        titleSmall: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
         ),
-        bodyLarge: GoogleFonts.dmSans(
+        bodyLarge: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 16,
           fontWeight: FontWeight.normal,
           color: AppColors.textPrimary,
         ),
-        bodyMedium: GoogleFonts.dmSans(
+        bodyMedium: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 14,
           fontWeight: FontWeight.normal,
           color: AppColors.textPrimary,
         ),
-        bodySmall: GoogleFonts.dmSans(
+        bodySmall: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 12,
           fontWeight: FontWeight.normal,
           color: AppColors.textSecondary,
         ),
-        labelLarge: GoogleFonts.dmSans(
+        labelLarge: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 14,
           fontWeight: FontWeight.w500,
           color: AppColors.textPrimary,
         ),
-        labelMedium: GoogleFonts.dmSans(
+        labelMedium: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 12,
           fontWeight: FontWeight.w500,
           color: AppColors.textSecondary,
         ),
-        labelSmall: GoogleFonts.dmSans(
+        labelSmall: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 11,
           fontWeight: FontWeight.w500,
           color: AppColors.textTertiary,
@@ -117,12 +135,13 @@ class AppTheme {
       ),
 
       // AppBar theme
-      appBarTheme: AppBarTheme(
+      appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: false,
-        titleTextStyle: GoogleFonts.dmSans(
+        titleTextStyle: TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 20,
           fontWeight: FontWeight.w600,
           color: AppColors.textPrimary,
@@ -150,7 +169,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           elevation: AppSizes.elevationNone,
-          textStyle: GoogleFonts.dmSans(
+          textStyle: const TextStyle(
+            fontFamily: _fontFamily,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -169,7 +189,8 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           side: const BorderSide(color: AppColors.primary, width: 1.5),
-          textStyle: GoogleFonts.dmSans(
+          textStyle: const TextStyle(
+            fontFamily: _fontFamily,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
@@ -184,7 +205,8 @@ class AppTheme {
             horizontal: AppSizes.base,
             vertical: AppSizes.sm,
           ),
-          textStyle: GoogleFonts.dmSans(
+          textStyle: const TextStyle(
+            fontFamily: _fontFamily,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -219,11 +241,13 @@ class AppTheme {
           horizontal: AppSizes.base,
           vertical: AppSizes.base,
         ),
-        labelStyle: GoogleFonts.dmSans(
+        labelStyle: const TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 14,
           color: AppColors.textSecondary,
         ),
-        hintStyle: GoogleFonts.dmSans(
+        hintStyle: const TextStyle(
+          fontFamily: _fontFamily,
           fontSize: 14,
           color: AppColors.textTertiary,
         ),

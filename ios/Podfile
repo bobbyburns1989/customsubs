@@ -41,8 +41,12 @@ post_install do |installer|
     flutter_additional_ios_build_settings(target)
 
     # Set minimum iOS deployment target to 13.0 for all pods
+    # Use -Osize in Release for smaller binary (minimal perf trade-off)
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+      if config.name == 'Release'
+        config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Osize'
+      end
     end
   end
 end
