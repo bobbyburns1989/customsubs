@@ -59,6 +59,13 @@ class AnalyticsService {
     // Auto-track Application Opened / Application Backgrounded events
     config.captureApplicationLifecycleEvents = true;
 
+    // Enable crash/error tracking — PostHog's autocapture integration hooks
+    // FlutterError.onError, PlatformDispatcher.onError, and isolate errors.
+    // Sends $exception events with full stack traces. Respects opt-out.
+    config.errorTrackingConfig.captureFlutterErrors = true;
+    config.errorTrackingConfig.capturePlatformDispatcherErrors = true;
+    config.errorTrackingConfig.captureIsolateErrors = true;
+
     await Posthog().setup(config);
 
     // Respect saved opt-out preference from previous sessions

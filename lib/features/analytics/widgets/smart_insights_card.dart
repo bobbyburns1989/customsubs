@@ -6,6 +6,7 @@ import 'package:custom_subs/features/analytics/smart_insights_controller.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Smart Insights card shown at the bottom of the Analytics screen.
 ///
@@ -144,7 +145,12 @@ class _OverlapRow extends StatelessWidget {
       icon: Icons.warning_amber_rounded,
       title: '${insight.names.length} ${insight.groupLabel} services',
       subtitle: '$names = ${fmt.format(insight.combinedMonthly)}/mo combined',
-      onTap: () => _showOverlapSheet(context, insight),
+      onTap: () {
+        AnalyticsService().capture('smart_insight_tapped', {
+          'insight_type': 'service_overlap',
+        });
+        _showOverlapSheet(context, insight);
+      },
     );
   }
 
@@ -240,7 +246,12 @@ class _AnnualSavingsRow extends StatelessWidget {
       title: 'Switch to annual billing',
       subtitle: 'Est. save ${fmt.format(insight.minSavings)}–'
           '${fmt.format(insight.maxSavings)}/year',
-      onTap: () => _showAnnualSavingsSheet(context, insight),
+      onTap: () {
+        AnalyticsService().capture('smart_insight_tapped', {
+          'insight_type': 'annual_savings',
+        });
+        _showAnnualSavingsSheet(context, insight);
+      },
     );
   }
 
@@ -345,7 +356,12 @@ class _BundleRow extends StatelessWidget {
       icon: Icons.workspace_premium_rounded,
       title: '${insight.bundleName} available',
       subtitle: 'Save ~${fmt.format(insight.potentialSavings)}/mo vs separate plans',
-      onTap: () => _showBundleSheet(context, insight),
+      onTap: () {
+        AnalyticsService().capture('smart_insight_tapped', {
+          'insight_type': 'bundle_opportunity',
+        });
+        _showBundleSheet(context, insight);
+      },
     );
   }
 
@@ -498,7 +514,12 @@ class _HighSpendRow extends StatelessWidget {
       icon: Icons.pie_chart_rounded,
       title: '${insight.categoryName} = $pct% of spend',
       subtitle: 'One category dominates your subscription budget',
-      onTap: () => _showHighSpendSheet(context, insight),
+      onTap: () {
+        AnalyticsService().capture('smart_insight_tapped', {
+          'insight_type': 'high_spend_category',
+        });
+        _showHighSpendSheet(context, insight);
+      },
     );
   }
 

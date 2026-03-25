@@ -1,7 +1,7 @@
 # Quick Reference
 
 **Status**: ✅ Complete
-**Last Updated**: March 16, 2026 (v1.4.7 — PostHog analytics, CustomApps promo card, mark-as-paid UX)
+**Last Updated**: March 25, 2026 (v1.4.9 — crash analytics, growth events, in-app review)
 **Relevant to**: Developers
 
 **Fast lookup for common tasks and patterns in CustomSubs.**
@@ -394,6 +394,62 @@ AnimatedContainer(
 - Use 2% scale for button press (0.98)
 - Use `Curves.easeOut` for fades
 - See `docs/design/MICRO_ANIMATIONS.md` for full guide
+
+---
+
+## 📊 Analytics & Crash Reporting
+
+**Full guide:** [`docs/guides/analytics-and-tracking.md`](analytics-and-tracking.md)
+
+### Track an Event
+
+```dart
+// With Riverpod ref (controllers, widgets):
+ref.read(analyticsServiceProvider).capture('event_name', {
+  'property': 'categorical_value',  // No PII, no user text, no amounts
+  'is_flag': true,                  // Boolean OK
+  'count': 5,                       // Int OK
+});
+
+// Without ref (static utilities, services):
+AnalyticsService().capture('event_name', {'property': 'value'});
+```
+
+### Event Naming Convention
+
+```
+{noun}_{past_tense_verb}  in snake_case
+
+subscription_created     ✅
+template_selected        ✅
+notification_tapped      ✅
+create_subscription      ❌  (wrong verb tense)
+```
+
+### Crash Reporting (automatic)
+
+Enabled via `errorTrackingConfig` in `AnalyticsService.init()`. Captures unhandled Flutter errors, platform errors, and isolate errors as `$exception` events. No manual setup needed.
+
+### Screen Views (automatic)
+
+`PosthogObserver()` on GoRouter sends `$screen` events on every route change. No manual code needed.
+
+### In-App Review
+
+```dart
+// Triggers after 5th subscription created — wired in add_subscription_screen.dart
+final reviewService = ReviewService();
+await reviewService.incrementCreateCount();
+await reviewService.maybePromptReview();  // Shows prompt if threshold met
+```
+
+### Opt-Out
+
+```dart
+final analytics = ref.read(analyticsServiceProvider);
+await analytics.setOptOut(true);   // Stops all events + crash reporting
+await analytics.setOptOut(false);  // Re-enables
+```
 
 ---
 

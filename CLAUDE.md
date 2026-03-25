@@ -21,6 +21,7 @@
 | Forms and validation | [`docs/guides/forms-and-validation.md`](docs/guides/forms-and-validation.md) |
 | Multi-currency support | [`docs/guides/multi-currency.md`](docs/guides/multi-currency.md) |
 | Animations & Polish | [`docs/design/MICRO_ANIMATIONS.md`](docs/design/MICRO_ANIMATIONS.md) |
+| Analytics, crash reporting & events | [`docs/guides/analytics-and-tracking.md`](docs/guides/analytics-and-tracking.md) |
 
 ### 📐 Architecture & Design
 | Topic | Documentation |
@@ -63,7 +64,9 @@
 - **Currency:** `intl` NumberFormat. Exchange rates are **bundled JSON** — never fetched from network.
 - **Brand Icons:** `simple_icons` (font-based) + local SVGs in `assets/logos/`. Widget: `lib/core/widgets/subscription_icon.dart`. Mapping: `lib/core/utils/service_icons.dart`.
 - **IAP:** RevenueCat (`purchases_flutter: ^9.0.0`). Outbound calls for IAP validation only — user data stays local.
-- **Analytics:** PostHog (`posthog_flutter: ^5.20.0`). Anonymous-only, no PII. Opt-out toggle in Settings. Second outbound SDK after RevenueCat.
+- **Analytics:** PostHog (`posthog_flutter: ^5.20.0`). Anonymous-only, no PII. Opt-out toggle in Settings. Second outbound SDK after RevenueCat. See [`docs/guides/analytics-and-tracking.md`](docs/guides/analytics-and-tracking.md).
+- **Crash Reporting:** PostHog error tracking autocapture (Flutter errors, platform errors, isolate errors). Enabled via `errorTrackingConfig` in `AnalyticsService.init()`. No Sentry/Crashlytics needed.
+- **In-App Review:** `in_app_review: ^2.0.9`. Prompts after 5th subscription created. Single-use, Apple rate-limited.
 - **IDs:** `uuid` package for subscription UUIDs.
 
 ### Key Dependencies
@@ -77,7 +80,8 @@ google_fonts: ^6.2.1                  # DM Sans + DM Mono
 simple_icons: ^14.6.1
 flutter_svg: ^2.0.0                   # local SVG logos
 purchases_flutter: ^9.0.0             # RevenueCat IAP
-posthog_flutter: ^5.20.0              # Anonymous analytics (opt-out in Settings)
+posthog_flutter: ^5.20.0              # Analytics + crash reporting (opt-out in Settings)
+in_app_review: ^2.0.9                 # App Store review prompt (after 5th subscription)
 fl_chart: ^0.68.0
 app_settings: ^5.1.1                  # notification settings deep-link (iOS + Android)
 ```
@@ -124,7 +128,8 @@ lib/
 │       ├── notification_service.dart
 │       ├── backup_service.dart
 │       ├── entitlement_service.dart  # RevenueCat / IAP
-│       ├── analytics_service.dart   # PostHog wrapper + opt-out
+│       ├── analytics_service.dart   # PostHog wrapper + crash reporting + opt-out
+│       ├── review_service.dart     # In-app review prompt (after 5th subscription)
 │       ├── template_service.dart
 │       └── demo_data_service.dart  # Hidden dev tools: 18 sample subs
 │
@@ -149,7 +154,7 @@ lib/
 2. **Repository pattern** — widgets never touch Hive directly. All DB ops through `SubscriptionRepository`.
 3. **Models are immutable** — use `copyWith`. Generate TypeAdapters with `hive_generator`.
 4. **No singletons** — wrap all services in Riverpod providers.
-5. **No network calls for user data** — 100% offline. Exchange rates are bundled JSON. Two outbound SDKs: RevenueCat (IAP validation) and PostHog (anonymous analytics, opt-out available).
+5. **No network calls for user data** — 100% offline. Exchange rates are bundled JSON. Two outbound SDKs: RevenueCat (IAP validation) and PostHog (anonymous analytics + crash reporting, opt-out available). `in_app_review` triggers native OS review dialog (no network call from app).
 
 ---
 

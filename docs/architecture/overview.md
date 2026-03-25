@@ -442,7 +442,7 @@ class SubscriptionRepository {
 - **Lightweight** — Dart-side configuration only, no native platform config needed
 - **Self-serve** — dashboards, funnels, and retention analysis without building custom tooling
 
-**Note:** PostHog is the second outbound SDK. It tracks 18 events (monetization funnel, core engagement, screen views) with categorical properties only. Users can disable via Settings > Privacy.
+**Note:** PostHog is the second outbound SDK. It tracks 28 custom events (monetization funnel, core engagement, screen views, creation funnel, feature usage) plus automatic crash reporting (`$exception` events with stack traces) and screen views (`$screen`). Properties are categorical only — no PII. Users can disable via Settings > Privacy. See `docs/guides/analytics-and-tracking.md` for the full event reference.
 
 ### Why Local Notifications?
 

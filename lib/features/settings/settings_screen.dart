@@ -89,6 +89,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               if (selected != null && selected != primaryCurrency) {
                 await HapticUtils.medium(); // Setting changed feedback
 
+                ref.read(analyticsServiceProvider).capture('settings_changed', {
+                  'setting': 'primary_currency',
+                });
+
                 // Cache previous currency for UNDO
                 final undoService = UndoService();
                 undoService.cacheCurrencyChange(primaryCurrency);
@@ -153,6 +157,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                   if (time != null) {
                     await HapticUtils.medium(); // Setting changed feedback
+
+                    ref.read(analyticsServiceProvider).capture('settings_changed', {
+                      'setting': 'reminder_time',
+                    });
 
                     // Cache previous time for UNDO
                     final undoService = UndoService();
@@ -384,6 +392,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             value: !_isAnalyticsOptedOut,
             onChanged: (value) async {
               final analytics = ref.read(analyticsServiceProvider);
+              // Track BEFORE setting opt-out (after opt-out, events are dropped)
+              if (!value) {
+                analytics.capture('settings_changed', {
+                  'setting': 'analytics_opt_out',
+                });
+              }
               await analytics.setOptOut(!value);
               setState(() => _isAnalyticsOptedOut = !value);
             },
@@ -459,6 +473,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     await ref.read(settingsRepositoryProvider.notifier)
                         .setLastBackupDate(DateTime.now());
 
+                    ref.read(analyticsServiceProvider).capture('backup_exported', {
+                      'subscription_count': subscriptions.length,
+                    });
+
                     if (context.mounted) {
                       SnackBarUtils.show(
                         context,
@@ -486,6 +504,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               try{
                 // Import backup
                 final result = await ref.read(importBackupProvider.future);
+
+                ref.read(analyticsServiceProvider).capture('backup_imported', {
+                  'imported_count': result.imported,
+                  'duplicates_skipped': result.duplicates,
+                });
 
                 if (context.mounted) {
                   // Show result dialog

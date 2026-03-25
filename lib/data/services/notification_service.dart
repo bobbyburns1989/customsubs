@@ -211,10 +211,11 @@ class NotificationService {
   /// **Parameters:**
   /// - [subscriptionId]: UUID of the subscription
   /// - [action]: Action type (defaults to 'view_detail')
-  String _createPayload(String subscriptionId, {String action = 'view_detail'}) {
+  String _createPayload(String subscriptionId, {String action = 'view_detail', String? notificationType}) {
     return NotificationRouter.createPayload(
       subscriptionId: subscriptionId,
       action: action,
+      notificationType: notificationType,
     );
   }
 
@@ -398,7 +399,7 @@ class NotificationService {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
       // Add payload for deep linking
-      payload: _createPayload(subscription.id),
+      payload: _createPayload(subscription.id, notificationType: 'reminder1'),
     );
   }
 
@@ -469,7 +470,7 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      payload: _createPayload(subscription.id),
+      payload: _createPayload(subscription.id, notificationType: 'reminder2'),
     );
   }
 
@@ -530,7 +531,7 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      payload: _createPayload(subscription.id),
+      payload: _createPayload(subscription.id, notificationType: 'dayof'),
     );
   }
 
@@ -625,7 +626,7 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
-      payload: _createPayload(subscription.id),
+      payload: _createPayload(subscription.id, notificationType: type),
     );
   }
 

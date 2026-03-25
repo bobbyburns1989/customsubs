@@ -67,9 +67,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   Future<void> _completeOnboarding() async {
     await HapticUtils.medium(); // Primary action feedback
 
-    // Request notification permissions
+    // Request notification permissions and track result
     final notificationService = await ref.read(notificationServiceProvider.future);
-    await notificationService.requestPermissions();
+    final granted = await notificationService.requestPermissions();
+
+    ref.read(analyticsServiceProvider).capture('notification_permission_result', {
+      'granted': granted,
+    });
 
     // Mark onboarding as complete
     final settingsBox = await Hive.openBox('settings');

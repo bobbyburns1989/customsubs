@@ -4,6 +4,7 @@ import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Card displaying cancellation information and interactive checklist.
 ///
@@ -126,6 +127,7 @@ class CancellationCard extends StatelessWidget {
                 width: double.infinity,
                 child: FilledButton.icon(
                   onPressed: () async {
+                    AnalyticsService().capture('cancellation_url_opened');
                     final url = Uri.parse(subscription.cancelUrl!);
                     if (await canLaunchUrl(url)) {
                       await launchUrl(url, mode: LaunchMode.externalApplication);

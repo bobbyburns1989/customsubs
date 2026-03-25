@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Handles notification tap callbacks and routes to appropriate screens.
 ///
@@ -125,6 +126,13 @@ class NotificationRouter {
 
       debugPrint('NotificationRouter: Handling action "$action" for subscription $subscriptionId');
 
+      // Track notification engagement — proves core value prop
+      final notificationType = data['type'] as String? ?? 'unknown';
+      AnalyticsService().capture('notification_tapped', {
+        'action': action,
+        'notification_type': notificationType,
+      });
+
       // Route based on action type
       switch (action) {
         case 'mark_paid':
@@ -168,10 +176,12 @@ class NotificationRouter {
   static String createPayload({
     required String subscriptionId,
     String action = 'view_detail',
+    String? notificationType,
   }) {
     return jsonEncode({
       'subscriptionId': subscriptionId,
       'action': action,
+      if (notificationType != null) 'type': notificationType,
     });
   }
 }

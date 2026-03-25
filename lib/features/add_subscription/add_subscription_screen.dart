@@ -23,6 +23,7 @@ import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/data/services/review_service.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -54,6 +55,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   bool _showTemplates = true;
   String _searchQuery = '';
   String? _selectedTemplateName; // Tracks template selection for analytics
+  bool _hasSubmitted = false; // Tracks if form was saved (for abandonment analytics)
+  String? _lastNoResultsQuery; // Dedup template_search_no_results events
 
   @override
   void initState() {
@@ -89,6 +92,14 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
   @override
   void dispose() {
+    // Track form abandonment if user never saved (and was on the form, not templates)
+    if (!_hasSubmitted && !_showTemplates && widget.subscriptionId == null) {
+      AnalyticsService().capture('subscription_form_abandoned', {
+        'had_name': _formState.nameController.text.isNotEmpty,
+        'had_amount': _formState.amountController.text.isNotEmpty,
+        'was_from_template': _selectedTemplateName != null,
+      });
+    }
     _formState.dispose();
     super.dispose();
   }
@@ -161,6 +172,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
       if (!mounted) return;
 
+      _hasSubmitted = true;
       await HapticUtils.medium(); // Save success feedback
 
       // Track subscription create/edit event
@@ -175,6 +187,13 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             'template_name': _selectedTemplateName!,
         },
       );
+
+      // Check for in-app review opportunity after new subscription
+      if (!isEditing) {
+        final reviewService = ReviewService();
+        await reviewService.incrementCreateCount();
+        await reviewService.maybePromptReview();
+      }
 
       // Invalidate home controller to refresh the list
       ref.invalidate(homeControllerProvider);
@@ -204,6 +223,12 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
   /// Show upgrade prompt when user hits subscription limit.
   Future<void> _showUpgradePrompt() async {
+    // Track hitting the free tier ceiling (distinct from paywall_viewed)
+    final subs = await ref.read(homeControllerProvider.future);
+    ref.read(analyticsServiceProvider).capture('premium_limit_reached', {
+      'subscription_count': subs.length,
+    });
+
     ref.read(analyticsServiceProvider).capture('paywall_viewed', {
       'source': 'limit_reached',
     });
@@ -300,6 +325,12 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
                   // Show empty state when search returns no results
                   if (filteredTemplates.isEmpty) {
+                    // Track template search with no results — signals library gaps
+                    // Guarded to fire once per unique query (build() can re-run)
+                    if (_searchQuery.length >= 2 && _searchQuery != _lastNoResultsQuery) {
+                      _lastNoResultsQuery = _searchQuery;
+                      AnalyticsService().capture('template_search_no_results');
+                    }
                     return const Padding(
                       padding: EdgeInsets.symmetric(
                         vertical: AppSizes.xxxl,
