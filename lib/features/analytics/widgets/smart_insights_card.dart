@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:custom_subs/features/analytics/smart_insights_controller.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
 
@@ -53,10 +53,10 @@ class _SmartInsightsCardContent extends StatelessWidget {
     // Build insight rows in priority order, inserting dividers between them
     void addRow(Widget row) {
       if (rows.isNotEmpty) {
-        rows.add(const Divider(
+        rows.add(Divider(
           height: 1,
           thickness: 1,
-          color: AppColors.divider,
+          color: context.colors.divider,
         ));
       }
       rows.add(row);
@@ -85,9 +85,9 @@ class _SmartInsightsCardContent extends StatelessWidget {
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-        border: Border.all(color: AppColors.border, width: 1.5),
+        border: Border.all(color: context.colors.border, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -114,7 +114,7 @@ class _SmartInsightsCardContent extends StatelessWidget {
             ),
           ),
 
-          const Divider(height: 1, thickness: 1, color: AppColors.divider),
+          Divider(height: 1, thickness: 1, color: context.colors.divider),
 
           // Insight rows
           ...rows,
@@ -141,7 +141,7 @@ class _OverlapRow extends StatelessWidget {
     final names = insight.names.join(' · ');
 
     return _InsightRow(
-      accentColor: AppColors.warning,
+      accentColor: context.colors.warning,
       icon: Icons.warning_amber_rounded,
       title: '${insight.names.length} ${insight.groupLabel} services',
       subtitle: '$names = ${fmt.format(insight.combinedMonthly)}/mo combined',
@@ -161,9 +161,9 @@ class _OverlapRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _BottomSheet(
+      builder: (sheetContext) => _BottomSheet(
         title: 'Overlapping ${insight.groupLabel}',
-        accentColor: AppColors.warning,
+        accentColor: sheetContext.colors.warning,
         icon: Icons.warning_amber_rounded,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,8 +171,8 @@ class _OverlapRow extends StatelessWidget {
             Text(
               'You have ${insight.names.length} ${insight.groupLabel} subscriptions. '
               'These services offer similar content — you may only need one.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                    color: sheetContext.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSizes.lg),
@@ -180,16 +180,16 @@ class _OverlapRow extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: AppSizes.sm),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.circle,
                         size: 8,
-                        color: AppColors.warning,
+                        color: sheetContext.colors.warning,
                       ),
                       const SizedBox(width: AppSizes.md),
                       Expanded(
                         child: Text(
                           name,
-                          style: Theme.of(context).textTheme.bodyLarge,
+                          style: Theme.of(sheetContext).textTheme.bodyLarge,
                         ),
                       ),
                     ],
@@ -199,21 +199,21 @@ class _OverlapRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSizes.md),
               decoration: BoxDecoration(
-                color: AppColors.warning.withValues(alpha: 0.1),
+                color: sheetContext.colors.warning.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.savings_outlined,
-                      size: 20, color: AppColors.warning),
+                  Icon(Icons.savings_outlined,
+                      size: 20, color: sheetContext.colors.warning),
                   const SizedBox(width: AppSizes.sm),
                   Expanded(
                     child: Text(
                       'Combined: ${fmt.format(insight.combinedMonthly)}/mo · '
                       '${fmt.format(insight.combinedMonthly * 12)}/year',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: AppColors.warning,
+                            color: sheetContext.colors.warning,
                           ),
                     ),
                   ),
@@ -241,7 +241,7 @@ class _AnnualSavingsRow extends StatelessWidget {
     final fmt = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
 
     return _InsightRow(
-      accentColor: AppColors.primary,
+      accentColor: context.colors.primary,
       icon: Icons.calendar_today_rounded,
       title: 'Switch to annual billing',
       subtitle: 'Est. save ${fmt.format(insight.minSavings)}–'
@@ -263,9 +263,9 @@ class _AnnualSavingsRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _BottomSheet(
+      builder: (sheetContext) => _BottomSheet(
         title: 'Annual Billing Savings',
-        accentColor: AppColors.primary,
+        accentColor: sheetContext.colors.primary,
         icon: Icons.calendar_today_rounded,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,8 +273,8 @@ class _AnnualSavingsRow extends StatelessWidget {
             Text(
               'Most services offer a 15–20% discount when you pay annually '
               'instead of monthly.',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                    color: sheetContext.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSizes.lg),
@@ -284,10 +284,10 @@ class _AnnualSavingsRow extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(AppSizes.lg),
               decoration: BoxDecoration(
-                color: AppColors.primarySurface,
+                color: sheetContext.colors.primarySurface,
                 borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.3),
+                  color: sheetContext.colors.primary.withValues(alpha: 0.3),
                 ),
               ),
               child: Column(
@@ -295,15 +295,15 @@ class _AnnualSavingsRow extends StatelessWidget {
                   Text(
                     '${fmtShort.format(insight.minSavings)}–'
                     '${fmtShort.format(insight.maxSavings)}',
-                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: AppColors.primary,
+                    style: Theme.of(sheetContext).textTheme.headlineMedium?.copyWith(
+                          color: sheetContext.colors.primary,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Text(
                     'estimated annual savings',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.primary,
+                    style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                          color: sheetContext.colors.primary,
                         ),
                   ),
                 ],
@@ -315,8 +315,8 @@ class _AnnualSavingsRow extends StatelessWidget {
             Text(
               'Applies to ${insight.subscriptionCount} monthly-billed '
               '${insight.subscriptionCount == 1 ? 'subscription' : 'subscriptions'}.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                    color: sheetContext.colors.textSecondary,
                   ),
             ),
 
@@ -326,8 +326,8 @@ class _AnnualSavingsRow extends StatelessWidget {
             Text(
               '* Estimated based on a 15–20% typical discount. Check each '
               'provider\'s current annual pricing for exact savings.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
+              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                    color: sheetContext.colors.textTertiary,
                     fontStyle: FontStyle.italic,
                   ),
             ),
@@ -352,7 +352,7 @@ class _BundleRow extends StatelessWidget {
     final fmt = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
     return _InsightRow(
-      accentColor: AppColors.primary,
+      accentColor: context.colors.primary,
       icon: Icons.workspace_premium_rounded,
       title: '${insight.bundleName} available',
       subtitle: 'Save ~${fmt.format(insight.potentialSavings)}/mo vs separate plans',
@@ -372,17 +372,17 @@ class _BundleRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _BottomSheet(
+      builder: (sheetContext) => _BottomSheet(
         title: insight.bundleName,
-        accentColor: AppColors.primary,
+        accentColor: sheetContext.colors.primary,
         icon: Icons.workspace_premium_rounded,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               insight.description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                    color: sheetContext.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSizes.lg),
@@ -391,26 +391,26 @@ class _BundleRow extends StatelessWidget {
             _PriceComparisonRow(
               label: 'You pay now',
               amount: fmt.format(insight.currentCost),
-              color: AppColors.textSecondary,
+              color: sheetContext.colors.textSecondary,
             ),
             const SizedBox(height: AppSizes.sm),
             _PriceComparisonRow(
               label: insight.bundleName,
               amount: fmt.format(insight.bundleAmount),
-              color: AppColors.primary,
+              color: sheetContext.colors.primary,
             ),
             const Divider(height: AppSizes.lg),
             _PriceComparisonRow(
               label: 'Monthly savings',
               amount: '~${fmt.format(insight.potentialSavings)}',
-              color: AppColors.primary,
+              color: sheetContext.colors.primary,
               bold: true,
             ),
             const SizedBox(height: AppSizes.xs),
             Text(
               '≈ ${fmt.format(insight.potentialSavings * 12)}/year',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
+              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                    color: sheetContext.colors.primary,
                     fontWeight: FontWeight.w500,
                   ),
             ),
@@ -421,8 +421,8 @@ class _BundleRow extends StatelessWidget {
             Text(
               '* Bundle price shown in USD. Check current pricing — '
               'promotions and regional pricing vary.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
+              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                    color: sheetContext.colors.textTertiary,
                     fontStyle: FontStyle.italic,
                   ),
             ),
@@ -444,8 +444,8 @@ class _BundleRow extends StatelessWidget {
                   icon: const Icon(Icons.open_in_new, size: 16),
                   label: const Text('Check current pricing'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
+                    foregroundColor: sheetContext.colors.primary,
+                    side: BorderSide(color: sheetContext.colors.primary),
                   ),
                 ),
               ),
@@ -479,7 +479,7 @@ class _PriceComparisonRow extends StatelessWidget {
         Text(
           label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: bold ? color : AppColors.textPrimary,
+                color: bold ? color : context.colors.textPrimary,
                 fontWeight: bold ? FontWeight.bold : FontWeight.normal,
               ),
         ),
@@ -510,7 +510,7 @@ class _HighSpendRow extends StatelessWidget {
     final pct = insight.percentage.toStringAsFixed(0);
 
     return _InsightRow(
-      accentColor: AppColors.warning,
+      accentColor: context.colors.warning,
       icon: Icons.pie_chart_rounded,
       title: '${insight.categoryName} = $pct% of spend',
       subtitle: 'One category dominates your subscription budget',
@@ -531,9 +531,9 @@ class _HighSpendRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _BottomSheet(
+      builder: (sheetContext) => _BottomSheet(
         title: '${insight.categoryName} Spending',
-        accentColor: AppColors.warning,
+        accentColor: sheetContext.colors.warning,
         icon: Icons.pie_chart_rounded,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -542,8 +542,8 @@ class _HighSpendRow extends StatelessWidget {
               '${insight.categoryName} accounts for $pct% of your active '
               'subscription spend — ${fmt.format(insight.monthlyAmount)}/mo '
               '(${fmt.format(insight.monthlyAmount * 12)}/year).',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                    color: sheetContext.colors.textSecondary,
                   ),
             ),
             const SizedBox(height: AppSizes.lg),
@@ -554,9 +554,9 @@ class _HighSpendRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: insight.percentage / 100,
                 minHeight: 8,
-                backgroundColor: AppColors.divider,
+                backgroundColor: sheetContext.colors.divider,
                 valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppColors.warning),
+                    AlwaysStoppedAnimation<Color>(sheetContext.colors.warning),
               ),
             ),
             const SizedBox(height: AppSizes.md),
@@ -564,8 +564,8 @@ class _HighSpendRow extends StatelessWidget {
             // List subscriptions in this category
             Text(
               'Subscriptions in this category:',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
+              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                    color: sheetContext.colors.textTertiary,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -575,16 +575,16 @@ class _HighSpendRow extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: AppSizes.xs),
                   child: Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.circle,
                         size: 8,
-                        color: AppColors.warning,
+                        color: sheetContext.colors.warning,
                       ),
                       const SizedBox(width: AppSizes.md),
                       Expanded(
                         child: Text(
                           name,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(sheetContext).textTheme.bodyMedium,
                         ),
                       ),
                     ],
@@ -636,7 +636,7 @@ class _InsightRowState extends State<_InsightRow> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 80),
         color: _pressed
-            ? AppColors.divider
+            ? context.colors.divider
             : Colors.transparent,
         padding: const EdgeInsets.symmetric(
           horizontal: AppSizes.lg,
@@ -675,7 +675,7 @@ class _InsightRowState extends State<_InsightRow> {
                   Text(
                     widget.subtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -685,10 +685,10 @@ class _InsightRowState extends State<_InsightRow> {
             ),
 
             // Chevron
-            const Icon(
+            Icon(
               Icons.chevron_right,
               size: 20,
-              color: AppColors.textTertiary,
+              color: context.colors.textTertiary,
             ),
           ],
         ),
@@ -717,9 +717,9 @@ class _BottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(
+      decoration: BoxDecoration(
+        color: context.colors.surface,
+        borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppSizes.radiusXl),
         ),
       ),
@@ -734,7 +734,7 @@ class _BottomSheet extends StatelessWidget {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: AppColors.border,
+                color: context.colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -771,7 +771,7 @@ class _BottomSheet extends StatelessWidget {
                 IconButton(
                   icon: const Icon(Icons.close, size: 20),
                   onPressed: () => Navigator.pop(context),
-                  color: AppColors.textTertiary,
+                  color: context.colors.textTertiary,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(
                     minWidth: 32,
@@ -782,7 +782,7 @@ class _BottomSheet extends StatelessWidget {
             ),
           ),
 
-          const Divider(height: 1, color: AppColors.divider),
+          Divider(height: 1, color: context.colors.divider),
 
           // Sheet content — scrollable so it doesn't overflow on small phones
           SingleChildScrollView(

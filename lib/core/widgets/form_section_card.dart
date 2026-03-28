@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// A reusable card wrapper for form sections with optional collapse functionality.
 ///
@@ -107,10 +107,10 @@ class _FormSectionCardState extends State<FormSectionCard> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(
-          color: AppColors.border,
+          color: context.colors.border,
           width: 1.5,
         ),
       ),
@@ -168,7 +168,7 @@ class _FormSectionCardState extends State<FormSectionCard> {
                   Text(
                     widget.subtitle!,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -188,14 +188,14 @@ class _FormSectionCardState extends State<FormSectionCard> {
         Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
-            color: AppColors.primarySurface,
+          decoration: BoxDecoration(
+            color: context.colors.primarySurface,
             shape: BoxShape.circle,
           ),
           child: Icon(
             widget.icon,
             size: 20,
-            color: AppColors.primary,
+            color: context.colors.primary,
           ),
         ),
         const SizedBox(width: AppSizes.base),
@@ -216,7 +216,7 @@ class _FormSectionCardState extends State<FormSectionCard> {
                 Text(
                   widget.subtitle!,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                     height: 1.5,
                   ),
                 ),
@@ -236,9 +236,9 @@ class _FormSectionCardState extends State<FormSectionCard> {
       turns: _isExpanded ? 0.5 : 0, // 180° rotation when expanded
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      child: const Icon(
+      child: Icon(
         Icons.expand_more,
-        color: AppColors.textSecondary,
+        color: context.colors.textSecondary,
         size: 24,
       ),
     );

@@ -392,6 +392,9 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 ## 🆕 Recent Updates
 
+**March 28, 2026**:
+- ✅ Calendar View — monthly grid with colored billing dots, day detail list, `table_calendar` integration (`lib/features/calendar/`)
+
 **March 16, 2026 (v1.4.7)**:
 - ✅ CustomApps Portfolio card — collapsible cross-promotion card in Settings showcasing CustomBank, CustomCrypto, and CustomWorth (`lib/features/settings/widgets/custom_apps_promo_card.dart`)
 

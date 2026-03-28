@@ -29,6 +29,7 @@ class SettingsRepository extends _$SettingsRepository {
   static const String _defaultReminderMinuteKey = 'default_reminder_minute';
   static const String _backupReminderShownKey = 'backup_reminder_shown';
   static const String _lastBackupDateKey = 'last_backup_date';
+  static const String _isDarkModeKey = 'is_dark_mode';
 
   Box? _box;
 
@@ -112,6 +113,19 @@ class SettingsRepository extends _$SettingsRepository {
   /// Update last backup date
   Future<void> setLastBackupDate(DateTime date) async {
     await _getBox.put(_lastBackupDateKey, date.toIso8601String());
+  }
+
+  // Dark Mode
+
+  /// Get dark mode preference (default: false)
+  bool getIsDarkMode() {
+    return _getBox.get(_isDarkModeKey, defaultValue: false) as bool;
+  }
+
+  /// Set dark mode preference
+  Future<void> setIsDarkMode(bool value) async {
+    await _getBox.put(_isDarkModeKey, value);
+    ref.invalidateSelf();
   }
 }
 

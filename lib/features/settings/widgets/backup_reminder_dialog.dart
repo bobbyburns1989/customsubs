@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 
 /// Backup reminder dialog shown after user adds their 3rd subscription.
@@ -37,13 +37,13 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
       icon: Container(
         padding: const EdgeInsets.all(AppSizes.base),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.1),
+          color: context.colors.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: const Icon(
+        child: Icon(
           Icons.backup_outlined,
           size: 32,
-          color: AppColors.primary,
+          color: context.colors.primary,
         ),
       ),
       title: const Text(
@@ -62,7 +62,7 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
           Text(
             'You can export a backup anytime in Settings → Export Backup.',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
             ),
             textAlign: TextAlign.center,
           ),

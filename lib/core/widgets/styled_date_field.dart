@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// A styled date picker field that matches TextFormField styling.
 ///
@@ -70,12 +70,7 @@ class _StyledDateFieldState extends State<StyledDateField> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppColors.primary,
-              onPrimary: Colors.white,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
-            ),
+            colorScheme: Theme.of(context).colorScheme,
           ),
           child: child!,
         );
@@ -99,7 +94,7 @@ class _StyledDateFieldState extends State<StyledDateField> {
         Text(
           widget.label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
@@ -115,10 +110,10 @@ class _StyledDateFieldState extends State<StyledDateField> {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color: context.colors.surface,
               borderRadius: BorderRadius.circular(AppSizes.radiusMd),
               border: Border.all(
-                color: _isFocused ? AppColors.primary : AppColors.border,
+                color: _isFocused ? context.colors.primary : context.colors.border,
                 width: _isFocused ? 2 : 1,
               ),
             ),
@@ -133,7 +128,7 @@ class _StyledDateFieldState extends State<StyledDateField> {
                   child: Text(
                     dateFormat.format(widget.value),
                     style: theme.textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
@@ -142,7 +137,7 @@ class _StyledDateFieldState extends State<StyledDateField> {
                 Icon(
                   Icons.calendar_today_outlined,
                   size: 20,
-                  color: _isFocused ? AppColors.primary : AppColors.textSecondary,
+                  color: _isFocused ? context.colors.primary : context.colors.textSecondary,
                 ),
               ],
             ),

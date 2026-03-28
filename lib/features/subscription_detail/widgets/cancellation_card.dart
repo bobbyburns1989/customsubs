@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
@@ -163,7 +163,7 @@ class CancellationCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSizes.base),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
+                  color: context.colors.primarySurface,
                   borderRadius: BorderRadius.circular(AppSizes.radiusMd),
                 ),
                 child: Text(
@@ -188,14 +188,14 @@ class CancellationCard extends StatelessWidget {
               LinearProgressIndicator(
                 value: subscription.checklistCompleted.where((c) => c).length /
                     subscription.cancelChecklist.length,
-                backgroundColor: AppColors.border,
-                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
+                backgroundColor: context.colors.border,
+                valueColor: AlwaysStoppedAnimation<Color>(context.colors.success),
               ),
               const SizedBox(height: AppSizes.xs),
               Text(
                 '${subscription.checklistCompleted.where((c) => c).length} of ${subscription.cancelChecklist.length} complete',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
               ),
 

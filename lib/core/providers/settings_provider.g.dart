@@ -26,7 +26,7 @@ final primaryCurrencyProvider = AutoDisposeProvider<String>.internal(
 // ignore: unused_element
 typedef PrimaryCurrencyRef = AutoDisposeProviderRef<String>;
 String _$settingsRepositoryHash() =>
-    r'c261168e6ca463ac5a2704bf30cf041b46ebaa94';
+    r'04010671a0f7649285527d20c314fb3ef7ad4e53';
 
 /// Settings provider for app-wide preferences.
 ///

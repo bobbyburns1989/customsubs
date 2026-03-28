@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/widgets/standard_card.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
@@ -117,10 +117,10 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
               child: _isExpanded
                   ? Column(
                       children: [
-                        const Divider(height: 1, color: AppColors.border),
+                        Divider(height: 1, color: context.colors.border),
                         for (int i = 0; i < _apps.length; i++) ...[
                           if (i > 0)
-                            const Divider(height: 1, color: AppColors.border),
+                            Divider(height: 1, color: context.colors.border),
                           _buildAppRow(_apps[i]),
                         ],
                       ],
@@ -144,14 +144,14 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
           Container(
             width: 36,
             height: 36,
-            decoration: const BoxDecoration(
-              color: AppColors.primarySurface,
+            decoration: BoxDecoration(
+              color: context.colors.primarySurface,
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.apps_rounded,
               size: 20,
-              color: AppColors.primary,
+              color: context.colors.primary,
             ),
           ),
           const SizedBox(width: AppSizes.base),
@@ -171,7 +171,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                 Text(
                   'Check out our other apps',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -183,9 +183,9 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
             turns: _isExpanded ? 0.5 : 0,
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut,
-            child: const Icon(
+            child: Icon(
               Icons.expand_more,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               size: 24,
             ),
           ),
@@ -250,9 +250,9 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                   const SizedBox(height: 2),
                   Text(
                     app.subtitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -260,9 +260,9 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
             ),
 
             // Trailing arrow
-            const Icon(
+            Icon(
               Icons.chevron_right,
-              color: AppColors.textTertiary,
+              color: context.colors.textTertiary,
               size: 20,
             ),
           ],

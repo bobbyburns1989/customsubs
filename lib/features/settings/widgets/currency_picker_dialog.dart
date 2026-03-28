@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 
@@ -145,16 +145,16 @@ class _CurrencyPickerDialogState extends State<CurrencyPickerDialog> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.search_off,
                             size: 48,
-                            color: AppColors.textTertiary,
+                            color: context.colors.textTertiary,
                           ),
                           const SizedBox(height: AppSizes.base),
                           Text(
                             'No currencies found',
                             style: theme.textTheme.bodyLarge?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -211,15 +211,15 @@ class _CurrencyTile extends StatelessWidget {
         height: 48,
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : AppColors.border.withValues(alpha: 0.3),
+              ? context.colors.primary.withValues(alpha: 0.15)
+              : context.colors.border.withValues(alpha: 0.3),
           borderRadius: BorderRadius.circular(AppSizes.radiusMd),
         ),
         child: Center(
           child: Text(
             symbol,
             style: theme.textTheme.titleLarge?.copyWith(
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
+              color: isSelected ? context.colors.primary : context.colors.textSecondary,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -229,19 +229,19 @@ class _CurrencyTile extends StatelessWidget {
         code,
         style: theme.textTheme.bodyLarge?.copyWith(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+          color: isSelected ? context.colors.primary : context.colors.textPrimary,
         ),
       ),
       subtitle: Text(
         name,
         style: theme.textTheme.bodyMedium?.copyWith(
-          color: AppColors.textSecondary,
+          color: context.colors.textSecondary,
         ),
       ),
       trailing: isSelected
-          ? const Icon(
+          ? Icon(
               Icons.check_circle,
-              color: AppColors.primary,
+              color: context.colors.primary,
             )
           : null,
     );

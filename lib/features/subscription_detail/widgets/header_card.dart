@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/data/models/subscription.dart';
@@ -113,7 +113,7 @@ class HeaderCard extends StatelessWidget {
             Text(
               '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.shortName}',
               style: theme.textTheme.titleLarge?.copyWith(
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
 
@@ -127,9 +127,9 @@ class HeaderCard extends StatelessWidget {
               children: [
                 // Trial badge
                 if (subscription.isTrial)
-                  const StatusBadge(
+                  StatusBadge(
                     label: 'Trial',
-                    color: AppColors.trial,
+                    color: context.colors.trial,
                   ),
 
                 // Paid badge with fade animation
@@ -137,9 +137,9 @@ class HeaderCard extends StatelessWidget {
                   opacity: subscription.isPaid ? 1.0 : 0.0,
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOut,
-                  child: const StatusBadge(
+                  child: StatusBadge(
                     label: 'Paid',
-                    color: AppColors.success,
+                    color: context.colors.success,
                   ),
                 ),
               ],

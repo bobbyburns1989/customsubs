@@ -10,6 +10,7 @@ import 'package:custom_subs/features/settings/settings_screen.dart';
 import 'package:custom_subs/features/add_subscription/add_subscription_screen.dart';
 import 'package:custom_subs/features/subscription_detail/subscription_detail_screen.dart';
 import 'package:custom_subs/features/analytics/analytics_screen.dart';
+import 'package:custom_subs/features/calendar/calendar_screen.dart';
 import 'package:custom_subs/features/paywall/paywall_screen.dart';
 import 'package:custom_subs/core/utils/notification_router.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
@@ -29,6 +30,7 @@ class AppRouter {
   static const String home = '/';
   static const String settings = '/settings';
   static const String analytics = '/analytics';
+  static const String calendar = '/calendar';
   static const String addSubscription = '/add-subscription';
   static const String editSubscription = '/edit-subscription';
   static const String subscriptionDetail = '/subscription';
@@ -95,6 +97,13 @@ class AppRouter {
           pageBuilder: (context, state) => CupertinoPage(
             key: state.pageKey,
             child: const AnalyticsScreen(),
+          ),
+        ),
+        GoRoute(
+          path: calendar,
+          pageBuilder: (context, state) => CupertinoPage(
+            key: state.pageKey,
+            child: const CalendarScreen(),
           ),
         ),
         GoRoute(

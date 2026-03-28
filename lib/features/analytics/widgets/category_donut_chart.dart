@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/features/analytics/analytics_controller.dart';
 
@@ -89,29 +89,29 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
                     children: [
                       Text(
                         centerLabel,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 11,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         centerAmount,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                          fontFeatures: [FontFeature.tabularFigures()],
+                          color: context.colors.textPrimary,
+                          fontFeatures: const [FontFeature.tabularFigures()],
                         ),
                       ),
                       if (centerPercent != null) ...[
                         const SizedBox(height: 2),
                         Text(
                           centerPercent,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 11,
-                            color: AppColors.textTertiary,
+                            color: context.colors.textTertiary,
                           ),
                         ),
                       ],
@@ -192,7 +192,7 @@ class _LegendItem extends StatelessWidget {
         color: isSelected ? color.withValues(alpha: 0.15) : Colors.transparent,
         borderRadius: BorderRadius.circular(AppSizes.radiusSm),
         border: Border.all(
-          color: isSelected ? color : AppColors.border,
+          color: isSelected ? color : context.colors.border,
           width: isSelected ? 2 : 1,
         ),
       ),
@@ -206,7 +206,7 @@ class _LegendItem extends StatelessWidget {
           )),
           const SizedBox(width: AppSizes.xs),
           Text(amount, style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
           )),
         ],

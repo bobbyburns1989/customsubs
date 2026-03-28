@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/providers/entitlement_provider.dart';
@@ -226,7 +226,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             label: const Text('Add New'),
                           ),
                         ),
-                        const SizedBox(width: AppSizes.base),
+                        const SizedBox(width: AppSizes.sm),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () async {
+                              await HapticUtils.medium();
+                              if (context.mounted) {
+                                context.push(AppRouter.calendar);
+                              }
+                            },
+                            icon: const Icon(Icons.calendar_month_outlined),
+                            label: const Text('Calendar'),
+                          ),
+                        ),
+                        const SizedBox(width: AppSizes.sm),
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: () async {
@@ -250,7 +263,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: Padding(
                       padding: const EdgeInsets.all(AppSizes.base),
                       child: Card(
-                        color: AppColors.trial.withValues(alpha: 0.1),
+                        color: context.colors.trial.withValues(alpha: 0.1),
                         child: Padding(
                           padding: const EdgeInsets.all(AppSizes.base),
                           child: Column(
@@ -258,16 +271,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             children: [
                               Row(
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.warning_amber_rounded,
-                                    color: AppColors.trial,
+                                    color: context.colors.trial,
                                     size: 20,
                                   ),
                                   const SizedBox(width: AppSizes.sm),
                                   Text(
                                     'Trials Ending Soon',
                                     style: theme.textTheme.titleMedium?.copyWith(
-                                      color: AppColors.trial,
+                                      color: context.colors.trial,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -313,7 +326,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               : 'next 30 days',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: paidUpcoming.isNotEmpty
-                                ? AppColors.success
+                                ? context.colors.success
                                 : null,
                           ),
                         ),
@@ -419,7 +432,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           Text(
                             '31–90 days',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -454,7 +467,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.pause_circle_outline, size: 20, color: AppColors.textSecondary),
+                          Icon(Icons.pause_circle_outline, size: 20, color: context.colors.textSecondary),
                           const SizedBox(width: AppSizes.sm),
                           Text(
                             'Paused',
@@ -464,7 +477,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           Text(
                             '$pausedCount paused',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
                         ],
@@ -517,7 +530,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 child: Row(
                   children: [
                     Expanded(child: SkeletonBox(height: 48)),
-                    SizedBox(width: AppSizes.base),
+                    SizedBox(width: AppSizes.sm),
+                    Expanded(child: SkeletonBox(height: 48)),
+                    SizedBox(width: AppSizes.sm),
                     Expanded(child: SkeletonBox(height: 48)),
                   ],
                 ),
@@ -562,7 +577,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               homeController.deleteSubscription(subscription.id);
               Navigator.pop(context);
             },
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(foregroundColor: context.colors.error),
             child: const Text('Delete'),
           ),
         ],
@@ -662,7 +677,7 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
       child: Container(
         padding: const EdgeInsets.all(AppSizes.lg),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.92),
+          color: context.colors.primary.withValues(alpha: 0.92),
           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           border: Border.all(
             color: Colors.white.withValues(alpha: 0.2),
@@ -820,7 +835,7 @@ class _SubscriptionTile extends StatelessWidget {
       key: Key(subscription.id),
       // Change 5: Swipe indicator — green/check when unpaid, amber/undo when paid
       background: Container(
-        color: subscription.isPaid ? AppColors.warning : AppColors.success,
+        color: subscription.isPaid ? context.colors.warning : context.colors.success,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.only(left: AppSizes.xl),
         child: Icon(
@@ -829,7 +844,7 @@ class _SubscriptionTile extends StatelessWidget {
         ),
       ),
       secondaryBackground: Container(
-        color: AppColors.error,
+        color: context.colors.error,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: AppSizes.xl),
         child: const Icon(Icons.delete, color: Colors.white),
@@ -922,12 +937,12 @@ class _SubscriptionTile extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         // Mute urgency coloring when already paid
                         color: subscription.isPaid
-                            ? AppColors.textTertiary
+                            ? context.colors.textTertiary
                             : subscription.isOverdue
-                                ? AppColors.error
+                                ? context.colors.error
                                 : subscription.daysUntilBilling <= 1
-                                    ? AppColors.warning
-                                    : AppColors.textPrimary,
+                                    ? context.colors.warning
+                                    : context.colors.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -937,7 +952,7 @@ class _SubscriptionTile extends StatelessWidget {
                         child: Text(
                           subscription.nextBillingDate.toShortFormattedString(),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textTertiary,
+                            color: context.colors.textTertiary,
                             fontSize: 11,
                           ),
                         ),
@@ -954,13 +969,13 @@ class _SubscriptionTile extends StatelessWidget {
                             vertical: AppSizes.xs,
                           ),
                           decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.1),
+                            color: context.colors.success.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                           ),
                           child: Text(
                             'Paid',
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: AppColors.success,
+                              color: context.colors.success,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -974,13 +989,13 @@ class _SubscriptionTile extends StatelessWidget {
                           vertical: AppSizes.xs,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.trial.withValues(alpha: 0.1),
+                          color: context.colors.trial.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                         ),
                         child: Text(
                           'Trial',
                           style: theme.textTheme.labelSmall?.copyWith(
-                            color: AppColors.trial,
+                            color: context.colors.trial,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -1021,20 +1036,20 @@ class _PaidDivider extends StatelessWidget {
           Icon(
             Icons.check_circle,
             size: 14,
-            color: AppColors.success.withValues(alpha: 0.5),
+            color: context.colors.success.withValues(alpha: 0.5),
           ),
           const SizedBox(width: AppSizes.xs),
           Text(
             'Paid · $paidCount of $totalCount',
             style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.success.withValues(alpha: 0.6),
+              color: context.colors.success.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
             ),
           ),
           const SizedBox(width: AppSizes.sm),
           Expanded(
             child: Divider(
-              color: AppColors.success.withValues(alpha: 0.2),
+              color: context.colors.success.withValues(alpha: 0.2),
               thickness: 1,
             ),
           ),
@@ -1077,7 +1092,7 @@ class _PausedSubscriptionTile extends StatelessWidget {
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: AppSizes.base),
           decoration: BoxDecoration(
-            color: AppColors.success,
+            color: context.colors.success,
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
           ),
           child: const Icon(Icons.play_arrow, color: Colors.white),
@@ -1113,14 +1128,14 @@ class _PausedSubscriptionTile extends StatelessWidget {
                         Text(
                           subscription.name,
                           style: theme.textTheme.titleMedium?.copyWith(
-                            color: AppColors.textSecondary, // Muted
+                            color: context.colors.textSecondary, // Muted
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           _getPauseStatusText(),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textTertiary,
+                            color: context.colors.textTertiary,
                           ),
                         ),
                       ],
@@ -1134,7 +1149,7 @@ class _PausedSubscriptionTile extends StatelessWidget {
                       subscription.currencyCode,
                     ),
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ],
@@ -1218,7 +1233,7 @@ class _LaterSubscriptionTile extends StatelessWidget {
                     Text(
                       subscription.name,
                       style: theme.textTheme.titleSmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1226,7 +1241,7 @@ class _LaterSubscriptionTile extends StatelessWidget {
                     Text(
                       '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.shortName}',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textTertiary,
+                        color: context.colors.textTertiary,
                       ),
                     ),
                   ],
@@ -1237,7 +1252,7 @@ class _LaterSubscriptionTile extends StatelessWidget {
               Text(
                 DateFormat.MMMd().format(subscription.nextBillingDate),
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
               ),

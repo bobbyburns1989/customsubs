@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// Standard card widget for consistent styling across the app.
 ///
@@ -37,7 +37,7 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 /// **Colored variant:**
 /// ```dart
 /// StandardCard(
-///   backgroundColor: AppColors.primarySurface,
+///   backgroundColor: context.colors.primarySurface,
 ///   child: Text('Tinted background'),
 /// )
 /// ```
@@ -54,7 +54,7 @@ class StandardCard extends StatelessWidget {
   final EdgeInsets? margin;
 
   /// Background color of the card
-  /// Defaults to `AppColors.surface` (white)
+  /// Defaults to theme's surface color when null
   final Color? backgroundColor;
 
   const StandardCard({
@@ -62,7 +62,7 @@ class StandardCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(AppSizes.lg),
     this.margin = EdgeInsets.zero,
-    this.backgroundColor = AppColors.surface,
+    this.backgroundColor,
   });
 
   @override
@@ -70,10 +70,10 @@ class StandardCard extends StatelessWidget {
     return Container(
       margin: margin,
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor ?? context.colors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(
-          color: AppColors.border,
+          color: context.colors.border,
           width: 1.5,
         ),
       ),

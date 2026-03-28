@@ -138,6 +138,7 @@ lib/
 │   ├── subscription_detail/      # Detail view + actions
 │   ├── settings/                 # App settings
 │   ├── analytics/                # Spending breakdown
+│   ├── calendar/                 # Billing date calendar view
 │   └── cancellation/             # Cancel flows
 │
 └── main.dart                     # Entry point + initialization

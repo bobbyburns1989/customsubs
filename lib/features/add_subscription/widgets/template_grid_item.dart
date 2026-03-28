@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/data/services/template_service.dart';
@@ -57,7 +57,7 @@ class TemplateGridItem extends StatelessWidget {
               Text(
                 '\$${template.defaultAmount.toStringAsFixed(2)}/${template.defaultCycle.shortName}',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

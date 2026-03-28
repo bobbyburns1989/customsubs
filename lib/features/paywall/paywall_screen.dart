@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For PlatformException
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
@@ -128,10 +128,10 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
             children: [
               // ── Header: icon + title + inline price ───────────────────
               const SizedBox(height: AppSizes.sm),
-              const Icon(
+              Icon(
                 Icons.workspace_premium,
                 size: 56, // Compact (was 80px)
-                color: AppColors.primary,
+                color: context.colors.primary,
               ),
               const SizedBox(height: AppSizes.sm),
               const Text(
@@ -144,25 +144,25 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               // PRICE — prominent, Apple compliance (was a tall bordered box)
               // Shows inline with trial info on a single line for compactness.
               _isLoadingOffering
-                  ? const Center(
+                  ? Center(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(vertical: 4),
                         child: SizedBox(
                           height: 16,
                           width: 16,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                           ),
                         ),
                       ),
                     )
                   : Text(
                       '$priceString/month · $trialPeriod free trial',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -187,21 +187,21 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.warning_amber_rounded,
-                          size: 14, color: AppColors.warning),
+                      Icon(Icons.warning_amber_rounded,
+                          size: 14, color: context.colors.warning),
                       const SizedBox(width: 4),
-                      const Text(
+                      Text(
                         'Could not load pricing. ',
                         style: TextStyle(
-                            fontSize: 12, color: AppColors.textSecondary),
+                            fontSize: 12, color: context.colors.textSecondary),
                       ),
                       GestureDetector(
                         onTap: _preloadOffering,
-                        child: const Text(
+                        child: Text(
                           'Retry',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.primary,
+                            color: context.colors.primary,
                             decoration: TextDecoration.underline,
                           ),
                         ),
@@ -218,7 +218,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                 onPressed:
                     (_isPurchasing || _isLoadingOffering) ? null : _handlePurchase,
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
+                  backgroundColor: context.colors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSizes.radiusMd),
@@ -248,9 +248,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               // ── Trial terms (Apple required disclosure) ────────────────
               Text(
                 'Free for $trialPeriod, then $priceString/month. Renews monthly. Cancel anytime.',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: AppColors.textTertiary,
+                  color: context.colors.textTertiary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -268,13 +268,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('Restore',
+                    child: Text('Restore',
                         style: TextStyle(
-                            fontSize: 13, color: AppColors.primary)),
+                            fontSize: 13, color: context.colors.primary)),
                   ),
-                  const Text(' · ',
+                  Text(' · ',
                       style: TextStyle(
-                          fontSize: 12, color: AppColors.textTertiary)),
+                          fontSize: 12, color: context.colors.textTertiary)),
                   TextButton(
                     onPressed: () => _openUrl('https://customsubs.us/terms'),
                     style: TextButton.styleFrom(
@@ -283,13 +283,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('Terms',
+                    child: Text('Terms',
                         style: TextStyle(
-                            fontSize: 13, color: AppColors.primary)),
+                            fontSize: 13, color: context.colors.primary)),
                   ),
-                  const Text(' · ',
+                  Text(' · ',
                       style: TextStyle(
-                          fontSize: 12, color: AppColors.textTertiary)),
+                          fontSize: 12, color: context.colors.textTertiary)),
                   TextButton(
                     onPressed: () => _openUrl('https://customsubs.us/privacy'),
                     style: TextButton.styleFrom(
@@ -298,18 +298,18 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Text('Privacy',
+                    child: Text('Privacy',
                         style: TextStyle(
-                            fontSize: 13, color: AppColors.primary)),
+                            fontSize: 13, color: context.colors.primary)),
                   ),
                 ],
               ),
 
               // ── Fine print ─────────────────────────────────────────────
-              const Text(
+              Text(
                 'Managed through App Store. Free tier: ${RevenueCatConstants.maxFreeSubscriptions} subscriptions.',
                 style: TextStyle(
-                    fontSize: 11, color: AppColors.textTertiary),
+                    fontSize: 11, color: context.colors.textTertiary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSizes.sm),
@@ -327,8 +327,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
       padding: const EdgeInsets.symmetric(vertical: AppSizes.xs),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_rounded,
-              color: AppColors.primary, size: 20),
+          Icon(Icons.check_circle_rounded,
+              color: context.colors.primary, size: 20),
           const SizedBox(width: AppSizes.md),
           Expanded(
             child: Text(
@@ -373,9 +373,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
 
         // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Premium activated! Enjoy unlimited subscriptions.'),
-            backgroundColor: AppColors.success,
+          SnackBar(
+            content: const Text('✅ Premium activated! Enjoy unlimited subscriptions.'),
+            backgroundColor: context.colors.success,
           ),
         );
 
@@ -451,7 +451,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Purchase failed: $errorMsg'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
             duration: const Duration(seconds: 7),
             action: SnackBarAction(
               label: 'Details',
@@ -487,7 +487,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Purchase error: ${e.message}'),
-              backgroundColor: AppColors.error,
+              backgroundColor: context.colors.error,
             ),
           );
         }
@@ -498,7 +498,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Unexpected Error: ${e.toString()}'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
             duration: const Duration(seconds: 7),
             action: SnackBarAction(
               label: 'Copy',
@@ -555,9 +555,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ref.invalidate(isPremiumProvider);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Purchases restored successfully!'),
-            backgroundColor: AppColors.success,
+          SnackBar(
+            content: const Text('✅ Purchases restored successfully!'),
+            backgroundColor: context.colors.success,
           ),
         );
 
@@ -575,7 +575,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Restore failed: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }
@@ -599,7 +599,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Could not open $urlString'),
-              backgroundColor: AppColors.error,
+              backgroundColor: context.colors.error,
             ),
           );
         }
@@ -609,7 +609,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error opening link: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colors.error,
           ),
         );
       }

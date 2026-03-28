@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
@@ -344,7 +344,7 @@ class _SubscriptionDetailScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+              Icon(Icons.error_outline, size: 48, color: context.colors.error),
               const SizedBox(height: AppSizes.base),
               Text('Error loading subscription: $error'),
               const SizedBox(height: AppSizes.base),
@@ -375,7 +375,7 @@ class _SubscriptionDetailScreenState
           ),
           FilledButton(
             style: FilledButton.styleFrom(
-              backgroundColor: AppColors.error,
+              backgroundColor: context.colors.error,
             ),
             onPressed: () async {
               await HapticUtils.heavy(); // Destructive action haptic
@@ -463,27 +463,27 @@ class _SubscriptionDetailScreenState
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSizes.sm),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.notifications_off, size: 16, color: AppColors.textSecondary),
-                  SizedBox(width: AppSizes.sm),
-                  Expanded(child: Text('No reminders will be sent')),
+                  Icon(Icons.notifications_off, size: 16, color: context.colors.textSecondary),
+                  const SizedBox(width: AppSizes.sm),
+                  const Expanded(child: Text('No reminders will be sent')),
                 ],
               ),
               const SizedBox(height: AppSizes.xs),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.pause_circle_outline, size: 16, color: AppColors.textSecondary),
-                  SizedBox(width: AppSizes.sm),
-                  Expanded(child: Text('Billing dates won\'t advance')),
+                  Icon(Icons.pause_circle_outline, size: 16, color: context.colors.textSecondary),
+                  const SizedBox(width: AppSizes.sm),
+                  const Expanded(child: Text('Billing dates won\'t advance')),
                 ],
               ),
               const SizedBox(height: AppSizes.xs),
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.trending_down, size: 16, color: AppColors.textSecondary),
-                  SizedBox(width: AppSizes.sm),
-                  Expanded(child: Text('Excluded from spending totals')),
+                  Icon(Icons.trending_down, size: 16, color: context.colors.textSecondary),
+                  const SizedBox(width: AppSizes.sm),
+                  const Expanded(child: Text('Excluded from spending totals')),
                 ],
               ),
 
@@ -609,13 +609,13 @@ class _PausedSubscriptionActions extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(AppSizes.base),
           decoration: BoxDecoration(
-            color: AppColors.primarySurface,
+            color: context.colors.primarySurface,
             borderRadius: BorderRadius.circular(AppSizes.radiusLg),
-            border: Border.all(color: AppColors.border, width: 1.5),
+            border: Border.all(color: context.colors.border, width: 1.5),
           ),
           child: Row(
             children: [
-              const Icon(Icons.pause_circle, color: AppColors.primary),
+              Icon(Icons.pause_circle, color: context.colors.primary),
               const SizedBox(width: AppSizes.md),
               Expanded(
                 child: Column(
@@ -624,7 +624,7 @@ class _PausedSubscriptionActions extends StatelessWidget {
                     Text(
                       'Subscription Paused',
                       style: theme.textTheme.titleSmall?.copyWith(
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -632,7 +632,7 @@ class _PausedSubscriptionActions extends StatelessWidget {
                     Text(
                       _getResumeInfoText(),
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                       ),
                     ),
                   ],

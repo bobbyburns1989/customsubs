@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:custom_subs/features/analytics/analytics_controller.dart';
 import 'package:custom_subs/features/analytics/widgets/smart_insights_card.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
@@ -95,10 +95,10 @@ class AnalyticsScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline,
                 size: 48,
-                color: AppColors.error,
+                color: context.colors.error,
               ),
               const SizedBox(height: AppSizes.base),
               Text(
@@ -319,7 +319,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
     return Container(
       // No extra horizontal margin — fills content area consistently with other cards
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.92),
+        color: context.colors.primary.withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.2),
@@ -446,7 +446,7 @@ class _CategoryBreakdownCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSizes.lg),
@@ -483,7 +483,7 @@ class _TopSubscriptionsCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSizes.lg),
@@ -548,7 +548,7 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
             ? const Color(0xFFC0C0C0) // Silver
             : widget.rank == 3
                 ? const Color(0xFFCD7F32) // Bronze
-                : AppColors.textTertiary;
+                : context.colors.textTertiary;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -568,10 +568,10 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
         child: Container(
           padding: const EdgeInsets.all(AppSizes.md),
           decoration: BoxDecoration(
-            color: AppColors.background,
+            color: context.colors.background,
             borderRadius: BorderRadius.circular(AppSizes.radiusMd),
             border: Border.all(
-              color: AppColors.divider,
+              color: context.colors.divider,
               width: 1,
             ),
           ),
@@ -604,7 +604,7 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
                   child: Text(
                     '${widget.rank}',
                     style: TextStyle(
-                      color: widget.rank <= 3 ? rankColor : AppColors.textPrimary,
+                      color: widget.rank <= 3 ? rankColor : context.colors.textPrimary,
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     ),
@@ -655,7 +655,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.colors.border),
       ),
       child: Padding(
         padding: const EdgeInsets.all(AppSizes.lg),
@@ -710,7 +710,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
                   '≈ ${_getCurrencySymbol(analytics.primaryCurrency)}${analytics.monthlyTotal.toStringAsFixed(2)}',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: context.colors.primary,
                         fontFeatures: const [FontFeature.tabularFigures()],
                       ),
                 ),
@@ -720,7 +720,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
             Text(
               'At bundled exchange rates',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textTertiary,
+                    color: context.colors.textTertiary,
                   ),
             ),
           ],
@@ -790,7 +790,7 @@ class _ActiveVsPausedCard extends StatelessWidget {
             // Active row
             _SpendingRow(
               icon: Icons.play_arrow,
-              iconColor: AppColors.success,
+              iconColor: context.colors.success,
               label: 'Active (${analytics.activeCount})',
               amount: '${currencyFormat.format(analytics.monthlyTotal)}/mo',
               isActive: true,
@@ -801,7 +801,7 @@ class _ActiveVsPausedCard extends StatelessWidget {
             // Paused row
             _SpendingRow(
               icon: Icons.pause,
-              iconColor: AppColors.textSecondary,
+              iconColor: context.colors.textSecondary,
               label: 'Paused (${analytics.pausedCount})',
               amount: '${currencyFormat.format(analytics.pausedMonthlyTotal)}/mo',
               isActive: false,
@@ -812,20 +812,20 @@ class _ActiveVsPausedCard extends StatelessWidget {
             // Combined total info
             Row(
               children: [
-                const Icon(Icons.info_outline, size: 16, color: AppColors.textSecondary),
+                Icon(Icons.info_outline, size: 16, color: context.colors.textSecondary),
                 const SizedBox(width: AppSizes.sm),
                 Expanded(
                   child: Text(
                     'If all resumed',
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                 ),
                 Text(
                   '${currencyFormat.format(analytics.combinedMonthlyTotal)}/mo',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -866,7 +866,7 @@ class _SpendingRow extends StatelessWidget {
           child: Text(
             label,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+              color: isActive ? context.colors.textPrimary : context.colors.textSecondary,
             ),
           ),
         ),
@@ -874,7 +874,7 @@ class _SpendingRow extends StatelessWidget {
           amount,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
-            color: isActive ? AppColors.textPrimary : AppColors.textSecondary,
+            color: isActive ? context.colors.textPrimary : context.colors.textSecondary,
           ),
         ),
       ],

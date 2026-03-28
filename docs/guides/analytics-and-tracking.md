@@ -201,7 +201,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `Application Opened` | App foreground | Via `captureApplicationLifecycleEvents` |
 | `Application Backgrounded` | App background | Via `captureApplicationLifecycleEvents` |
 
-### Custom Events (28 total)
+### Custom Events (30 total)
 
 #### App Lifecycle (1)
 
@@ -255,10 +255,12 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `restore_completed` | — | `paywall_screen.dart` | Restore success |
 | `restore_failed` | `error` | `paywall_screen.dart` | Restore errors |
 
-#### Feature Usage (5)
+#### Feature Usage (7)
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
+| `calendar_viewed` | `active_sub_count` (int) | `calendar_screen.dart` | Feature engagement |
+| `calendar_day_tapped` | `has_subs` (bool), `sub_count` (int) | `calendar_screen.dart` | Calendar interaction |
 | `backup_exported` | `subscription_count` (int) | `settings_screen.dart` | Data safety adoption |
 | `backup_imported` | `imported_count`, `duplicates_skipped` (int) | `settings_screen.dart` | Migration usage |
 | `cancellation_url_opened` | — | `cancellation_card.dart` | Cancellation feature value |

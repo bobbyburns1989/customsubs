@@ -5,8 +5,8 @@
 library;
 
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// A reusable empty state widget with icon and optional call-to-action.
 ///
@@ -76,12 +76,12 @@ class EmptyStateWidget extends StatefulWidget {
 
   /// Background color for the circular icon container.
   ///
-  /// Defaults to AppColors.primarySurface (light green).
+  /// Defaults to theme's primarySurface color when null.
   final Color? iconBackgroundColor;
 
   /// Color for the icon itself.
   ///
-  /// Defaults to AppColors.primary (green).
+  /// Defaults to theme's primary color when null.
   final Color? iconColor;
 
   const EmptyStateWidget({
@@ -158,13 +158,13 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
                 width: containerSize,
                 height: containerSize,
                 decoration: BoxDecoration(
-                  color: widget.iconBackgroundColor ?? AppColors.primarySurface,
+                  color: widget.iconBackgroundColor ?? context.colors.primarySurface,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   widget.icon,
                   size: widget.iconSize,
-                  color: widget.iconColor ?? AppColors.primary,
+                  color: widget.iconColor ?? context.colors.primary,
                 ),
               ),
               const SizedBox(height: AppSizes.xl),
@@ -174,7 +174,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
                 widget.title,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -184,7 +184,7 @@ class _EmptyStateWidgetState extends State<EmptyStateWidget>
               Text(
                 widget.subtitle,
                 style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),

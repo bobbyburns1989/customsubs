@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/data/models/subscription.dart';
@@ -139,7 +139,7 @@ class BillingInfoCard extends StatelessWidget {
                 Text(
                   'Then ${CurrencyUtils.formatAmount(subscription.postTrialAmount!, subscription.currencyCode)}/${subscription.cycle.shortName}',
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],

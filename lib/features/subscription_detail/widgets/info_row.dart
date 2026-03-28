@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// A reusable row widget displaying a label-value pair with optional highlight badge.
 ///
@@ -33,7 +33,7 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 /// ## Design Philosophy
 ///
 /// This widget provides consistent formatting for all info rows across the
-/// detail screen. The highlight badge uses AppColors.trial for emphasis,
+/// detail screen. The highlight badge uses the theme's trial color for emphasis,
 /// making countdowns and time-sensitive information stand out.
 class InfoRow extends StatelessWidget {
   /// The label text displayed on the left side
@@ -62,7 +62,7 @@ class InfoRow extends StatelessWidget {
         Text(
           label,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
         Row(
@@ -81,15 +81,15 @@ class InfoRow extends StatelessWidget {
                   vertical: 2,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.trial.withValues(alpha: 0.15),
+                  color: context.colors.trial.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                 ),
                 child: Text(
                   highlight!,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.trial,
+                    color: context.colors.trial,
                   ),
                 ),
               ),

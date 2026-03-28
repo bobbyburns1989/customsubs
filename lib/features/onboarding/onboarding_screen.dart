@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
@@ -120,7 +120,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           borderRadius: BorderRadius.circular(AppSizes.radiusLg),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primary.withValues(alpha: 0.08),
+                              color: context.colors.primary.withValues(alpha: 0.08),
                               blurRadius: 24,
                               offset: const Offset(0, 4),
                             ),
@@ -151,7 +151,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       Text(
                         'Your private subscription tracker',
                         style: theme.textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -227,16 +227,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.lock_outline,
                             size: 14,
-                            color: AppColors.textTertiary,
+                            color: context.colors.textTertiary,
                           ),
                           const SizedBox(width: AppSizes.xs),
                           Text(
                             '100% offline • No account required',
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: AppColors.textTertiary,
+                              color: context.colors.textTertiary,
                             ),
                           ),
                         ],
@@ -275,10 +275,10 @@ class _FeatureCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(AppSizes.radiusLg),
         border: Border.all(
-          color: AppColors.border,
+          color: context.colors.border,
           width: 1.5,
         ),
       ),
@@ -289,14 +289,14 @@ class _FeatureCard extends StatelessWidget {
           Container(
             width: 48,
             height: 48,
-            decoration: const BoxDecoration(
-              color: AppColors.primarySurface,
+            decoration: BoxDecoration(
+              color: context.colors.primarySurface,
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
               size: 24,
-              color: AppColors.primary,
+              color: context.colors.primary,
             ),
           ),
           const SizedBox(width: AppSizes.md),
@@ -316,7 +316,7 @@ class _FeatureCard extends StatelessWidget {
                 Text(
                   description,
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                     height: 1.4,
                   ),
                 ),

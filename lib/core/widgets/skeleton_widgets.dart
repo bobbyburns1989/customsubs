@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 
 /// Static skeleton box for loading states
 class SkeletonBox extends StatelessWidget {
@@ -21,7 +21,7 @@ class SkeletonBox extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.divider,
+        color: context.colors.divider,
         borderRadius: BorderRadius.circular(borderRadius),
       ),
     );

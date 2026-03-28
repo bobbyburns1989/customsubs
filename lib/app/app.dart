@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:custom_subs/app/theme.dart';
 import 'package:custom_subs/app/router.dart';
+import 'package:custom_subs/core/providers/theme_provider.dart';
 
 /// Root application widget for CustomSubs.
 ///
@@ -20,6 +21,8 @@ class CustomSubsApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+
     return FutureBuilder<bool>(
       future: _getOnboardingStatus(),
       builder: (context, snapshot) {
@@ -27,6 +30,8 @@ class CustomSubsApp extends ConsumerWidget {
         if (!snapshot.hasData) {
           return MaterialApp(
             theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeMode,
             home: const Scaffold(
               body: Center(child: CircularProgressIndicator()),
             ),
@@ -40,6 +45,8 @@ class CustomSubsApp extends ConsumerWidget {
         return MaterialApp.router(
           title: 'CustomSubs',
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeMode,
           routerConfig: router,
           debugShowCheckedModeBanner: false,
         );

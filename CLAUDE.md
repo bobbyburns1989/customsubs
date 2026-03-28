@@ -83,6 +83,7 @@ purchases_flutter: ^9.0.0             # RevenueCat IAP
 posthog_flutter: ^5.20.0              # Analytics + crash reporting (opt-out in Settings)
 in_app_review: ^2.0.9                 # App Store review prompt (after 5th subscription)
 fl_chart: ^0.68.0
+table_calendar: ^3.1.2                # Calendar view of upcoming bills
 app_settings: ^5.1.1                  # notification settings deep-link (iOS + Android)
 ```
 
@@ -140,6 +141,7 @@ lib/
 │   ├── subscription_detail/
 │   ├── cancellation/
 │   ├── analytics/
+│   ├── calendar/                    # calendar_screen.dart + calendar_controller.dart
 │   ├── settings/                    # settings_screen.dart + widgets/custom_apps_promo_card.dart
 │   └── paywall/                    # paywall_screen.dart (RevenueCat)
 │
@@ -243,7 +245,7 @@ Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app f
 - **Section spacing**: `AppSizes.sectionSpacing` (20px) between major sections
 - **Fonts**: DM Sans for UI text, DM Mono for currency amounts
 - **Press animations**: `SubtlePressable` with 0.99 scale
-- **Light mode only** — no dark mode yet
+- **Dark mode supported** — toggle in Settings > General. Colors via `context.colors` (`ThemeExtension<CustomColors>`)
 
 ---
 
@@ -265,7 +267,7 @@ Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app f
 - ❌ No cloud sync / Firebase / Supabase
 - ❌ No bank linking / email scanning
 - ❌ No live exchange rate fetching (use bundled `assets/data/exchange_rates.json`)
-- ❌ No dark mode (future phase)
+- ✅ Dark mode **IS** implemented — toggle in Settings, persisted via Hive, uses `ThemeExtension<CustomColors>`
 - ❌ No home screen widgets (future phase)
 - ❌ No ads / social features / web version
 - ✅ Premium tier via RevenueCat **IS** implemented — see `docs/guides/iap-and-premium.md`

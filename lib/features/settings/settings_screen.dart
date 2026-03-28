@@ -4,11 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
-import 'package:custom_subs/core/constants/app_colors.dart';
+import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
+import 'package:custom_subs/core/providers/theme_provider.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/data/services/backup_service.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
@@ -196,6 +197,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
+          Consumer(
+            builder: (context, ref, child) {
+              final themeMode = ref.watch(themeModeProvider);
+              final isDarkMode = themeMode == ThemeMode.dark;
+
+              return SwitchListTile(
+                secondary: const Icon(Icons.dark_mode_outlined),
+                title: const Text('Dark Mode'),
+                value: isDarkMode,
+                onChanged: (value) async {
+                  await HapticUtils.medium();
+                  await ref.read(settingsRepositoryProvider.notifier)
+                      .setIsDarkMode(value);
+
+                  ref.read(analyticsServiceProvider).capture('settings_changed', {
+                    'setting': 'dark_mode',
+                  });
+                },
+              );
+            },
+          ),
 
           const Divider(height: 1),
 
@@ -211,7 +233,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     ListTile(
                       leading: Icon(
                         isPremium ? Icons.workspace_premium : Icons.lock_outline,
-                        color: isPremium ? AppColors.primary : AppColors.textSecondary,
+                        color: isPremium ? context.colors.primary : context.colors.textSecondary,
                       ),
                       title: Text(isPremium ? 'Premium Active' : 'Free Tier'),
                       subtitle: Text(
@@ -274,7 +296,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: Text('Checking premium status'),
                 ),
                 error: (err, stack) => ListTile(
-                  leading: const Icon(Icons.error_outline, color: AppColors.error),
+                  leading: Icon(Icons.error_outline, color: context.colors.error),
                   title: const Text('Error loading premium status'),
                   subtitle: Text('$err'),
                 ),
@@ -364,8 +386,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
-          const Padding(
-            padding: EdgeInsets.symmetric(
+          Padding(
+            padding: const EdgeInsets.symmetric(
               horizontal: AppSizes.base,
               vertical: AppSizes.sm,
             ),
@@ -374,7 +396,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               'Make sure notifications are enabled in your device settings.',
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ),
@@ -427,7 +449,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       ? _formatBackupDate(lastBackupDate)
                       : 'Never backed up',
                   style: TextStyle(
-                    color: lastBackupDate == null ? AppColors.warning : null,
+                    color: lastBackupDate == null ? context.colors.warning : null,
                     fontWeight:
                         lastBackupDate == null ? FontWeight.w600 : null,
                   ),
@@ -559,10 +581,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.delete_forever, color: AppColors.error),
-            title: const Text(
+            leading: Icon(Icons.delete_forever, color: context.colors.error),
+            title: Text(
               'Delete All Data',
-              style: TextStyle(color: AppColors.error),
+              style: TextStyle(color: context.colors.error),
             ),
             subtitle: const Text('Permanently delete all subscriptions'),
             onTap: () async {
@@ -585,7 +607,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.error,
+                        foregroundColor: context.colors.error,
                       ),
                       child: const Text('Continue'),
                     ),
@@ -639,7 +661,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         }
                       },
                       style: TextButton.styleFrom(
-                        foregroundColor: AppColors.error,
+                        foregroundColor: context.colors.error,
                       ),
                       child: const Text('Delete All'),
                     ),
@@ -877,7 +899,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            style: TextButton.styleFrom(foregroundColor: context.colors.error),
             child: const Text('Clear'),
           ),
         ],
