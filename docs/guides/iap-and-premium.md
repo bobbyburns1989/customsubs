@@ -1,7 +1,7 @@
 # IAP & Premium — Implementation Guide
 
 **Status**: ✅ Live in production
-**Last Updated**: March 4, 2026
+**Last Updated**: March 29, 2026
 **Version**: v1.4.2+ (RevenueCat 9.x, purchases_flutter ^9.0.0)
 **Relevant to**: Developers working on paywall, entitlement checks, or purchase flow
 
@@ -67,7 +67,7 @@ class RevenueCatConstants {
   static const String productId = 'customsubs_premium_monthly';
   static const String entitlementId = 'premium';
   static const String defaultOfferingId = 'default';
-  static const int maxFreeSubscriptions = 3; // Free tier limit
+  static const int maxFreeSubscriptions = 5; // Free tier limit
 }
 ```
 
@@ -161,11 +161,22 @@ File: `lib/features/paywall/paywall_screen.dart`
 ```
 [App Icon 56px]
 [Title: "Go Premium"]
-[Subtitle with price and trial inline]
+[Subtitle: "Less than a coffee per month"]
+[Price + trial inline]
 [4 compact feature rows with checkmarks]
 [Subscribe button — full width, always enabled]
+[Trial disclosure with bold emphasis]
 [Restore · Terms · Privacy — single row]
 ```
+
+### Premium model (v1.4.9+)
+
+**Single hard gate only.** The 6th subscription triggers the paywall.
+
+- Free tier: 5 subscriptions (all features unlocked)
+- Premium: unlimited subscriptions
+- Soft prompt: one-time bottom sheet after 3rd subscription created (non-blocking)
+- Analytics, calendar, reminders, backup, dark mode: **always free** for all users
 
 The screen is wrapped in `SingleChildScrollView` as a fallback for smaller devices (iPhone SE).
 

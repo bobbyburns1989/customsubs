@@ -1,7 +1,7 @@
 # Analytics & Tracking
 
 **Status**: Active
-**Last Updated**: March 25, 2026 (v1.4.9 — crash analytics, growth events, in-app review)
+**Last Updated**: March 29, 2026 (v1.4.9 — analytics fixes, soft paywall events, paywall dismissed tracking)
 **Relevant to**: Developers
 
 **Guide for working with PostHog analytics, crash reporting, and in-app review in CustomSubs.**
@@ -201,7 +201,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `Application Opened` | App foreground | Via `captureApplicationLifecycleEvents` |
 | `Application Backgrounded` | App background | Via `captureApplicationLifecycleEvents` |
 
-### Custom Events (30 total)
+### Custom Events (37 total)
 
 #### App Lifecycle (1)
 
@@ -227,6 +227,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `subscription_marked_paid` | `is_paid` (bool) | `home_controller.dart` | Engagement |
 | `subscription_paused` | `has_resume_date` (bool) | `home_controller.dart` | Pause adoption |
 | `subscription_resumed` | — | `home_controller.dart` | Resume patterns |
+| `subscription_auto_resumed` | `category`, `had_resume_date` (bool) | `main.dart` | Auto-resume tracking |
 
 #### Creation Funnel (3)
 
@@ -242,7 +243,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 |-------|-----------|------|---------|
 | `notification_tapped` | `action` (mark_paid/view_detail), `notification_type` (reminder1/reminder2/dayof/trial_*) | `notification_router.dart` | Core value proof |
 
-#### Premium / IAP (8)
+#### Premium / IAP (9)
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
@@ -251,11 +252,19 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `purchase_completed` | `price` | `paywall_screen.dart` | Revenue |
 | `purchase_failed` | `error` | `paywall_screen.dart` | Error diagnosis |
 | `purchase_cancelled` | — | `paywall_screen.dart` | Drop-off |
-| `restore_started` | — | `paywall_screen.dart` | Restore usage |
-| `restore_completed` | — | `paywall_screen.dart` | Restore success |
-| `restore_failed` | `error` | `paywall_screen.dart` | Restore errors |
+| `paywall_dismissed` | `time_on_screen_seconds` (int) | `paywall_screen.dart` | Drop-off timing |
+| `restore_started` | — | `paywall_screen.dart`, `settings_screen.dart` | Restore usage |
+| `restore_completed` | — | `paywall_screen.dart`, `settings_screen.dart` | Restore success |
+| `restore_failed` | `error` | `paywall_screen.dart`, `settings_screen.dart` | Restore errors |
 
-#### Feature Usage (7)
+#### Soft Paywall (2)
+
+| Event | Properties | File | Purpose |
+|-------|-----------|------|---------|
+| `soft_paywall_shown` | `source` (3rd_subscription) | `add_subscription_screen.dart` | Prompt impressions |
+| `soft_paywall_tapped` | `source` (3rd_subscription) | `add_subscription_screen.dart` | Prompt conversion |
+
+#### Feature Usage (9)
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
@@ -264,8 +273,10 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `backup_exported` | `subscription_count` (int) | `settings_screen.dart` | Data safety adoption |
 | `backup_imported` | `imported_count`, `duplicates_skipped` (int) | `settings_screen.dart` | Migration usage |
 | `cancellation_url_opened` | — | `cancellation_card.dart` | Cancellation feature value |
+| `analytics_viewed` | `active_count` (int) | `analytics_screen.dart` | Feature engagement |
+| `smart_insights_viewed` | `insight_count` (int) | `smart_insights_card.dart` | Insight discovery |
 | `smart_insight_tapped` | `insight_type` (service_overlap/annual_savings/bundle_opportunity/high_spend_category) | `smart_insights_card.dart` | Insight engagement |
-| `settings_changed` | `setting` (primary_currency/reminder_time/analytics_opt_out) | `settings_screen.dart` | Preference signals |
+| `settings_changed` | `setting` (primary_currency/reminder_time/analytics_opt_out/dark_mode) | `settings_screen.dart` | Preference signals |
 
 #### In-App Review (1)
 

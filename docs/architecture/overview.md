@@ -632,7 +632,7 @@ class SubscriptionRepository {
 ### User Privacy
 
 - Anonymous analytics only (PostHog) — opt-out toggle available in Settings
-- No crash reporting
+- Crash reporting via PostHog error tracking autocapture (respects opt-out)
 - No PII collected — event properties are categorical only (category names, cycle types, booleans)
 - Two outbound SDKs: RevenueCat (IAP) and PostHog (analytics) — neither transmits subscription data
 - User owns their data

@@ -30,10 +30,12 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
   Offering? _cachedOffering;
   String? _offeringError;
   Package? _monthlyPackage; // Cache the monthly package for price/trial display
+  late final DateTime _openedAt; // Track time on screen for paywall_dismissed event
 
   @override
   void initState() {
     super.initState();
+    _openedAt = DateTime.now();
     // Pre-load offerings to prevent timeout during purchase
     _preloadOffering();
   }
@@ -111,6 +113,11 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
           icon: const Icon(Icons.close),
           onPressed: () async {
             await HapticUtils.light();
+            // Track how long users spend on paywall before dismissing
+            final secondsOnScreen = DateTime.now().difference(_openedAt).inSeconds;
+            ref.read(analyticsServiceProvider).capture('paywall_dismissed', {
+              'time_on_screen_seconds': secondsOnScreen,
+            });
             if (context.mounted) context.pop();
           },
         ),
@@ -137,6 +144,15 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               const Text(
                 'Go Premium',
                 style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSizes.xs),
+              Text(
+                'Less than a coffee per month',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: context.colors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSizes.xs),
@@ -246,11 +262,25 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen> {
               const SizedBox(height: AppSizes.sm),
 
               // ── Trial terms (Apple required disclosure) ────────────────
-              Text(
-                'Free for $trialPeriod, then $priceString/month. Renews monthly. Cancel anytime.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: context.colors.textTertiary,
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Try free for $trialPeriod',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: context.colors.textSecondary,
+                      ),
+                    ),
+                    TextSpan(
+                      text: ', then $priceString/month. Cancel anytime.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: context.colors.textTertiary,
+                      ),
+                    ),
+                  ],
                 ),
                 textAlign: TextAlign.center,
               ),

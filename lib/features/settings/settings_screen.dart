@@ -262,6 +262,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         subtitle: const Text('Restore premium subscription'),
                         onTap: () async {
                           await HapticUtils.light();
+                          final analytics = ref.read(analyticsServiceProvider);
+                          analytics.capture('restore_started');
 
                           // Show loading indicator
                           if (context.mounted) {
@@ -271,17 +273,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             );
                           }
 
-                          // Restore purchases
-                          final service = ref.read(entitlementServiceProvider);
-                          final restored = await service.restorePurchases();
+                          try {
+                            // Restore purchases
+                            final service = ref.read(entitlementServiceProvider);
+                            final restored = await service.restorePurchases();
 
-                          if (context.mounted) {
-                            SnackBarUtils.show(
-                              context,
-                              restored
-                                  ? SnackBarUtils.success('Purchases restored successfully')
-                                  : SnackBarUtils.warning('No purchases to restore'),
-                            );
+                            if (restored) {
+                              analytics.capture('restore_completed');
+                            }
+
+                            if (context.mounted) {
+                              SnackBarUtils.show(
+                                context,
+                                restored
+                                    ? SnackBarUtils.success('Purchases restored successfully')
+                                    : SnackBarUtils.warning('No purchases to restore'),
+                              );
+                            }
+                          } catch (e) {
+                            analytics.capture('restore_failed', {'error': e.toString()});
+                            if (context.mounted) {
+                              SnackBarUtils.show(
+                                context,
+                                SnackBarUtils.error('Restore failed: $e'),
+                              );
+                            }
                           }
 
                           // Refresh premium status

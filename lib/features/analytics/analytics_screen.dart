@@ -10,6 +10,7 @@ import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart';
+import 'package:custom_subs/data/services/analytics_service.dart';
 
 /// Analytics screen showing spending insights and breakdowns.
 ///
@@ -22,11 +23,19 @@ import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart
 /// The yearly forecast is the primary focal point, showing annual spending
 /// projection in a prominent green gradient card. This provides stronger
 /// visual impact and clearer hierarchy than showing monthly totals.
-class AnalyticsScreen extends ConsumerWidget {
+class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<AnalyticsScreen> createState() => _AnalyticsScreenState();
+}
+
+class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
+  /// Track whether we've fired the analytics event this session.
+  bool _hasTrackedView = false;
+
+  @override
+  Widget build(BuildContext context) {
     final analyticsAsync = ref.watch(analyticsControllerProvider);
 
     return Scaffold(
@@ -44,6 +53,15 @@ class AnalyticsScreen extends ConsumerWidget {
       ),
       body: analyticsAsync.when(
         data: (analytics) {
+          // Fire analytics event once per screen visit
+          if (!_hasTrackedView) {
+            _hasTrackedView = true;
+            ref.read(analyticsServiceProvider).capture(
+              'analytics_viewed',
+              {'active_count': analytics.activeCount},
+            );
+          }
+
           // Empty state: no subscriptions
           if (analytics.activeCount == 0) {
             return EmptyStateWidget(

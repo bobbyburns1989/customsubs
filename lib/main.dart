@@ -109,7 +109,7 @@ void main() async {
     'active_count': allSubs.where((s) => s.isActive).length,
     'paused_count': allSubs.where((s) => !s.isActive).length,
     'premium_status': isPremium,
-    'app_version': '1.4.7',
+    'app_version': '1.4.9',
   });
 
   // Advance billing dates that are in the past to prevent outdated reminders
@@ -118,6 +118,14 @@ void main() async {
 
   // Auto-resume subscriptions whose resumeDate has passed
   final resumedSubscriptions = await repository.autoResumeSubscriptions();
+
+  // Track auto-resumed subscriptions (no PII — categorical properties only)
+  for (final sub in resumedSubscriptions) {
+    analyticsService.capture('subscription_auto_resumed', {
+      'category': sub.category.name,
+      'had_resume_date': sub.resumeDate != null,
+    });
+  }
 
   // Re-schedule all notifications for active subscriptions + updated/resumed ones
   // This ensures notifications are up-to-date after app launch

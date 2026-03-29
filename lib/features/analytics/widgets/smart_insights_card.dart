@@ -41,10 +41,34 @@ class SmartInsightsCard extends ConsumerWidget {
 }
 
 /// Renders the card once insights data is available.
-class _SmartInsightsCardContent extends StatelessWidget {
+class _SmartInsightsCardContent extends StatefulWidget {
   final SmartInsightsData data;
 
   const _SmartInsightsCardContent({required this.data});
+
+  @override
+  State<_SmartInsightsCardContent> createState() =>
+      _SmartInsightsCardContentState();
+}
+
+class _SmartInsightsCardContentState extends State<_SmartInsightsCardContent> {
+  bool _hasTrackedView = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Track that a user saw the insights card (fired once per mount)
+    if (!_hasTrackedView) {
+      _hasTrackedView = true;
+      final insightCount = widget.data.overlaps.length +
+          (widget.data.annualSavings != null ? 1 : 0) +
+          widget.data.bundleOpportunities.length +
+          (widget.data.highSpendCategory != null ? 1 : 0);
+      AnalyticsService().capture('smart_insights_viewed', {
+        'insight_count': insightCount,
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,23 +87,23 @@ class _SmartInsightsCardContent extends StatelessWidget {
     }
 
     // Overlap insights (can be multiple — music, video, cloud)
-    for (final overlap in data.overlaps) {
+    for (final overlap in widget.data.overlaps) {
       addRow(_OverlapRow(insight: overlap));
     }
 
     // Annual savings (at most one)
-    if (data.annualSavings != null) {
-      addRow(_AnnualSavingsRow(insight: data.annualSavings!));
+    if (widget.data.annualSavings != null) {
+      addRow(_AnnualSavingsRow(insight: widget.data.annualSavings!));
     }
 
     // Bundle opportunities (sorted by savings, can be multiple)
-    for (final bundle in data.bundleOpportunities) {
+    for (final bundle in widget.data.bundleOpportunities) {
       addRow(_BundleRow(insight: bundle));
     }
 
     // High-spend category (at most one)
-    if (data.highSpendCategory != null) {
-      addRow(_HighSpendRow(insight: data.highSpendCategory!));
+    if (widget.data.highSpendCategory != null) {
+      addRow(_HighSpendRow(insight: widget.data.highSpendCategory!));
     }
 
     return Container(
