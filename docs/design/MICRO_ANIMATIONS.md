@@ -57,7 +57,7 @@ SubtlePressable(
 
 **Applied to:**
 - ✅ Onboarding buttons (Skip, Next, Get Started)
-- ✅ Home screen quick actions (Add New, Analytics)
+- ✅ Home screen quick actions (Add New, Calendar, Analytics) — compact padding (12px/14px font) for small screens
 - ✅ Home screen Floating Action Button (+) - 2% scale
 - ✅ Subscription detail buttons (Mark as Paid, Pause/Resume) - 2% scale
 - ✅ Template grid items - 1.5% scale (0.985)

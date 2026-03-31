@@ -1,7 +1,7 @@
 # CustomSubs Design System
 
 **Status**: ✅ Complete
-**Last Updated**: February 7, 2026
+**Last Updated**: March 31, 2026
 **Relevant to**: Developers
 
 **Visual language and component patterns for CustomSubs.**
@@ -379,19 +379,24 @@ TextButton(
 
 **Button sizing:**
 ```dart
-// Default padding (comfortable)
+// Default padding (comfortable) — full-width buttons (paywall, forms)
 ElevatedButton(child: Text('Button'))
+// Uses theme: horizontal 24px (AppSizes.xl), vertical 16px (AppSizes.base), fontSize 16
 
-// Large padding (prominent actions)
-ElevatedButton(
+// Compact padding — multi-button rows (home quick actions)
+ElevatedButton.icon(
   style: ElevatedButton.styleFrom(
     padding: const EdgeInsets.symmetric(
-      horizontal: AppSizes.xl,
-      vertical: AppSizes.base,
+      horizontal: AppSizes.md,   // 12px
+      vertical: AppSizes.md,     // 12px
     ),
+    // Must include fontFamily — local textStyle replaces theme textStyle entirely
+    textStyle: const TextStyle(fontFamily: 'DM Sans', fontSize: 14, fontWeight: FontWeight.w600),
   ),
-  child: Text('Add Subscription'),
+  icon: const Icon(Icons.add, size: 20),
+  label: const Text('Add New', maxLines: 1, overflow: TextOverflow.ellipsis),
 )
+// Use compact style when 3+ buttons share a Row to prevent text wrapping on small screens (iPhone SE 375px, Pixel 4a 360px)
 ```
 
 ### Form Fields
@@ -857,6 +862,37 @@ Text('in 3 days', style: bodyMedium, color: textSecondary)
 - Minimum 48x48 logical pixels
 - Adequate spacing between tappable elements
 - Visual feedback on press (ripple effect)
+
+### 6. Text Overflow Protection
+
+All user-facing text in constrained layouts must handle overflow for small screens (iPhone SE 320pt, Pixel 4a 360pt):
+
+```dart
+// Single-line text in Expanded/Flexible columns — add overflow + maxLines
+Text(
+  subscription.name,
+  style: theme.textTheme.titleMedium,
+  maxLines: 1,
+  overflow: TextOverflow.ellipsis,
+)
+
+// Text in a Row alongside other elements — wrap in Flexible first
+Row(
+  children: [
+    Text('Title', style: titleLarge),
+    const SizedBox(width: 8),
+    Flexible(
+      child: Text('secondary label', maxLines: 1, overflow: TextOverflow.ellipsis),
+    ),
+  ],
+)
+```
+
+**Rules:**
+- Subscription names: always `maxLines: 1, overflow: TextOverflow.ellipsis`
+- Date labels and status text: always `maxLines: 1, overflow: TextOverflow.ellipsis`
+- Text in a `Row` without `Expanded`/`Flexible`: wrap the flexible element in `Flexible`
+- Fixed labels ("Paid", "Trial", icon-only): no overflow needed
 
 ---
 

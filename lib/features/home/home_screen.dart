@@ -216,40 +216,73 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       children: [
                         Expanded(
                           child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.md,
+                                vertical: AppSizes.md,
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             onPressed: () async {
                               await HapticUtils.medium();
                               if (context.mounted) {
                                 context.push(AppRouter.addSubscription);
                               }
                             },
-                            icon: const Icon(Icons.add),
-                            label: const Text('Add New'),
+                            icon: const Icon(Icons.add, size: 20),
+                            label: const Text('Add New', maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                         const SizedBox(width: AppSizes.sm),
                         Expanded(
                           child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.md,
+                                vertical: AppSizes.md,
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             onPressed: () async {
                               await HapticUtils.medium();
                               if (context.mounted) {
                                 context.push(AppRouter.calendar);
                               }
                             },
-                            icon: const Icon(Icons.calendar_month_outlined),
-                            label: const Text('Calendar'),
+                            icon: const Icon(Icons.calendar_month_outlined, size: 20),
+                            label: const Text('Calendar', maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                         const SizedBox(width: AppSizes.sm),
                         Expanded(
                           child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSizes.md,
+                                vertical: AppSizes.md,
+                              ),
+                              textStyle: const TextStyle(
+                                fontFamily: 'DM Sans',
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             onPressed: () async {
                               await HapticUtils.medium();
                               if (context.mounted) {
                                 context.push(AppRouter.analytics);
                               }
                             },
-                            icon: const Icon(Icons.analytics_outlined),
-                            label: const Text('Analytics'),
+                            icon: const Icon(Icons.analytics_outlined, size: 20),
+                            label: const Text('Analytics', maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                       ],
@@ -293,6 +326,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   child: Text(
                                     '${sub.name} trial ends ${sub.trialEndDate!.toShortRelativeString()}',
                                     style: theme.textTheme.bodyMedium,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -320,14 +355,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                         const SizedBox(width: AppSizes.sm),
                         // Show paid progress when any are paid, otherwise default label
-                        Text(
-                          paidUpcoming.isNotEmpty
-                              ? '${paidUpcoming.length} of ${upcoming.length} paid'
-                              : 'next 30 days',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: paidUpcoming.isNotEmpty
-                                ? context.colors.success
-                                : null,
+                        Flexible(
+                          child: Text(
+                            paidUpcoming.isNotEmpty
+                                ? '${paidUpcoming.length} of ${upcoming.length} paid'
+                                : 'next 30 days',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: paidUpcoming.isNotEmpty
+                                  ? context.colors.success
+                                  : null,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -754,12 +793,16 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
                 return Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      widget.pausedCount > 0
-                          ? '${widget.activeCount} active • ${widget.pausedCount} paused'
-                          : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
+                    Flexible(
+                      child: Text(
+                        widget.pausedCount > 0
+                            ? '${widget.activeCount} active • ${widget.pausedCount} paused'
+                            : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     if (isPremium) ...[
@@ -804,6 +847,8 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: Colors.white.withValues(alpha: 0.7),
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ],
@@ -945,6 +990,8 @@ class _SubscriptionTile extends StatelessWidget {
                                     : context.colors.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     if (subscription.daysUntilBilling > 1 && !subscription.isOverdue)
                       Padding(
@@ -955,6 +1002,8 @@ class _SubscriptionTile extends StatelessWidget {
                             color: context.colors.textTertiary,
                             fontSize: 11,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     if (subscription.isPaid)
@@ -1130,6 +1179,8 @@ class _PausedSubscriptionTile extends StatelessWidget {
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: context.colors.textSecondary, // Muted
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -1137,6 +1188,8 @@ class _PausedSubscriptionTile extends StatelessWidget {
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: context.colors.textTertiary,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -1255,6 +1308,8 @@ class _LaterSubscriptionTile extends StatelessWidget {
                   color: context.colors.textSecondary,
                   fontWeight: FontWeight.w500,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
