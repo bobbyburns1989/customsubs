@@ -42,10 +42,20 @@ class RevenueCatConstants {
   static const String premiumEntitlementId = 'premium';
 
   // ============================================================
+  // FREE MODE TOGGLE
+  // ============================================================
+
+  /// Master switch: true = app is completely free, no subscription limits.
+  /// RevenueCat SDK still initializes for passive install/subscriber tracking.
+  /// To re-monetize: set back to false.
+  static const bool isFreeMode = true;
+
+  // ============================================================
   // SUBSCRIPTION LIMITS
   // ============================================================
 
   /// Maximum number of subscriptions allowed on free tier.
+  /// Only enforced when isFreeMode is false.
   static const int maxFreeSubscriptions = 5;
 
   // ============================================================

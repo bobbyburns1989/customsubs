@@ -17,8 +17,6 @@ import 'package:custom_subs/data/services/demo_data_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
 import 'package:custom_subs/features/settings/widgets/custom_apps_promo_card.dart';
-import 'package:custom_subs/core/providers/entitlement_provider.dart';
-import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -215,107 +213,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     'setting': 'dark_mode',
                   });
                 },
-              );
-            },
-          ),
-
-          const Divider(height: 1),
-
-          // Premium section
-          const _SectionHeader(title: 'Premium'),
-          Consumer(
-            builder: (context, ref, child) {
-              final isPremiumAsync = ref.watch(isPremiumProvider);
-
-              return isPremiumAsync.when(
-                data: (isPremium) => Column(
-                  children: [
-                    ListTile(
-                      leading: Icon(
-                        isPremium ? Icons.workspace_premium : Icons.lock_outline,
-                        color: isPremium ? context.colors.primary : context.colors.textSecondary,
-                      ),
-                      title: Text(isPremium ? 'Premium Active' : 'Free Tier'),
-                      subtitle: Text(
-                        isPremium
-                            ? 'Unlimited subscriptions'
-                            : '${RevenueCatConstants.maxFreeSubscriptions} subscriptions limit',
-                      ),
-                      trailing: isPremium ? null : const Icon(Icons.chevron_right),
-                      onTap: isPremium
-                          ? null
-                          : () async {
-                              await HapticUtils.light();
-                              ref.read(analyticsServiceProvider).capture(
-                                'paywall_viewed',
-                                {'source': 'settings'},
-                              );
-                              if (context.mounted) {
-                                context.push('/paywall');
-                              }
-                            },
-                    ),
-                    if (isPremium)
-                      ListTile(
-                        leading: const Icon(Icons.restore),
-                        title: const Text('Restore Purchases'),
-                        subtitle: const Text('Restore premium subscription'),
-                        onTap: () async {
-                          await HapticUtils.light();
-                          final analytics = ref.read(analyticsServiceProvider);
-                          analytics.capture('restore_started');
-
-                          // Show loading indicator
-                          if (context.mounted) {
-                            SnackBarUtils.show(
-                              context,
-                              SnackBarUtils.info('Restoring purchases...'),
-                            );
-                          }
-
-                          try {
-                            // Restore purchases
-                            final service = ref.read(entitlementServiceProvider);
-                            final restored = await service.restorePurchases();
-
-                            if (restored) {
-                              analytics.capture('restore_completed');
-                            }
-
-                            if (context.mounted) {
-                              SnackBarUtils.show(
-                                context,
-                                restored
-                                    ? SnackBarUtils.success('Purchases restored successfully')
-                                    : SnackBarUtils.warning('No purchases to restore'),
-                              );
-                            }
-                          } catch (e) {
-                            analytics.capture('restore_failed', {'error': e.toString()});
-                            if (context.mounted) {
-                              SnackBarUtils.show(
-                                context,
-                                SnackBarUtils.error('Restore failed: $e'),
-                              );
-                            }
-                          }
-
-                          // Refresh premium status
-                          ref.invalidate(isPremiumProvider);
-                        },
-                      ),
-                  ],
-                ),
-                loading: () => const ListTile(
-                  leading: Icon(Icons.workspace_premium),
-                  title: Text('Loading...'),
-                  subtitle: Text('Checking premium status'),
-                ),
-                error: (err, stack) => ListTile(
-                  leading: Icon(Icons.error_outline, color: context.colors.error),
-                  title: const Text('Error loading premium status'),
-                  subtitle: Text('$err'),
-                ),
               );
             },
           ),

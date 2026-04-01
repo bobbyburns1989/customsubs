@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:custom_subs/core/constants/app_colors.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
-import 'package:custom_subs/core/providers/entitlement_provider.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
@@ -24,7 +23,6 @@ import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
 import 'package:custom_subs/data/services/review_service.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -176,8 +174,12 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       _hasSubmitted = true;
       await HapticUtils.medium(); // Save success feedback
 
-      // Track subscription create/edit event
+      // Track subscription create/edit event.
+      // Include running active count on create — this distribution across users
+      // reveals where the natural freemium breakpoint should be.
       final analytics = ref.read(analyticsServiceProvider);
+      final currentSubs = await ref.read(homeControllerProvider.future);
+      final activeCount = currentSubs.where((s) => s.isActive).length;
       analytics.capture(
         isEditing ? 'subscription_edited' : 'subscription_created',
         {
@@ -186,6 +188,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
           if (!isEditing) 'is_from_template': _selectedTemplateName != null,
           if (!isEditing && _selectedTemplateName != null)
             'template_name': _selectedTemplateName!,
+          if (!isEditing) 'active_subscription_count': activeCount,
         },
       );
 
@@ -207,128 +210,14 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
         ),
       );
       navigator.pop();
-
-      // One-time soft premium prompt after 3rd subscription created
-      if (!isEditing && mounted) {
-        final allSubs = await ref.read(homeControllerProvider.future);
-        final settingsBox = await Hive.openBox('settings');
-        final hasSeenPromo =
-            settingsBox.get('has_seen_3rd_sub_promo', defaultValue: false) as bool;
-        if (allSubs.length == 3 && !hasSeenPromo) {
-          await settingsBox.put('has_seen_3rd_sub_promo', true);
-          if (mounted) _showPremiumPromptSheet();
-        }
-      }
     } catch (e) {
       if (!mounted) return;
 
-      // Check if user hit subscription limit
-      if (e.toString().contains('SUBSCRIPTION_LIMIT_REACHED')) {
-        await _showUpgradePrompt();
-      } else {
-        // Show generic error for other exceptions
-        scaffoldMessenger.showSnackBar(
-          SnackBarUtils.error('Error: $e'),
-        );
-      }
-    }
-  }
-
-  /// Show upgrade prompt when user hits subscription limit.
-  Future<void> _showUpgradePrompt() async {
-    // Track hitting the free tier ceiling (distinct from paywall_viewed)
-    final subs = await ref.read(homeControllerProvider.future);
-    ref.read(analyticsServiceProvider).capture('premium_limit_reached', {
-      'subscription_count': subs.length,
-    });
-
-    ref.read(analyticsServiceProvider).capture('paywall_viewed', {
-      'source': 'limit_reached',
-    });
-
-    // Navigate to full paywall screen
-    await context.push('/paywall');
-
-    // After returning from paywall, check if user upgraded
-    final isPremium = await ref.refresh(isPremiumProvider.future);
-
-    if (isPremium && mounted) {
-      // User upgraded! Show success and retry save automatically
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBarUtils.success('Premium activated! Adding subscription...'),
+      // Show generic error for exceptions
+      scaffoldMessenger.showSnackBar(
+        SnackBarUtils.error('Error: $e'),
       );
-
-      // Retry the save operation
-      await _save();
     }
-  }
-
-  /// Shows a one-time bottom sheet encouraging premium after the 3rd subscription.
-  /// Non-blocking — user can dismiss with "Maybe Later".
-  void _showPremiumPromptSheet() {
-    final analytics = ref.read(analyticsServiceProvider);
-    analytics.capture('soft_paywall_shown', {'source': '3rd_subscription'});
-
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSizes.radiusLg)),
-      ),
-      builder: (sheetContext) => Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSizes.xl,
-          AppSizes.xl,
-          AppSizes.xl,
-          AppSizes.xxxl,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.workspace_premium,
-              size: 48,
-              color: Theme.of(sheetContext).colorScheme.primary,
-            ),
-            const SizedBox(height: AppSizes.base),
-            const Text(
-              "You're on a roll!",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            Text(
-              'Go Premium for unlimited subscriptions, full analytics, and more.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                color: Theme.of(sheetContext).colorScheme.onSurface.withValues(alpha: 0.7),
-              ),
-            ),
-            const SizedBox(height: AppSizes.xl),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  analytics.capture('soft_paywall_tapped', {
-                    'source': '3rd_subscription',
-                  });
-                  Navigator.pop(sheetContext);
-                  context.push('/paywall');
-                },
-                child: const Text('See Plans'),
-              ),
-            ),
-            const SizedBox(height: AppSizes.sm),
-            TextButton(
-              onPressed: () => Navigator.pop(sheetContext),
-              child: const Text('Maybe Later'),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   /// Auto-assigns a color by cycling through the color palette

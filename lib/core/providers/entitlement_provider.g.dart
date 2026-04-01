@@ -6,7 +6,7 @@ part of 'entitlement_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$isPremiumHash() => r'e79099073099aa41864d06987eae22faf56ce53a';
+String _$isPremiumHash() => r'e91d404df16829a252368361d1a96481c9726f8c';
 
 /// Provider for checking if user has premium entitlement.
 ///

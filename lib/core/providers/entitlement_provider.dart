@@ -4,6 +4,7 @@
 library;
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 import 'package:custom_subs/data/services/entitlement_service.dart';
 
 part 'entitlement_provider.g.dart';
@@ -25,6 +26,10 @@ part 'entitlement_provider.g.dart';
 /// ```
 @riverpod
 Future<bool> isPremium(IsPremiumRef ref) async {
+  // Free mode: everyone gets full access, no subscription limits.
+  // RevenueCat SDK still runs for passive tracking.
+  if (RevenueCatConstants.isFreeMode) return true;
+
   final entitlementService = EntitlementService.instance;
   return await entitlementService.hasPremiumEntitlement();
 }

@@ -28,6 +28,7 @@ import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/data/services/entitlement_service.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/core/constants/revenue_cat_constants.dart';
 
 /// Application entry point.
 ///
@@ -102,14 +103,53 @@ void main() async {
   final notificationService = await container.read(notificationServiceProvider.future);
 
   // Track app launch with context properties for PostHog segmentation
-  final isPremium = await EntitlementService.instance.hasPremiumEntitlement();
   final allSubs = repository.getAll();
+  final activeSubs = allSubs.where((s) => s.isActive).toList();
+  final pausedCount = allSubs.where((s) => !s.isActive).length;
+
+  // Compute monetization-relevant metrics:
+  // - Monthly spend in USD (normalized across currencies and billing cycles)
+  // - Category distribution (how many distinct categories are in use)
+  // - Top category by count (most popular category for this user)
+  double monthlySpendUsd = 0;
+  final categoryCounts = <String, int>{};
+  for (final sub in activeSubs) {
+    final monthlyInOriginal = sub.cycle.toMonthlyAmount(sub.amount);
+    monthlySpendUsd += CurrencyUtils.convert(
+      monthlyInOriginal,
+      sub.currencyCode,
+      'USD',
+    );
+    categoryCounts[sub.category.name] =
+        (categoryCounts[sub.category.name] ?? 0) + 1;
+  }
+  // Find the category with the most subscriptions
+  final topCategory = categoryCounts.entries.isEmpty
+      ? 'none'
+      : (categoryCounts.entries.toList()
+            ..sort((a, b) => b.value.compareTo(a.value)))
+          .first
+          .key;
+
   analyticsService.capture('app_launched', {
     'subscription_count': allSubs.length,
-    'active_count': allSubs.where((s) => s.isActive).length,
-    'paused_count': allSubs.where((s) => !s.isActive).length,
-    'premium_status': isPremium,
-    'app_version': '1.4.9',
+    'active_count': activeSubs.length,
+    'paused_count': pausedCount,
+    'app_mode': RevenueCatConstants.isFreeMode ? 'free' : 'premium_gated',
+    'app_version': '1.5.0',
+  });
+
+  // Set person properties for PostHog user segmentation.
+  // These update on every app launch so dashboards always reflect current state.
+  // Key metric: active_subscription_count distribution → informs freemium gate.
+  analyticsService.setPersonProperties({
+    'active_subscription_count': activeSubs.length,
+    'total_subscription_count': allSubs.length,
+    'paused_count': pausedCount,
+    'monthly_spend_usd': double.parse(monthlySpendUsd.toStringAsFixed(2)),
+    'categories_used': categoryCounts.length,
+    'top_category': topCategory,
+    'app_version': '1.5.0',
   });
 
   // Advance billing dates that are in the past to prevent outdated reminders

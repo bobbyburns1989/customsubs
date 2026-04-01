@@ -49,7 +49,8 @@
 
 **Core philosophy:** Do one thing perfectly — track subscriptions and remind users before they get charged.
 
-**Current version:** v1.4.9+52. All build phases complete. Active post-launch improvements only.
+**Current version:** v1.5.0+54. All build phases complete. Active post-launch improvements only.
+**Monetization:** App is **completely free** (no subscription limits). RevenueCat SDK remains initialized for passive tracking. Toggle: `RevenueCatConstants.isFreeMode` in `lib/core/constants/revenue_cat_constants.dart`.
 **Templates:** 329 pre-built templates (as of March 2026), including a `sports` analytics category.
 
 ---
@@ -63,7 +64,7 @@
 - **Navigation:** GoRouter (declarative routing)
 - **Currency:** `intl` NumberFormat. Exchange rates are **bundled JSON** — never fetched from network.
 - **Brand Icons:** `simple_icons` (font-based) + local SVGs in `assets/logos/`. Widget: `lib/core/widgets/subscription_icon.dart`. Mapping: `lib/core/utils/service_icons.dart`.
-- **IAP:** RevenueCat (`purchases_flutter: ^9.0.0`). Outbound calls for IAP validation only — user data stays local.
+- **IAP:** RevenueCat (`purchases_flutter: ^9.0.0`). SDK initializes for passive tracking only — app is free (`isFreeMode = true`). Paywall code preserved but dormant. User data stays local.
 - **Analytics:** PostHog (`posthog_flutter: ^5.20.0`). Anonymous-only, no PII. Opt-out toggle in Settings. Second outbound SDK after RevenueCat. See [`docs/guides/analytics-and-tracking.md`](docs/guides/analytics-and-tracking.md).
 - **Crash Reporting:** PostHog error tracking autocapture (Flutter errors, platform errors, isolate errors). Enabled via `errorTrackingConfig` in `AnalyticsService.init()`. No Sentry/Crashlytics needed.
 - **In-App Review:** `in_app_review: ^2.0.9`. Prompts after 5th subscription created. Single-use, Apple rate-limited.
@@ -102,7 +103,7 @@ lib/
 │   ├── constants/
 │   │   ├── app_colors.dart         # All color constants
 │   │   ├── app_sizes.dart          # Spacing, radius + sectionSpacing (20px)
-│   │   ├── revenue_cat_constants.dart # IAP product/entitlement IDs
+│   │   ├── revenue_cat_constants.dart # IAP config + isFreeMode toggle
 │   │   └── posthog_constants.dart  # PostHog API key + host
 │   ├── extensions/
 │   │   └── date_extensions.dart    # DateTime helpers (nextBillingDate calc)
@@ -143,7 +144,7 @@ lib/
 │   ├── analytics/
 │   ├── calendar/                    # calendar_screen.dart + calendar_controller.dart
 │   ├── settings/                    # settings_screen.dart + widgets/custom_apps_promo_card.dart
-│   └── paywall/                    # paywall_screen.dart (RevenueCat)
+│   └── paywall/                    # paywall_screen.dart (dormant — route removed, code preserved)
 │
 └── main.dart                       # Entry: Hive init, PostHog init, notifications init, runApp
 ```
@@ -156,7 +157,7 @@ lib/
 2. **Repository pattern** — widgets never touch Hive directly. All DB ops through `SubscriptionRepository`.
 3. **Models are immutable** — use `copyWith`. Generate TypeAdapters with `hive_generator`.
 4. **No singletons** — wrap all services in Riverpod providers.
-5. **No network calls for user data** — 100% offline. Exchange rates are bundled JSON. Two outbound SDKs: RevenueCat (IAP validation) and PostHog (anonymous analytics + crash reporting, opt-out available). `in_app_review` triggers native OS review dialog (no network call from app).
+5. **No network calls for user data** — 100% offline. Exchange rates are bundled JSON. Two outbound SDKs: RevenueCat (passive tracking only — app is free) and PostHog (anonymous analytics + crash reporting, opt-out available). `in_app_review` triggers native OS review dialog (no network call from app).
 
 ---
 
@@ -216,8 +217,8 @@ if (nextBillingDate.isBefore(DateTime.now())) { }
 ### Pause / Auto-Resume
 Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app foreground (`didChangeAppLifecycleState`), pull-to-refresh. Paused subs skip billing date advancement and notification scheduling entirely.
 
-### Premium Entitlement Refresh
-`isPremiumProvider` is `AutoDisposeFutureProvider` — must be manually invalidated with `ref.invalidate(isPremiumProvider)` after purchase, restore, and on app foreground.
+### Premium Entitlement (Currently Free Mode)
+App is free — `isPremiumProvider` always returns `true` when `RevenueCatConstants.isFreeMode` is `true`. The `ref.invalidate(isPremiumProvider)` call on app foreground is kept for re-monetization readiness. To re-enable premium gating: set `isFreeMode = false`, re-add `/paywall` route, re-add Premium section to settings, re-add paywall triggers in add subscription screen.
 
 ---
 
@@ -270,7 +271,7 @@ Auto-resume + date advancement run in 3 places: app startup (`main.dart`), app f
 - ✅ Dark mode **IS** implemented — toggle in Settings, persisted via Hive, uses `ThemeExtension<CustomColors>`
 - ❌ No home screen widgets (future phase)
 - ❌ No ads / social features / web version
-- ✅ Premium tier via RevenueCat **IS** implemented — see `docs/guides/iap-and-premium.md`
+- ✅ App is **free** — no subscription limits. RevenueCat SDK stays for passive tracking. Paywall code dormant. See `docs/guides/iap-and-premium.md` for re-monetization path.
 
 ---
 

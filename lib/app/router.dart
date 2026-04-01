@@ -11,7 +11,6 @@ import 'package:custom_subs/features/add_subscription/add_subscription_screen.da
 import 'package:custom_subs/features/subscription_detail/subscription_detail_screen.dart';
 import 'package:custom_subs/features/analytics/analytics_screen.dart';
 import 'package:custom_subs/features/calendar/calendar_screen.dart';
-import 'package:custom_subs/features/paywall/paywall_screen.dart';
 import 'package:custom_subs/core/utils/notification_router.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 
@@ -104,13 +103,6 @@ class AppRouter {
           pageBuilder: (context, state) => CupertinoPage(
             key: state.pageKey,
             child: const CalendarScreen(),
-          ),
-        ),
-        GoRoute(
-          path: paywall,
-          pageBuilder: (context, state) => _fadePage(
-            key: state.pageKey,
-            child: const PaywallScreen(),
           ),
         ),
         GoRoute(

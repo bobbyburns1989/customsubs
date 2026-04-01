@@ -784,59 +784,17 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
 
             const SizedBox(height: AppSizes.sm),
 
-            // Subscription count + optional premium badge
-            Consumer(
-              builder: (context, ref, child) {
-                final isPremiumAsync = ref.watch(isPremiumProvider);
-                final isPremium = isPremiumAsync.value ?? false;
-
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        widget.pausedCount > 0
-                            ? '${widget.activeCount} active • ${widget.pausedCount} paused'
-                            : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (isPremium) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.workspace_premium,
-                              size: 12,
-                              color: Colors.white.withValues(alpha: 0.9),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Premium',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white.withValues(alpha: 0.9),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ],
-                );
-              },
+            // Subscription count
+            Text(
+              widget.pausedCount > 0
+                  ? '${widget.activeCount} active • ${widget.pausedCount} paused'
+                  : '${widget.activeCount} active subscription${widget.activeCount == 1 ? '' : 's'}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.white.withValues(alpha: 0.9),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
             ),
 
             // Paid cycle progress — only shown when at least one upcoming sub is paid

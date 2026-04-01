@@ -1,9 +1,45 @@
 # IAP & Premium — Implementation Guide
 
-**Status**: ✅ Live in production
-**Last Updated**: March 29, 2026
-**Version**: v1.4.2+ (RevenueCat 9.x, purchases_flutter ^9.0.0)
-**Relevant to**: Developers working on paywall, entitlement checks, or purchase flow
+**Status**: Dormant — app is **free** as of v1.5.0 (`isFreeMode = true`)
+**Last Updated**: March 31, 2026
+**Version**: v1.5.0+ (RevenueCat 9.x, purchases_flutter ^9.0.0)
+**Relevant to**: Developers working on monetization or considering re-enabling premium
+
+---
+
+## Free Mode (Current State)
+
+As of v1.5.0, the app is completely free with no subscription limits. The change is controlled by a single toggle:
+
+```dart
+// lib/core/constants/revenue_cat_constants.dart
+static const bool isFreeMode = true;
+```
+
+**What this does:**
+- `isPremiumProvider` always returns `true` — no limit checks fire
+- Paywall route removed from `router.dart` (screen code preserved)
+- Soft prompt (after 3rd sub) and hard gate (at 6th sub) UI removed from `add_subscription_screen.dart`
+- Premium section removed from `settings_screen.dart`
+- Premium badge removed from home spending card
+- RevenueCat SDK **still initializes** on startup for passive dashboard tracking
+
+**What's preserved for re-monetization:**
+- `entitlement_service.dart` — full purchase/restore/trial logic intact
+- `paywall_screen.dart` — complete UI preserved, just unreachable
+- `add_subscription_controller.dart` — limit check still exists (always passes)
+- `revenue_cat_constants.dart` — all product/entitlement/offering IDs
+- RevenueCat dashboard config (product, entitlement, offering)
+
+### Re-Monetization Checklist
+
+1. Set `RevenueCatConstants.isFreeMode = false`
+2. Re-add `/paywall` route to `lib/app/router.dart` + import `PaywallScreen`
+3. Re-add Premium section to `lib/features/settings/settings_screen.dart`
+4. Re-add `_showUpgradePrompt()` and `_showPremiumPromptSheet()` to `lib/features/add_subscription/add_subscription_screen.dart`
+5. Re-add Premium badge to home spending card in `lib/features/home/home_screen.dart`
+6. Update `app_launched` analytics in `main.dart` (remove `app_mode`, restore `premium_status`)
+7. Test full purchase flow on sandbox
 
 ---
 
@@ -60,14 +96,16 @@ File: `lib/core/constants/revenue_cat_constants.dart`
 
 ```dart
 class RevenueCatConstants {
+  // FREE MODE TOGGLE — set to false to re-enable premium gating
+  static const bool isFreeMode = true;
+
   // API key — ALWAYS copy-paste, NEVER type manually
-  // Both previous typos were visually ambiguous characters
   static const String apiKey = 'appl_rRzabPDSmVyXEYjWSaSuklniHEA';
 
   static const String productId = 'customsubs_premium_monthly';
   static const String entitlementId = 'premium';
   static const String defaultOfferingId = 'default';
-  static const int maxFreeSubscriptions = 5; // Free tier limit
+  static const int maxFreeSubscriptions = 5; // Only enforced when isFreeMode is false
 }
 ```
 

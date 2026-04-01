@@ -92,6 +92,21 @@ class AnalyticsService {
     Posthog().capture(eventName: eventName, properties: properties);
   }
 
+  /// Set person properties on the anonymous PostHog user profile.
+  ///
+  /// Uses `$set` in event properties — PostHog processes this to update
+  /// the person's properties without requiring identify(). Properties are
+  /// attached to the auto-assigned anonymous distinct_id.
+  ///
+  /// Call on every app launch to keep person properties current.
+  void setPersonProperties(Map<String, Object> properties) {
+    if (!_initialized) return;
+    Posthog().capture(
+      eventName: '\$set',
+      properties: {'\$set': properties},
+    );
+  }
+
   /// Check if user has opted out of analytics.
   Future<bool> isOptedOut() async {
     final settingsBox = await Hive.openBox('settings');
