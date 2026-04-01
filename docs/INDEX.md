@@ -165,7 +165,7 @@ docs/
 │   ├── development-setup.md (environment setup)
 │   ├── adding-a-feature.md
 │   ├── forms-and-validation.md
-│   ├── iap-and-premium.md (RevenueCat, paywall)
+│   ├── iap-and-premium.md (RevenueCat — dormant, app is free as of v1.5.0)
 │   ├── multi-currency.md
 │   └── working-with-notifications.md (CRITICAL)
 │
@@ -414,7 +414,7 @@ For questions or suggestions about documentation, update this INDEX or create a 
 
 **February 26, 2026 (v1.4.0)**:
 - ✅ [Paywall redesign](completion/PAYWALL_REDESIGN.md) — compact single-screen layout (Apple compliant)
-- ✅ RevenueCat IAP fully live — see [iap-and-premium.md](guides/iap-and-premium.md)
+- ✅ RevenueCat IAP dormant (app is free as of v1.5.0) — see [iap-and-premium.md](guides/iap-and-premium.md) for re-monetization path
 
 **February 22, 2026**:
 - ✅ Resolved build system issues (exit code -9 errors)

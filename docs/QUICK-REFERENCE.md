@@ -680,16 +680,9 @@ ref.read(analyticsServiceProvider).capture('event_name', {
 
 | Event | Properties | Location |
 |-------|-----------|----------|
-| `app_launched` | `subscription_count`, `active_count`, `paused_count`, `premium_status`, `app_version` | `main.dart` |
-| `paywall_viewed` | `source: 'limit_reached' \| 'settings'` | call sites |
-| `purchase_started` | `price` | `paywall_screen.dart` |
-| `purchase_completed` | `price` | `paywall_screen.dart` |
-| `purchase_failed` | `error` | `paywall_screen.dart` |
-| `purchase_cancelled` | — | `paywall_screen.dart` |
-| `restore_started` | — | `paywall_screen.dart` |
-| `restore_completed` | — | `paywall_screen.dart` |
-| `restore_failed` | `error` | `paywall_screen.dart` |
-| `subscription_created` | `category`, `cycle`, `is_from_template`, `template_name` | `add_subscription_screen.dart` |
+| `app_launched` | `subscription_count`, `active_count`, `paused_count`, `app_mode`, `app_version` | `main.dart` |
+| `$set` (person props) | `active_subscription_count`, `monthly_spend_usd`, `categories_used`, `top_category` | `main.dart` |
+| `subscription_created` | `category`, `cycle`, `is_from_template`, `template_name`, `active_subscription_count` | `add_subscription_screen.dart` |
 | `subscription_edited` | `category`, `cycle` | `add_subscription_screen.dart` |
 | `subscription_deleted` | — | `home_controller.dart` |
 | `subscription_marked_paid` | `is_paid` | `home_controller.dart` |
@@ -1057,23 +1050,15 @@ This pattern is used in:
 
 ---
 
-## 💎 Premium Entitlement — Refresh Points
+## 💎 Premium Entitlement — Currently Free Mode
 
-`isPremiumProvider` is an `AutoDisposeFutureProvider<bool>` (NOT a stream). It must be manually invalidated when the entitlement status may have changed:
+As of v1.5.0, the app is free (`RevenueCatConstants.isFreeMode = true`). `isPremiumProvider` always returns `true` — no subscription limits.
 
-```dart
-// Invalidate (async rebuild of all watchers):
-ref.invalidate(isPremiumProvider);
+RevenueCat SDK still initializes for passive tracking. Paywall code preserved but dormant (route removed).
 
-// Refresh and await result (used before gating an action):
-final isPremium = await ref.refresh(isPremiumProvider.future);
-```
+**To re-monetize:** Set `isFreeMode = false`, re-add `/paywall` route, re-add Premium UI. See `docs/guides/iap-and-premium.md`.
 
-**Where it is invalidated:**
-1. `paywall_screen.dart` — after successful purchase
-2. `paywall_screen.dart` — after successful restore
-3. `settings_screen.dart` — after restore purchases
-4. `home_screen.dart` — on `didChangeAppLifecycleState(resumed)` ← covers trial expiry
+`ref.invalidate(isPremiumProvider)` is still called on app foreground (`home_screen.dart`) for re-monetization readiness.
 
 ---
 
@@ -1246,9 +1231,8 @@ dart run build_runner build --delete-conflicting-outputs
 - Check that `getUpcomingSubscriptions()` uses `!isBefore(todayStart)` not `isAfter(now)`
 - See: `subscription_repository.dart` and `home_controller.dart`
 
-**Premium badge not clearing after trial expires?** *(Fixed in v1.4.1)*
-- `ref.invalidate(isPremiumProvider)` must be called in `didChangeAppLifecycleState(resumed)`
-- See: `home_screen.dart` → `didChangeAppLifecycleState`
+**Premium badge not clearing after trial expires?** *(Fixed in v1.4.1, now moot — app is free as of v1.5.0)*
+- `ref.invalidate(isPremiumProvider)` is still called in `didChangeAppLifecycleState(resumed)` for re-monetization readiness
 
 **Yearly subscription invisible on Home screen?** *(Fixed in v1.4.1)*
 - Subs billing 31–90 days out now appear in the "Later" section

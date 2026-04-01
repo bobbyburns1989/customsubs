@@ -1,7 +1,7 @@
 # Analytics & Tracking
 
 **Status**: Active
-**Last Updated**: March 29, 2026 (v1.4.9 — analytics fixes, soft paywall events, paywall dismissed tracking)
+**Last Updated**: March 31, 2026 (v1.5.0 — app is free, paywall events dormant, added PostHog person properties for monetization analytics)
 **Relevant to**: Developers
 
 **Guide for working with PostHog analytics, crash reporting, and in-app review in CustomSubs.**
@@ -201,13 +201,14 @@ await analytics.setOptOut(false); // re-enables PostHog
 | `Application Opened` | App foreground | Via `captureApplicationLifecycleEvents` |
 | `Application Backgrounded` | App background | Via `captureApplicationLifecycleEvents` |
 
-### Custom Events (37 total)
+### Custom Events (37 total — 12 dormant in free mode)
 
-#### App Lifecycle (1)
+#### App Lifecycle (1) + Person Properties
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
-| `app_launched` | `subscription_count`, `active_count`, `paused_count`, `premium_status`, `app_version` | `main.dart` | Cohort segmentation |
+| `app_launched` | `subscription_count`, `active_count`, `paused_count`, `app_mode`, `app_version` | `main.dart` | Cohort segmentation |
+| `$set` (person properties) | `active_subscription_count`, `total_subscription_count`, `paused_count`, `monthly_spend_usd`, `categories_used`, `top_category`, `app_version` | `main.dart` | User segmentation for monetization analysis |
 
 #### Onboarding (2)
 
@@ -221,7 +222,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
 | `template_selected` | `template_name`, `category` | `add_subscription_screen.dart` | Template popularity |
-| `subscription_created` | `category`, `cycle`, `is_from_template`, `template_name` | `add_subscription_screen.dart` | Creation funnel |
+| `subscription_created` | `category`, `cycle`, `is_from_template`, `template_name`, `active_subscription_count` | `add_subscription_screen.dart` | Creation funnel + freemium gate analysis |
 | `subscription_edited` | `category`, `cycle` | `add_subscription_screen.dart` | Edit patterns |
 | `subscription_deleted` | — | `home_controller.dart` | Churn signal |
 | `subscription_marked_paid` | `is_paid` (bool) | `home_controller.dart` | Engagement |
@@ -235,7 +236,7 @@ await analytics.setOptOut(false); // re-enables PostHog
 |-------|-----------|------|---------|
 | `subscription_form_abandoned` | `had_name`, `had_amount`, `was_from_template` (all bool) | `add_subscription_screen.dart` | Drop-off diagnosis |
 | `template_search_no_results` | — | `add_subscription_screen.dart` | Template library gaps |
-| `premium_limit_reached` | `subscription_count` (int) | `add_subscription_screen.dart` | Free tier ceiling |
+| ~~`premium_limit_reached`~~ | `subscription_count` (int) | `add_subscription_screen.dart` | **Dormant** — removed in v1.5.0 (free mode) |
 
 #### Notification Engagement (1)
 
@@ -243,26 +244,28 @@ await analytics.setOptOut(false); // re-enables PostHog
 |-------|-----------|------|---------|
 | `notification_tapped` | `action` (mark_paid/view_detail), `notification_type` (reminder1/reminder2/dayof/trial_*) | `notification_router.dart` | Core value proof |
 
-#### Premium / IAP (9)
+#### Premium / IAP (9) — DORMANT (v1.5.0: app is free, paywall unreachable)
+
+These events exist in `paywall_screen.dart` (code preserved) but never fire because the paywall route is removed. They will resume if `isFreeMode` is set back to `false`.
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
-| `paywall_viewed` | `source` (settings/limit_reached) | `add_subscription_screen.dart`, `settings_screen.dart` | Funnel entry |
-| `purchase_started` | `price` | `paywall_screen.dart` | Conversion intent |
-| `purchase_completed` | `price` | `paywall_screen.dart` | Revenue |
-| `purchase_failed` | `error` | `paywall_screen.dart` | Error diagnosis |
-| `purchase_cancelled` | — | `paywall_screen.dart` | Drop-off |
-| `paywall_dismissed` | `time_on_screen_seconds` (int) | `paywall_screen.dart` | Drop-off timing |
-| `restore_started` | — | `paywall_screen.dart`, `settings_screen.dart` | Restore usage |
-| `restore_completed` | — | `paywall_screen.dart`, `settings_screen.dart` | Restore success |
-| `restore_failed` | `error` | `paywall_screen.dart`, `settings_screen.dart` | Restore errors |
+| ~~`paywall_viewed`~~ | `source` (settings/limit_reached) | — | Funnel entry |
+| ~~`purchase_started`~~ | `price` | `paywall_screen.dart` | Conversion intent |
+| ~~`purchase_completed`~~ | `price` | `paywall_screen.dart` | Revenue |
+| ~~`purchase_failed`~~ | `error` | `paywall_screen.dart` | Error diagnosis |
+| ~~`purchase_cancelled`~~ | — | `paywall_screen.dart` | Drop-off |
+| ~~`paywall_dismissed`~~ | `time_on_screen_seconds` (int) | `paywall_screen.dart` | Drop-off timing |
+| ~~`restore_started`~~ | — | `paywall_screen.dart` | Restore usage |
+| ~~`restore_completed`~~ | — | `paywall_screen.dart` | Restore success |
+| ~~`restore_failed`~~ | `error` | `paywall_screen.dart` | Restore errors |
 
-#### Soft Paywall (2)
+#### Soft Paywall (2) — DORMANT (removed in v1.5.0)
 
 | Event | Properties | File | Purpose |
 |-------|-----------|------|---------|
-| `soft_paywall_shown` | `source` (3rd_subscription) | `add_subscription_screen.dart` | Prompt impressions |
-| `soft_paywall_tapped` | `source` (3rd_subscription) | `add_subscription_screen.dart` | Prompt conversion |
+| ~~`soft_paywall_shown`~~ | `source` (3rd_subscription) | — | Removed in v1.5.0 |
+| ~~`soft_paywall_tapped`~~ | `source` (3rd_subscription) | — | Removed in v1.5.0 |
 
 #### Feature Usage (9)
 

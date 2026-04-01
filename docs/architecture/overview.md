@@ -508,7 +508,7 @@ class SubscriptionRepository {
 - ✅ Cancellation helper
 - ✅ Spending analytics
 - ✅ Offline-first mobile app
-- ✅ Freemium model — free tier (up to 3 subscriptions) + optional premium tier via IAP
+- ✅ Free app — no subscription limits (RevenueCat SDK retained for passive tracking; paywall code dormant, `isFreeMode = true`)
 
 ### What CustomSubs is NOT
 

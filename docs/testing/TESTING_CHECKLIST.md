@@ -610,59 +610,16 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 
 ---
 
-## 15. Paywall / Premium Upgrade Screen
+## 15. Paywall / Premium Upgrade Screen — DORMANT (v1.5.0: app is free)
 
-### Layout
-- [ ] Entire screen visible without scrolling on iPhone 14+ (no overscroll needed)
-- [ ] iPhone SE: content accessible with minimal scroll (SingleChildScrollView present)
-- [ ] AppBar title shows "Go Premium"
-- [ ] 56px premium icon centered below AppBar
-- [ ] Price + trial shown inline (e.g., "$0.99/month · 3 days free trial") in green bold text
-- [ ] 4 compact checkmark rows visible (green `check_circle_rounded` icon):
-  - [ ] "Unlimited subscriptions"
-  - [ ] "All reminders — 7-day, 1-day, day-of"
-  - [ ] "Spending analytics & yearly forecast"
-  - [ ] "Backup & restore your data"
-- [ ] Subscribe button full-width, green, shows dynamic price: "Subscribe for $X.XX/month"
-- [ ] Trial terms line below button (e.g., "Free for 3 days, then $0.99/month...")
-- [ ] Bottom row: Restore · Terms · Privacy — all three on one line
-- [ ] Fine print: "Managed through App Store. Free tier: 5 subscriptions."
-- [ ] No amber warning banner (removed — context in fine print)
+> **Note:** Paywall route removed and Premium UI stripped as of v1.5.0 (`isFreeMode = true`).
+> These tests only apply if re-monetizing (set `isFreeMode = false` and re-add paywall route/UI).
 
-### Loading State
-- [ ] Small inline spinner visible below price line while StoreKit loads (`_isLoadingOffering`)
-- [ ] Subscribe button shows spinner and is disabled during loading
-- [ ] After loading: price updates to real StoreKit value
-
-### Error State (simulate by disabling network)
-- [ ] Inline warning row appears: amber icon + "Could not load pricing." + "Retry" link
-- [ ] Subscribe button remains **enabled** (never gated on `_offeringError`)
-- [ ] Tapping Retry re-fetches offering
-
-### Purchase Flow
-- [ ] Tapping Subscribe triggers StoreKit purchase sheet
-- [ ] Success: snackbar "✅ Premium activated!", paywall closes
-- [ ] Cancel (user taps Cancel in sheet): no error shown, button re-enables
-- [ ] Failure: snackbar with error message + "Details" button
-- [ ] "Details" button opens dialog with structured error info
-
-### Restore Flow
-- [ ] Tapping "Restore" in bottom row triggers restore
-- [ ] Success: snackbar "✅ Purchases restored successfully!", paywall closes
-- [ ] No prior purchase: snackbar "No purchases found to restore."
-
-### Legal Links
-- [ ] Tapping "Terms" opens https://customsubs.us/terms in external browser
-- [ ] Tapping "Privacy" opens https://customsubs.us/privacy in external browser
-
-### Close
-- [ ] X button in AppBar closes paywall (navigates back)
-- [ ] Back gesture closes paywall
-
-### Premium Badge Freshness *(Fixed v1.4.1)*
-- [ ] After trial expires (or purchase lapses), background then foreground the app → Premium badge disappears
-- [ ] Settings screen reflects correct status (Free Tier) after foreground
-- [ ] Add subscription limit re-activates (blocked at 5) after premium lapses + foreground
+### Free Mode Verification (Current)
+- [ ] Add 6+ subscriptions — no paywall or limit prompt appears
+- [ ] Settings screen has no "Premium" section
+- [ ] Home spending card has no "Premium" badge
+- [ ] Navigating to `/paywall` directly shows 404 / no route match
 
 ---
 
