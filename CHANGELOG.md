@@ -1645,18 +1645,18 @@ Complete UI modernization of the Add Subscription screen through three iterative
   - GDPR and CCPA compliance statements
   - Technical transparency section
   - Boston, MA jurisdiction
-  - Contact: bobby@customapps.us
+  - Contact: info@customapps.us
 - **Terms of Service** (TERMS_OF_SERVICE.md)
   - Complete terms covering all app features
   - Disclaimer for notification reliability
   - User responsibilities for data backup
   - Massachusetts governing law
   - Arbitration agreement with opt-out provision
-  - Contact: bobby@customapps.us
+  - Contact: info@customapps.us
 
 ### Changed
 - Updated development status from 95% to 98% complete
-- All placeholder emails consolidated to bobby@customapps.us
+- All placeholder emails consolidated to info@customapps.us
 - Company location set to Boston, Massachusetts
 
 ---

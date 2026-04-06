@@ -9,7 +9,7 @@ class RevenueCatConstants {
   RevenueCatConstants._(); // Private constructor to prevent instantiation
 
   // ============================================================
-  // API KEYS (TODO: Replace with actual keys from RevenueCat dashboard)
+  // API KEYS
   // ============================================================
 
   /// iOS API key from RevenueCat dashboard.
@@ -18,8 +18,8 @@ class RevenueCatConstants {
 
   /// Android API key from RevenueCat dashboard.
   /// Get from: https://app.revenuecat.com/projects/YOUR_PROJECT/api-keys
-  /// TODO: Add Android app to RevenueCat and update this key
-  static const String androidApiKey = 'appl_rRzabPDSmVyXEYjWSaSuklniHEA'; // Using iOS key as placeholder for now
+  /// Android API key (currently shares iOS key — single RevenueCat app).
+  static const String androidApiKey = 'appl_rRzabPDSmVyXEYjWSaSuklniHEA';
 
   // ============================================================
   // PRODUCT IDS (Must match App Store Connect / Play Console)

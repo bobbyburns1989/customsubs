@@ -234,7 +234,7 @@ Upon termination:
 
 ### 11.1 Informal Resolution
 
-Before filing a claim, you agree to contact us at bobby@customapps.us to attempt to resolve the dispute informally. We will attempt to resolve disputes in good faith within 30 days.
+Before filing a claim, you agree to contact us at info@customapps.us to attempt to resolve the dispute informally. We will attempt to resolve disputes in good faith within 30 days.
 
 ### 11.2 Binding Arbitration
 
@@ -257,7 +257,7 @@ If for any reason a claim proceeds in court rather than arbitration, you waive a
 
 ### 11.4 Opt-Out
 
-You may opt out of the arbitration agreement by emailing us at bobby@customapps.us within 30 days of first using CustomSubs. Your opt-out notice must include your name and state that you wish to opt out of the arbitration agreement.
+You may opt out of the arbitration agreement by emailing us at info@customapps.us within 30 days of first using CustomSubs. Your opt-out notice must include your name and state that you wish to opt out of the arbitration agreement.
 
 ### 11.5 Governing Law
 
@@ -303,7 +303,7 @@ If you are a U.S. government entity, CustomSubs is a "commercial item" as define
 
 Under California Civil Code Section 1789.3, California users are entitled to the following consumer rights notice:
 
-If you have a question or complaint regarding CustomSubs, please contact us at bobby@customapps.us. You may also contact the Complaint Assistance Unit of the Division of Consumer Services of the California Department of Consumer Affairs:
+If you have a question or complaint regarding CustomSubs, please contact us at info@customapps.us. You may also contact the Complaint Assistance Unit of the Division of Consumer Services of the California Department of Consumer Affairs:
 
 - **Mail:** 1625 North Market Blvd., Suite N 112, Sacramento, CA 95834
 - **Phone:** (916) 445-1254 or (800) 952-5210
@@ -314,7 +314,7 @@ All legal notices should be sent to:
 
 **CustomApps LLC**
 **Attn: Legal Department**
-**Email:** bobby@customapps.us
+**Email:** info@customapps.us
 **Address:** Boston, Massachusetts
 
 ## 13. Third-Party Services
@@ -338,7 +338,7 @@ Accessing third-party links is at your own risk.
 
 ## 14. Accessibility
 
-We strive to make CustomSubs accessible to users with disabilities. If you have difficulty using the App, please contact us at bobby@customapps.us.
+We strive to make CustomSubs accessible to users with disabilities. If you have difficulty using the App, please contact us at info@customapps.us.
 
 ## 15. Open Source
 
@@ -352,9 +352,9 @@ These Terms may be translated into other languages for convenience. In the event
 
 If you have questions about these Terms of Service:
 
-**Email:** bobby@customapps.us
+**Email:** info@customapps.us
 **Website:** https://customsubs.us/terms
-**Legal Inquiries:** bobby@customapps.us
+**Legal Inquiries:** info@customapps.us
 
 ---
 

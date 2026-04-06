@@ -208,7 +208,7 @@ intl: ^0.19.0
 ## 📞 Support & Contact
 
 **Developer:** CustomApps LLC
-**Email:** bobby@customapps.us
+**Email:** info@customapps.us
 **Location:** Boston, Massachusetts
 **Website (Privacy):** customsubs.us/privacy
 **Website (Terms):** customsubs.us/terms

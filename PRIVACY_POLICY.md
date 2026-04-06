@@ -174,7 +174,7 @@ Continued use of the app after policy updates constitutes acceptance of the upda
 
 If you have questions about this Privacy Policy or CustomSubs's privacy practices:
 
-**Email:** bobby@customapps.us
+**Email:** info@customapps.us
 **Website:** https://customsubs.us/privacy
 **Mail:** CustomApps LLC, Boston, Massachusetts
 
@@ -224,7 +224,7 @@ This privacy policy is longer than most, not because we do a lot with your data,
 
 **CustomSubs**
 A CustomApps LLC Product
-bobby@customapps.us
+info@customapps.us
 https://customsubs.us
 
 ---

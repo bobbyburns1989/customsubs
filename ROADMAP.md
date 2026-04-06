@@ -315,7 +315,7 @@ Comprehensive testing plan ready. All pre-testing verification passed with **zer
   - GDPR and CCPA compliance statements
   - Technical transparency section
   - App Store privacy labels
-  - Contact: bobby@customapps.us
+  - Contact: info@customapps.us
   - Location: Boston, Massachusetts
 - ✅ **TERMS_OF_SERVICE.md** (15,767 bytes)
   - Complete terms covering all app features
@@ -325,7 +325,7 @@ Comprehensive testing plan ready. All pre-testing verification passed with **zer
   - Cancellation assistance disclaimer
   - Massachusetts governing law
   - Arbitration agreement with opt-out
-  - Contact: bobby@customapps.us
+  - Contact: info@customapps.us
 
 ### Impact
 - **Settings screen:** 100% complete per CLAUDE.md specification
@@ -598,7 +598,7 @@ Comprehensive testing plan ready. All pre-testing verification passed with **zer
 - ✅ Privacy Policy link in Settings
 - ✅ Terms of Service link in Settings
 - ✅ Boston, MA jurisdiction set
-- ✅ Contact email: bobby@customapps.us
+- ✅ Contact email: info@customapps.us
 - ✅ GDPR/CCPA compliance statements
 - ✅ App Store compliance ready
 

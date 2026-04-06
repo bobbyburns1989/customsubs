@@ -240,7 +240,7 @@ CustomSubs represents weeks of focused development, careful testing, and attenti
 ## Links
 
 - **App Store**: [Coming Soon - Add link when available]
-- **Support**: bobby@customapps.us
+- **Support**: info@customapps.us
 - **Privacy Policy**: customsubs.us/privacy
 - **Terms of Service**: customsubs.us/terms
 

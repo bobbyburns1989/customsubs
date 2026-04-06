@@ -41,7 +41,7 @@ Make sure your web server is configured so that:
 ## Contact Information in Terms
 
 The Terms reference:
-- **Email**: bobby@customapps.us
+- **Email**: info@customapps.us
 - **Company**: CustomApps LLC
 - **Location**: Boston, Massachusetts
 

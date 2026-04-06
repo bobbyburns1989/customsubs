@@ -177,7 +177,7 @@ See full notes in: `APP_STORE_REVIEW_NOTES_v1.8.md`
 - Issue 2 (Paywall design): ✅ Fixed - Price now most prominent
 - Issue 3 (IAP error): ✅ Resolved - Subscription properly configured
 - Purchase flow testing instructions included
-- Contact: bobby@customapps.us
+- Contact: info@customapps.us
 
 ---
 

@@ -194,7 +194,7 @@ CustomSubs competes with "Bobby" (iOS-only subscription tracker by Yummygum). Ou
 - Privacy Policy: Hosted at https://customsubs.us/privacy
 - Terms of Service: Apple Standard EULA
 - GDPR/CCPA compliant (no data collection)
-- Contact: bobby@customapps.us
+- Contact: info@customapps.us
 - Company: CustomApps LLC, Boston, MA
 
 ---
@@ -217,7 +217,7 @@ Before submitting, verify:
 ## 📞 Contact Information
 
 **Developer:** Bobby Burns
-**Email:** bobby@customapps.us
+**Email:** info@customapps.us
 **Company:** CustomApps LLC
 **Location:** Boston, Massachusetts, USA
 

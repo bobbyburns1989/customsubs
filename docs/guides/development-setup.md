@@ -172,15 +172,24 @@ dart fix --apply
 ### Testing
 
 ```bash
-# Run all tests
+# Run all unit tests (~100+ tests)
 flutter test
 
 # Run specific test file
-flutter test test/path/to/test_file.dart
+flutter test test/data/repositories/subscription_repository_test.dart
+
+# Run by directory
+flutter test test/data/              # Repository + service tests
+flutter test test/features/home/     # HomeController tests
 
 # Run with coverage
 flutter test --coverage
 ```
+
+**Mocking:** Uses `mocktail` (no codegen). Mocks declared in `test/helpers/mocks.dart`.
+**Test data:** Use `TestSub` factory in `test/helpers/test_subscription_factory.dart`.
+
+See [`testing.md`](testing.md) for full patterns and conventions.
 
 ### Build & Release
 

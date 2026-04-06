@@ -106,61 +106,7 @@ CustomSubs is a **privacy-first, offline-only** subscription tracker for iOS and
 
 ## Folder Structure
 
-```
-lib/
-├── app/                          # App configuration
-│   ├── app.dart                  # MaterialApp + providers
-│   ├── router.dart               # All navigation routes
-│   └── theme.dart                # Complete Material3 theme
-│
-├── core/                         # Shared utilities
-│   ├── constants/                # Colors, sizes, templates
-│   │   ├── app_colors.dart       # Color palette
-│   │   ├── app_sizes.dart        # Spacing + sectionSpacing (20px)
-│   │   └── subscription_templates.dart
-│   ├── extensions/               # DateTime, currency helpers
-│   ├── utils/                    # Currency, export utilities
-│   └── widgets/                  # Reusable UI components
-│       ├── standard_card.dart       # Consistent card styling (16px radius, 1.5px border)
-│       ├── subtle_pressable.dart    # Micro-interaction wrapper
-│       ├── subscription_icon.dart   # Brand icon widget (SimpleIcons + letter fallback)
-│       └── empty_state.dart         # Empty state component
-│
-├── data/                         # Data layer
-│   ├── models/                   # Domain models + Hive adapters
-│   ├── repositories/             # Data access (CRUD operations)
-│   └── services/                 # Cross-cutting concerns
-│
-├── features/                     # Feature modules
-│   ├── onboarding/               # First-launch flow
-│   ├── home/                     # Main dashboard
-│   ├── add_subscription/         # Add/edit forms
-│   ├── subscription_detail/      # Detail view + actions
-│   ├── settings/                 # App settings
-│   ├── analytics/                # Spending breakdown
-│   ├── calendar/                 # Billing date calendar view
-│   └── cancellation/             # Cancel flows
-│
-└── main.dart                     # Entry point + initialization
-```
-
-### Folder Organization Rules
-
-**Feature-first structure:**
-- Each feature is self-contained in its own directory
-- Shared code goes in `core/`
-- Data access centralized in `data/`
-
-**File naming:**
-- `snake_case.dart` for all Dart files
-- `[feature]_screen.dart` for UI
-- `[feature]_controller.dart` for state management
-- `[feature]_controller.g.dart` for generated files
-
-**Widget organization:**
-- Keep large widgets in separate files
-- Extract reusable widgets to `/widgets` subdirectory
-- Screen-specific widgets stay in feature directory
+See `CLAUDE.md` for the current folder structure and file naming conventions.
 
 ---
 
@@ -381,76 +327,14 @@ class SubscriptionRepository {
 
 ## Technology Choices
 
-### Why Flutter?
+See `CLAUDE.md` for the authoritative tech stack and key dependencies. For the reasoning behind key decisions:
 
-- **Cross-platform** - iOS and Android from single codebase
-- **Fast development** - Hot reload, rich widget library
-- **Performance** - Native compilation, smooth 60fps animations
-- **Maturity** - Large ecosystem, stable releases
-
-### Why Riverpod?
-
-- **Type-safe** - Compile-time errors vs runtime crashes
-- **Testable** - Easy to mock providers
-- **Reactive** - UI updates automatically
-- **Code generation** - Less boilerplate, better DX
-
-**See:** `docs/decisions/001-riverpod-code-generation.md`
-
-### Why Hive?
-
-- **Offline-first** - No network dependency
-- **Fast** - Synchronous reads, lazy loading
-- **Type-safe** - Code generation for adapters
-- **Lightweight** - No SQLite overhead
-
-### Why `simple_icons` + local SVGs for Brand Logos?
-
-- **Offline** - Font-based SVG icons bundled with the app, no network needed
-- **Legal** - Open-source icon set with established fair-use precedent for identification UI
-- **Coverage** - 3,270+ brand icons; ~80 subscription services mapped
-- **Quality** - Vector, scales perfectly at any size
-- **Fallback** - Three-tier resolution: local SVG → SimpleIcons → letter avatar — no broken UI
-
-**Trademark removals covered by bundled SVGs (`assets/logos/`):** Adobe, Microsoft, Disney+, LinkedIn, Xbox, Nintendo, Hulu, Bumble were removed from Simple Icons but are covered by hand-crafted SVG logo files bundled in the app. Add more by creating `{iconName}.svg` and registering in `ServiceIcons._localLogoIconNames`.
-
-**Packages:** `simple_icons: ^14.6.1` (SimpleIcons font) + `flutter_svg: ^2.0.0` (for local SVG rendering)
-
-### Why NOT Firebase/Supabase/Cloud?
-
-- **Privacy** - Subscription data never leaves the device
-- **Simplicity** - No auth, no backend to maintain
-- **Reliability** - Works without internet
-- **Trust** - Users control their data
-
-**See:** `docs/decisions/003-offline-first-architecture.md`
-
-### Why RevenueCat for IAP? (v1.3.0+)
-
-- **Cross-platform** - Single API for App Store and Google Play billing
-- **Receipt validation** - Server-side validation without building our own backend
-- **Entitlement management** - Simple `isPremium` check independent of platform
-- **Dashboard** - Real-time subscription analytics and debugging
-
-**Note:** RevenueCat and PostHog are the only SDKs that make outbound network calls. All subscription tracking data remains local.
-
-**See:** `docs/guides/iap-and-premium.md`
-
-### Why PostHog for Analytics? (v1.4.7+)
-
-- **Privacy-first** — anonymous-only (no user IDs, no PII), with opt-out toggle
-- **Consistent** — same analytics platform used across CustomBank, CustomCrypto, CustomNotify, and CustomSubs
-- **Lightweight** — Dart-side configuration only, no native platform config needed
-- **Self-serve** — dashboards, funnels, and retention analysis without building custom tooling
-
-**Note:** PostHog is the second outbound SDK. It tracks 28 custom events (monetization funnel, core engagement, screen views, creation funnel, feature usage) plus automatic crash reporting (`$exception` events with stack traces) and screen views (`$screen`). Properties are categorical only — no PII. Users can disable via Settings > Privacy. See `docs/guides/analytics-and-tracking.md` for the full event reference.
-
-### Why Local Notifications?
-
-- **Platform-native** - OS handles scheduling
-- **Battery-efficient** - No background polling
-- **Reliable** - Survives app restarts and device reboots
-- **Free** - No push notification service costs
+| Decision | ADR |
+|----------|-----|
+| Riverpod code generation | `docs/decisions/001-riverpod-code-generation.md` |
+| Notification ID strategy | `docs/decisions/002-notification-id-strategy.md` |
+| Offline-first (no cloud) | `docs/decisions/003-offline-first-architecture.md` |
+| Pause via isActive reuse | `docs/decisions/004-pause-feature-isactive-reuse.md` |
 
 ---
 
@@ -564,17 +448,21 @@ class SubscriptionRepository {
 
 ## Testing Strategy
 
-### Unit Tests
+**Mocking library:** `mocktail` (no codegen). Full guide: [`docs/guides/testing.md`](../guides/testing.md).
 
-- **Models** - Test computed properties, copyWith(), edge cases
-- **Utilities** - Test date calculations, currency conversions
-- **Extensions** - Test DateTime helpers, formatting
+### Unit Tests (~100+ tests)
+
+- **SubscriptionRepository** (~34 tests) — CRUD, date advancement (calendar-day boundary), pause/resume, filtering, aggregation
+- **NotificationService** (~22 tests) — skip-paused, skip-paid, trial routing, deterministic IDs, past-notification skipping
+- **HomeController** (~22 tests) — 30-day boundary, unpaid-first sort, optimistic markAsPaid, notification side effects
+- **Forms** (~26 tests) — validation, state management, serialization
+
+Test helpers: `TestSub` factory (`test/helpers/test_subscription_factory.dart`), mocks (`test/helpers/mocks.dart`).
 
 ### Widget Tests
 
-- **Screens** - Test UI renders correctly, handles all states
-- **Forms** - Test validation, submission, error handling
-- **Controllers** - Test state management, async operations
+- **Forms** - Validation, submission, section collapsibility
+- **Screens** - UI renders correctly, handles all states
 
 ### Integration Tests
 

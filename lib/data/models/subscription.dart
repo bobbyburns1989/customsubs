@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
@@ -299,28 +300,48 @@ class Subscription extends HiveObject {
     };
   }
 
-  /// Create from JSON for backup import
+  /// Parse a date string safely, returning [fallback] on null or invalid input.
+  static DateTime _parseDate(dynamic value, DateTime fallback) {
+    if (value == null) return fallback;
+    try {
+      return DateTime.parse(value as String);
+    } catch (_) {
+      return fallback;
+    }
+  }
+
+  /// Parse an optional date string safely, returning null on invalid input.
+  static DateTime? _parseDateOrNull(dynamic value) {
+    if (value == null) return null;
+    try {
+      return DateTime.parse(value as String);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Create from JSON for backup import.
+  /// Applies defensive defaults for missing/corrupted fields so that a
+  /// single bad field doesn't crash the entire import.
   factory Subscription.fromJson(Map<String, dynamic> json) {
     return Subscription(
-      id: json['id'] as String,
-      name: json['name'] as String,
-      amount: (json['amount'] as num).toDouble(),
-      currencyCode: json['currencyCode'] as String,
+      id: json['id'] as String? ?? const Uuid().v4(),
+      name: json['name'] as String? ?? 'Unknown Subscription',
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
+      currencyCode: json['currencyCode'] as String? ?? 'USD',
       cycle: SubscriptionCycle.values.firstWhere(
         (e) => e.name == json['cycle'],
         orElse: () => SubscriptionCycle.monthly,
       ),
-      nextBillingDate: DateTime.parse(json['nextBillingDate'] as String),
-      startDate: DateTime.parse(json['startDate'] as String),
+      nextBillingDate: _parseDate(json['nextBillingDate'], DateTime.now()),
+      startDate: _parseDate(json['startDate'], DateTime.now()),
       category: SubscriptionCategory.values.firstWhere(
         (e) => e.name == json['category'],
         orElse: () => SubscriptionCategory.other,
       ),
       isActive: json['isActive'] as bool? ?? true,
       isTrial: json['isTrial'] as bool? ?? false,
-      trialEndDate: json['trialEndDate'] != null
-          ? DateTime.parse(json['trialEndDate'] as String)
-          : null,
+      trialEndDate: _parseDateOrNull(json['trialEndDate']),
       postTrialAmount: json['postTrialAmount'] != null
           ? (json['postTrialAmount'] as num).toDouble()
           : null,
@@ -337,20 +358,31 @@ class Subscription extends HiveObject {
           [],
       notes: json['notes'] as String?,
       iconName: json['iconName'] as String?,
-      colorValue: json['colorValue'] as int,
-      reminders: ReminderConfig.fromJson(
-          json['reminders'] as Map<String, dynamic>),
+      colorValue: json['colorValue'] as int? ?? 0xFF6366F1,
+      reminders: json['reminders'] != null
+          ? ReminderConfig.fromJson(
+              json['reminders'] as Map<String, dynamic>)
+          : ReminderConfig.defaultConfig(),
       isPaid: json['isPaid'] as bool? ?? false,
-      lastMarkedPaidDate: json['lastMarkedPaidDate'] != null
-          ? DateTime.parse(json['lastMarkedPaidDate'] as String)
-          : null,
-      pausedDate: json['pausedDate'] != null
-          ? DateTime.parse(json['pausedDate'] as String)
-          : null,
-      resumeDate: json['resumeDate'] != null
-          ? DateTime.parse(json['resumeDate'] as String)
-          : null,
+      lastMarkedPaidDate: _parseDateOrNull(json['lastMarkedPaidDate']),
+      pausedDate: _parseDateOrNull(json['pausedDate']),
+      resumeDate: _parseDateOrNull(json['resumeDate']),
       pauseCount: json['pauseCount'] as int? ?? 0,
     );
+  }
+
+  /// Attempts to parse a Subscription from JSON, returning null on failure.
+  /// Use this for per-item error isolation during backup imports.
+  static Subscription? tryFromJson(
+    Map<String, dynamic> json, {
+    void Function(String error)? onError,
+  }) {
+    try {
+      return Subscription.fromJson(json);
+    } catch (e) {
+      onError?.call(
+          'Failed to parse "${json['name'] ?? 'unknown'}": $e');
+      return null;
+    }
   }
 }

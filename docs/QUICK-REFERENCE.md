@@ -1,92 +1,12 @@
 # Quick Reference
 
-**Status**: ✅ Complete
-**Last Updated**: March 25, 2026 (v1.4.9 — crash analytics, growth events, in-app review)
-**Relevant to**: Developers
+**Last Updated**: March 25, 2026 (v1.4.9)
 
-**Fast lookup for common tasks and patterns in CustomSubs.**
-
-Bookmark this page for quick access during development.
+Code snippets and patterns for CustomSubs development. For project structure, tech stack, and design system basics, see `CLAUDE.md`.
 
 ---
 
-## 🚀 Common Commands
-
-```bash
-# Install dependencies
-flutter pub get
-
-# Run code generation
-dart run build_runner build --delete-conflicting-outputs
-
-# Watch mode (auto-rebuild)
-dart run build_runner watch
-
-# Run app
-flutter run
-
-# Analyze code
-flutter analyze
-
-# Format code
-dart format .
-
-# Clean build
-flutter clean && flutter pub get
-```
-
----
-
-## 📁 Project Structure
-
-```
-lib/
-├── app/                    # Config, router, theme
-├── core/
-│   ├── constants/         # AppColors, AppSizes
-│   ├── extensions/        # DateTime, currency helpers
-│   └── utils/             # CurrencyUtils, etc.
-├── data/
-│   ├── models/            # Hive models (@HiveType)
-│   ├── repositories/      # Data access (CRUD)
-│   └── services/          # NotificationService, etc.
-└── features/
-    └── [feature_name]/
-        ├── [feature]_screen.dart
-        ├── [feature]_controller.dart
-        └── widgets/
-```
-
----
-
-## 🎨 Colors & Styling
-
-```dart
-import 'package:custom_subs/core/constants/app_colors.dart';
-import 'package:custom_subs/core/constants/app_sizes.dart';
-
-// Colors
-AppColors.primary              // Green 600
-AppColors.textPrimary          // Slate 900
-AppColors.textSecondary        // Slate 500
-AppColors.error                // Red 500
-AppColors.warning              // Amber 500
-
-// Spacing
-AppSizes.xs      // 4px
-AppSizes.sm      // 8px
-AppSizes.base    // 16px (most common)
-AppSizes.xl      // 24px
-AppSizes.xxl     // 32px
-
-// Border Radius
-AppSizes.radiusMd    // 12px (cards)
-AppSizes.radiusFull  // 999px (circles)
-```
-
----
-
-## 🔄 Riverpod Patterns
+## Riverpod Patterns
 
 ### AsyncNotifier (Screen Controller)
 
@@ -849,14 +769,9 @@ Future<void> _save() async {
 ### Card
 
 ```dart
-Card(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-  ),
-  child: Padding(
-    padding: EdgeInsets.all(AppSizes.base),
-    child: /* content */,
-  ),
+// Use StandardCard for all cards (16px radius, 1.5px border, 20px padding)
+StandardCard(
+  child: /* content */,
 )
 ```
 

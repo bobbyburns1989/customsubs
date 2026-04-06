@@ -162,7 +162,7 @@ ElevatedButton(onPressed: handler, ...)
 8. **Your Rights** - Access, portability, deletion
 9. **International Users** - GDPR/CCPA compliance
 10. **Changes to Policy** - How updates are communicated
-11. **Contact Us** - bobby@customapps.us, Boston MA
+11. **Contact Us** - info@customapps.us, Boston MA
 12. **Technical Transparency** - Network monitoring details
 13. **App Store Privacy Labels** - What's declared
 
@@ -174,7 +174,7 @@ ElevatedButton(onPressed: handler, ...)
 - No legalese - clear and honest tone
 
 **Contact Info:**
-- Email: bobby@customapps.us
+- Email: info@customapps.us
 - Location: Boston, Massachusetts
 - Website: https://customsubs.us/privacy
 
@@ -198,7 +198,7 @@ ElevatedButton(onPressed: handler, ...)
 12. **General Provisions** - Standard legal clauses
 13. **Third-Party Services** - App store providers
 14. **Accessibility** - Commitment to accessibility
-15. **Contact** - bobby@customapps.us
+15. **Contact** - info@customapps.us
 
 **Key Features:**
 - Clear "No Financial Advice" disclaimer
@@ -216,8 +216,8 @@ ElevatedButton(onPressed: handler, ...)
 - Arbitration: American Arbitration Association (AAA)
 
 **Contact Info:**
-- Email: bobby@customapps.us
-- Legal: bobby@customapps.us
+- Email: info@customapps.us
+- Legal: info@customapps.us
 - Location: Boston, Massachusetts
 
 ---
@@ -347,7 +347,7 @@ Terms of Service
 - [ ] Home "Analytics" button has green outline
 
 ### Legal Documents
-- [ ] All emails are bobby@customapps.us
+- [ ] All emails are info@customapps.us
 - [ ] All locations are Boston, Massachusetts
 - [ ] Privacy Policy loads on website
 - [ ] Terms of Service loads on website

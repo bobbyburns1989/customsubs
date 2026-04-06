@@ -1,45 +1,27 @@
 # CLAUDE.md — CustomSubs
 
-## 📚 Documentation Quick Reference
+## Documentation Routing
 
-**This file = essential rules only.** For implementation details, follow the links below.
+**This file = essential rules. Most tasks require ONLY this file.**
 
-### 🎯 Start Here
-- **New to this project?** Read this file + [`docs/architecture/overview.md`](docs/architecture/overview.md)
-- **Implementing a feature?** See [`docs/guides/adding-a-feature.md`](docs/guides/adding-a-feature.md)
-- **Working with state?** See [`docs/architecture/state-management.md`](docs/architecture/state-management.md)
+Read additional docs ONLY when your task matches:
 
-### 🔧 Implementation Guides
-| Task | Documentation |
-|------|--------------|
-| **Notifications (CRITICAL)** | [`docs/guides/working-with-notifications.md`](docs/guides/working-with-notifications.md) |
-| **Data models & HiveFields** | [`docs/architecture/models.md`](docs/architecture/models.md) |
-| Data layer (Hive, repos) | [`docs/architecture/data-layer.md`](docs/architecture/data-layer.md) |
-| IAP & Premium (RevenueCat) | [`docs/guides/iap-and-premium.md`](docs/guides/iap-and-premium.md) |
-| Adding a new feature | [`docs/guides/adding-a-feature.md`](docs/guides/adding-a-feature.md) |
-| State management patterns | [`docs/architecture/state-management.md`](docs/architecture/state-management.md) |
-| Forms and validation | [`docs/guides/forms-and-validation.md`](docs/guides/forms-and-validation.md) |
-| Multi-currency support | [`docs/guides/multi-currency.md`](docs/guides/multi-currency.md) |
-| Animations & Polish | [`docs/design/MICRO_ANIMATIONS.md`](docs/design/MICRO_ANIMATIONS.md) |
-| Analytics, crash reporting & events | [`docs/guides/analytics-and-tracking.md`](docs/guides/analytics-and-tracking.md) |
+| If you're... | MUST read |
+|---|---|
+| Modifying notifications | [`docs/guides/working-with-notifications.md`](docs/guides/working-with-notifications.md) |
+| Adding/changing a HiveField | [`docs/architecture/models.md`](docs/architecture/models.md) |
+| Adding a new screen/feature | [`docs/guides/adding-a-feature.md`](docs/guides/adding-a-feature.md) |
+| Working with forms | [`docs/guides/forms-and-validation.md`](docs/guides/forms-and-validation.md) |
+| Working with currency | [`docs/guides/multi-currency.md`](docs/guides/multi-currency.md) |
+| Modifying IAP/paywall | [`docs/guides/iap-and-premium.md`](docs/guides/iap-and-premium.md) |
+| Adding analytics events | [`docs/guides/analytics-and-tracking.md`](docs/guides/analytics-and-tracking.md) |
+| Changing Riverpod patterns | [`docs/architecture/state-management.md`](docs/architecture/state-management.md) |
+| Changing design system | [`docs/architecture/design-system.md`](docs/architecture/design-system.md) |
+| Working with animations | [`docs/design/MICRO_ANIMATIONS.md`](docs/design/MICRO_ANIMATIONS.md) |
+| Need code snippets | [`docs/QUICK-REFERENCE.md`](docs/QUICK-REFERENCE.md) |
+| Questioning past decisions | [`docs/decisions/`](docs/decisions/) (4 ADRs) |
 
-### 📐 Architecture & Design
-| Topic | Documentation |
-|-------|--------------|
-| Architecture overview | [`docs/architecture/overview.md`](docs/architecture/overview.md) |
-| Design system (colors, typography) | [`docs/architecture/design-system.md`](docs/architecture/design-system.md) |
-| Architectural decisions (ADRs) | [`docs/decisions/`](docs/decisions/) |
-
-### 📋 Templates & Examples
-| Template | File |
-|----------|------|
-| Feature implementation checklist | [`docs/templates/feature-template.md`](docs/templates/feature-template.md) |
-| Screen with controller (annotated) | [`docs/templates/screen-with-controller.dart`](docs/templates/screen-with-controller.dart) |
-| Form screen (annotated) | [`docs/templates/form-screen.dart`](docs/templates/form-screen.dart) |
-
-### ⚡ Quick Reference
-- **Cheat sheet**: [`docs/QUICK-REFERENCE.md`](docs/QUICK-REFERENCE.md)
-- **Feature specs (v1, all complete)**: [`docs/archive/feature-specs-v1.md`](docs/archive/feature-specs-v1.md)
+**Do NOT read:** `docs/completion/`, `docs/archive/`, `docs/testing/`, `docs/INDEX.md` — historical, not useful for implementation.
 
 ---
 
@@ -69,6 +51,7 @@
 - **Crash Reporting:** PostHog error tracking autocapture (Flutter errors, platform errors, isolate errors). Enabled via `errorTrackingConfig` in `AnalyticsService.init()`. No Sentry/Crashlytics needed.
 - **In-App Review:** `in_app_review: ^2.0.9`. Prompts after 5th subscription created. Single-use, Apple rate-limited.
 - **IDs:** `uuid` package for subscription UUIDs.
+- **Testing:** `mocktail` for mocking (no codegen). See [`docs/guides/testing.md`](docs/guides/testing.md).
 
 ### Key Dependencies
 ```
@@ -286,6 +269,19 @@ flutter run
 Run `build_runner` after any Hive model or Riverpod annotation change.
 
 Verify notifications on a **real device** — simulators have limited notification support.
+
+### Running Tests
+
+```bash
+flutter test                                    # All unit + widget tests
+flutter test test/data/                         # Repository + service + model tests
+flutter test test/features/home/                # HomeController tests
+flutter test test/core/                         # Date extensions tests
+flutter test integration_test/smoke_test.dart   # On-device smoke test
+flutter test --coverage                         # With coverage report
+```
+
+See [`docs/guides/testing.md`](docs/guides/testing.md) for test patterns and conventions.
 
 ### Android Release AAB (Google Play)
 

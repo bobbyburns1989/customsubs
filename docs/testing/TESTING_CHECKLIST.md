@@ -525,9 +525,11 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Import accepts `.json` files
 - [ ] Valid backup imports successfully
 - [ ] Confirmation shows subscription count
-- [ ] Duplicates skipped (name + amount + cycle match)
+- [ ] Duplicates skipped (UUID match or name + amount + cycle match)
+- [ ] Paused subscriptions detected as duplicates (not re-imported)
 - [ ] After import, home updates immediately
 - [ ] Notifications re-scheduled for all imported subs
+- [ ] Notification scheduling failure doesn't crash import
 
 ### Backup Reminder
 - [ ] After adding 3rd subscription, one-time prompt appears
@@ -541,11 +543,14 @@ This checklist covers all features, edge cases, and critical user flows in Custo
 - [ ] Amber warning if never backed up
 
 ### Edge Cases
-- [ ] Import same backup twice → second time skips all duplicates
+- [ ] Import same backup twice → second time skips all duplicates (UUID detection)
 - [ ] Import backup with 0 subscriptions → shows message
 - [ ] Malformed JSON → error message, no crash
 - [ ] Import backup from old version (future-proofing) → handles gracefully
 - [ ] Export → uninstall → reinstall → import → all data restored
+- [ ] Corrupted subscription in backup (missing fields) → skipped with warning, others import fine
+- [ ] Import dialog shows "N subscription(s) could not be imported" when data is invalid
+- [ ] Missing colorValue/reminders in JSON → defaults applied, no crash
 
 ---
 

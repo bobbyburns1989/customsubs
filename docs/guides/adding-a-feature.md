@@ -821,7 +821,18 @@ class DetailScreen extends ConsumerWidget {
 
 ## Testing Your Feature
 
-### Checklist
+### Unit Tests
+
+Write tests for any new controller or service logic. See [`testing.md`](testing.md) for full patterns.
+
+- [ ] **Create test file** mirroring `lib/` structure under `test/`
+- [ ] **Use `TestSub` factory** for test data (don't construct `Subscription` manually)
+- [ ] **Mock dependencies** using `mocktail` (add to `test/helpers/mocks.dart`)
+- [ ] **Test filtering/business logic** — boundary conditions, empty states, error paths
+- [ ] **Test mutations** — verify repository calls, notification side effects, state updates
+- [ ] **Run `flutter test`** — all tests pass before committing
+
+### Manual Checklist
 
 - [ ] **Hot reload works** - UI changes appear without restart
 - [ ] **Loading state displays** - Shows spinner while loading

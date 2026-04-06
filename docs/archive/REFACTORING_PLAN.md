@@ -650,11 +650,16 @@ class BackupResult {
   final int subscriptionCount;
 }
 
+// NOTE: Actual ImportResult (as of v1.5.1) has expanded fields:
+// totalFound, duplicates, imported, subscriptions,
+// parseErrors, validationErrors, hasWarnings, skippedCount
 class ImportResult {
-  final bool success;
-  final int importedCount;
-  final int duplicateCount;
-  final String? errorMessage;
+  final int totalFound;
+  final int duplicates;
+  final int imported;
+  final List<Subscription> subscriptions;
+  final List<String> parseErrors;
+  final List<String> validationErrors;
 }
 ```
 

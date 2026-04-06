@@ -647,7 +647,7 @@ List<Subscription> getUpcomingSubscriptions({int days = 30}) {
   - `Future<String> exportToJson()` - Returns JSON string
   - `Future<void> shareBackup()` - Triggers share sheet
   - `Future<void> importFromFile()` - File picker + import
-  - `Future<List<Subscription>> parseBackupFile(String json)` - Validate + parse
+  - `Future<ParseResult> parseBackupFile(String json)` - Validate + parse (per-item error isolation)
 - Handle errors gracefully (invalid JSON, wrong format, etc.)
 
 **Files to Create/Modify:**

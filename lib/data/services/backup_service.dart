@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
@@ -125,19 +126,34 @@ class BackupService {
         throw BackupException('Unable to read file content');
       }
 
-      // Parse and validate backup
-      final parsedData = await parseBackupFile(fileContent);
+      // Parse backup — individual items that fail are skipped, not fatal
+      final parseResult = await parseBackupFile(fileContent);
 
-      // Detect duplicates
-      final duplicates = _detectDuplicates(parsedData, existingSubscriptions);
+      // Validate parsed subscriptions before any Hive writes
+      final validationErrors = <String>[];
+      final validSubscriptions = <Subscription>[];
+      for (final sub in parseResult.subscriptions) {
+        final error = validateSubscription(sub);
+        if (error != null) {
+          validationErrors.add('"${sub.name}": $error');
+        } else {
+          validSubscriptions.add(sub);
+        }
+      }
+
+      // Detect duplicates among valid subscriptions only
+      final duplicates =
+          detectDuplicates(validSubscriptions, existingSubscriptions);
       final newSubscriptions =
-          parsedData.where((sub) => !duplicates.contains(sub)).toList();
+          validSubscriptions.where((sub) => !duplicates.contains(sub)).toList();
 
       return ImportResult(
-        totalFound: parsedData.length,
+        totalFound: parseResult.totalInFile,
         duplicates: duplicates.length,
         imported: newSubscriptions.length,
         subscriptions: newSubscriptions,
+        parseErrors: parseResult.parseErrors,
+        validationErrors: validationErrors,
       );
     } catch (e) {
       if (e is BackupException) rethrow;
@@ -147,11 +163,15 @@ class BackupService {
 
   /// Parse and validate a backup JSON file.
   ///
+  /// Parses each subscription individually so that one corrupted entry
+  /// doesn't prevent the rest from importing. Returns a [ParseResult]
+  /// with successfully parsed subscriptions and any parse errors.
+  ///
   /// Throws [BackupException] if:
   /// - JSON is invalid
-  /// - Required fields are missing
+  /// - Required outer fields are missing
   /// - App name doesn't match
-  Future<List<Subscription>> parseBackupFile(String jsonContent) async {
+  Future<ParseResult> parseBackupFile(String jsonContent) async {
     try {
       final Map<String, dynamic> data = jsonDecode(jsonContent);
 
@@ -166,13 +186,31 @@ class BackupService {
         throw BackupException('Invalid backup file: missing subscriptions data');
       }
 
-      // Parse subscriptions
+      // Parse subscriptions individually — skip bad ones, collect errors
       final List<dynamic> subscriptionsJson = data['subscriptions'];
-      final subscriptions = subscriptionsJson
-          .map((json) => Subscription.fromJson(json as Map<String, dynamic>))
-          .toList();
+      final subscriptions = <Subscription>[];
+      final parseErrors = <String>[];
 
-      return subscriptions;
+      for (int i = 0; i < subscriptionsJson.length; i++) {
+        final json = subscriptionsJson[i];
+        if (json is! Map<String, dynamic>) {
+          parseErrors.add('Item ${i + 1}: not a valid subscription object');
+          continue;
+        }
+        final sub = Subscription.tryFromJson(
+          json,
+          onError: (error) => parseErrors.add('Item ${i + 1}: $error'),
+        );
+        if (sub != null) {
+          subscriptions.add(sub);
+        }
+      }
+
+      return ParseResult(
+        subscriptions: subscriptions,
+        parseErrors: parseErrors,
+        totalInFile: subscriptionsJson.length,
+      );
     } on FormatException catch (e) {
       throw BackupException('Invalid JSON format: $e');
     } catch (e) {
@@ -181,21 +219,39 @@ class BackupService {
     }
   }
 
+  /// Validates a subscription's data integrity before writing to Hive.
+  /// Returns null if valid, or an error message describing the problem.
+  static String? validateSubscription(Subscription sub) {
+    if (sub.name.trim().isEmpty) return 'Empty name';
+    if (sub.amount < 0) return 'Negative amount (${sub.amount})';
+    if (sub.currencyCode.trim().isEmpty) return 'Empty currency code';
+    return null;
+  }
+
   /// Detect duplicate subscriptions.
   ///
-  /// Duplicates are identified by matching:
-  /// - Name (case-insensitive)
-  /// - Amount
-  /// - Billing cycle
-  List<Subscription> _detectDuplicates(
+  /// Duplicates are identified by:
+  /// 1. UUID match (primary — same subscription re-imported)
+  /// 2. Name + amount + cycle match (secondary — same logical subscription)
+  @visibleForTesting
+  List<Subscription> detectDuplicates(
     List<Subscription> newSubscriptions,
     List<Subscription> existingSubscriptions,
   ) {
+    final existingIds = existingSubscriptions.map((s) => s.id).toSet();
     final duplicates = <Subscription>[];
 
     for (final newSub in newSubscriptions) {
+      // Primary: UUID match (same subscription re-imported)
+      if (existingIds.contains(newSub.id)) {
+        duplicates.add(newSub);
+        continue;
+      }
+
+      // Secondary: name+amount+cycle match (different ID, same logical sub)
       final isDuplicate = existingSubscriptions.any((existing) {
-        return existing.name.toLowerCase() == newSub.name.toLowerCase() &&
+        return existing.name.toLowerCase().trim() ==
+                   newSub.name.toLowerCase().trim() &&
             existing.amount == newSub.amount &&
             existing.cycle == newSub.cycle;
       });
@@ -219,19 +275,42 @@ class BackupService {
   }
 }
 
+/// Result of parsing a backup file (before duplicate detection or Hive writes).
+class ParseResult {
+  final List<Subscription> subscriptions;
+  final List<String> parseErrors;
+  final int totalInFile;
+
+  ParseResult({
+    required this.subscriptions,
+    required this.parseErrors,
+    required this.totalInFile,
+  });
+}
+
 /// Result of an import operation
 class ImportResult {
   final int totalFound;
   final int duplicates;
   final int imported;
   final List<Subscription> subscriptions;
+  final List<String> parseErrors;
+  final List<String> validationErrors;
 
   ImportResult({
     required this.totalFound,
     required this.duplicates,
     required this.imported,
     required this.subscriptions,
+    this.parseErrors = const [],
+    this.validationErrors = const [],
   });
+
+  /// True if some subscriptions could not be imported
+  bool get hasWarnings => parseErrors.isNotEmpty || validationErrors.isNotEmpty;
+
+  /// Total number of subscriptions that were skipped
+  int get skippedCount => parseErrors.length + validationErrors.length;
 }
 
 /// Exception thrown when backup operations fail
@@ -270,9 +349,10 @@ Future<void> exportBackup(Ref ref) async {
 Future<ImportResult> importBackup(Ref ref) async {
   final backupService = await ref.read(backupServiceProvider.future);
   final repository = await ref.read(subscriptionRepositoryProvider.future);
-  final existingSubscriptions = repository.getAllActive();
+  // Use getAll() not getAllActive() — paused subs must be checked for duplicates too
+  final existingSubscriptions = repository.getAll();
 
-  // Import subscriptions
+  // Import subscriptions (parse + validate + duplicate detect — no Hive writes yet)
   final result = await backupService.importFromFile(existingSubscriptions);
 
   // Save new subscriptions to repository
@@ -280,11 +360,16 @@ Future<ImportResult> importBackup(Ref ref) async {
     await repository.upsert(subscription);
   }
 
-  // Reschedule notifications for all new subscriptions
+  // Reschedule notifications — errors are non-fatal so a single notification
+  // failure doesn't crash the import after data is already saved
   if (result.subscriptions.isNotEmpty) {
     final notificationService = await ref.read(notificationServiceProvider.future);
     for (final subscription in result.subscriptions) {
-      await notificationService.scheduleNotificationsForSubscription(subscription);
+      try {
+        await notificationService.scheduleNotificationsForSubscription(subscription);
+      } catch (_) {
+        // Notification scheduling will be retried on next app launch
+      }
     }
   }
 

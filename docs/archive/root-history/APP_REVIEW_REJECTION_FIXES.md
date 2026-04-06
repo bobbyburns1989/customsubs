@@ -144,7 +144,7 @@ Privacy Policy: https://customsubs.us/privacy
 
 SUPPORT
 
-For help or questions: bobby@customapps.us
+For help or questions: info@customapps.us
 ```
 
 4. **Click:** Save

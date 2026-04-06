@@ -48,6 +48,8 @@ class SubscriptionRepository {
   static const String _boxName = 'subscriptions';
   Box<Subscription>? _box;
 
+  SubscriptionRepository({Box<Subscription>? box}) : _box = box;
+
   Future<void> init() async {
     _box = await Hive.openBox<Subscription>(_boxName);
   }

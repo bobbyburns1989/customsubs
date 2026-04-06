@@ -76,7 +76,7 @@
 **New File Created:** 9,253 bytes
 
 **Updates Made:**
-- All emails changed to: **bobby@customapps.us**
+- All emails changed to: **info@customapps.us**
 - All locations set to: **Boston, Massachusetts**
 - Contact info updated throughout
 
@@ -95,7 +95,7 @@
 **New File Created:** 15,767 bytes
 
 **Updates Made:**
-- All emails changed to: **bobby@customapps.us**
+- All emails changed to: **info@customapps.us**
 - Governing law set to: **State of Massachusetts**
 - Arbitration location: **Boston, Massachusetts**
 - Contact info updated throughout (9 instances)
