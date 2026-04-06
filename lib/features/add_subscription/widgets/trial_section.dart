@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/styled_date_field.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Form section for free trial configuration.
 ///
@@ -59,9 +60,10 @@ class TrialSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FormSectionCard(
-      title: 'Free Trial',
-      subtitle: 'Track trial period and conversion date',
+      title: l10n.trialSectionTitle,
+      subtitle: l10n.trialSectionSubtitle,
       icon: Icons.timer_outlined,
       isCollapsible: true,
       initiallyExpanded: false,
@@ -69,8 +71,8 @@ class TrialSection extends StatelessWidget {
         children: [
           // Trial toggle
           SwitchListTile(
-            title: const Text('This is a free trial'),
-            subtitle: const Text('Enable if subscription is currently in trial period'),
+            title: Text(l10n.trialToggleLabel),
+            subtitle: Text(l10n.trialToggleSubtitle),
             value: isTrial,
             onChanged: onTrialChanged,
             contentPadding: EdgeInsets.zero,
@@ -88,7 +90,7 @@ class TrialSection extends StatelessWidget {
                       // Trial end date picker or set button
                       if (trialEndDate != null)
                         StyledDateField(
-                          label: 'Trial End Date',
+                          label: l10n.trialEndDateLabel,
                           value: trialEndDate!,
                           firstDate: DateTime.now(),
                           lastDate: DateTime.now().add(const Duration(days: 365)),
@@ -98,16 +100,16 @@ class TrialSection extends StatelessWidget {
                         OutlinedButton.icon(
                           onPressed: onSetTrialEndDate,
                           icon: const Icon(Icons.calendar_today),
-                          label: const Text('Set Trial End Date'),
+                          label: Text(l10n.trialSetEndDate),
                         ),
 
                       const SizedBox(height: AppSizes.md),
 
                       // Post-trial amount field
                       TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: 'Amount after trial',
-                          hintText: '0.00',
+                        decoration: InputDecoration(
+                          labelText: l10n.trialAmountAfter,
+                          hintText: l10n.detailsAmountHint,
                         ),
                         keyboardType: const TextInputType.numberWithOptions(decimal: true),
                         initialValue: postTrialAmount?.toString(),

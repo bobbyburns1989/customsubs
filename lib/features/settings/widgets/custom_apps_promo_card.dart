@@ -5,6 +5,7 @@ import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/widgets/standard_card.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Data class for sibling apps displayed in the cross-promotion card.
 class _AppInfo {
@@ -75,10 +76,43 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
     setState(() => _isExpanded = !_isExpanded);
   }
 
+  /// Returns the localized name for a sibling app.
+  String _localizedName(AppLocalizations l10n, String name) {
+    switch (name) {
+      case 'CustomBank':
+        return l10n.promoCustomBank;
+      case 'CustomCrypto':
+        return l10n.promoCustomCrypto;
+      case 'CustomNotify':
+        return l10n.promoCustomNotify;
+      case 'CustomWorth':
+        return l10n.promoCustomWorth;
+      default:
+        return name;
+    }
+  }
+
+  /// Returns the localized subtitle for a sibling app.
+  String _localizedSubtitle(AppLocalizations l10n, String name) {
+    switch (name) {
+      case 'CustomBank':
+        return l10n.promoCustomBankDesc;
+      case 'CustomCrypto':
+        return l10n.promoCustomCryptoDesc;
+      case 'CustomNotify':
+        return l10n.promoCustomNotifyDesc;
+      case 'CustomWorth':
+        return l10n.promoCustomWorthDesc;
+      default:
+        return name;
+    }
+  }
+
   /// Opens the app's website in an external browser.
   /// Shows an error snackbar if the URL cannot be launched.
   Future<void> _openWebsite(String url) async {
     await HapticUtils.light();
+    final l10n = AppLocalizations.of(context);
     final uri = Uri.parse(url);
     try {
       if (await canLaunchUrl(uri)) {
@@ -86,14 +120,14 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
       } else if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.error('Could not open website'),
+          SnackBarUtils.error(l10n.promoCouldNotOpen),
         );
       }
     } catch (e) {
       if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.error('Could not open website'),
+          SnackBarUtils.error(l10n.promoCouldNotOpen),
         );
       }
     }
@@ -102,6 +136,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSizes.base),
@@ -114,7 +149,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
             GestureDetector(
               onTap: _toggleExpansion,
               behavior: HitTestBehavior.opaque,
-              child: _buildHeader(theme),
+              child: _buildHeader(theme, l10n),
             ),
 
             // Expandable app list
@@ -128,7 +163,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                         for (int i = 0; i < _apps.length; i++) ...[
                           if (i > 0)
                             Divider(height: 1, color: context.colors.border),
-                          _buildAppRow(_apps[i]),
+                          _buildAppRow(_apps[i], l10n),
                         ],
                       ],
                     )
@@ -142,7 +177,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
 
   /// Header row with icon, title/subtitle, and animated chevron.
   /// Matches the FormSectionCard header pattern for visual consistency.
-  Widget _buildHeader(ThemeData theme) {
+  Widget _buildHeader(ThemeData theme, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.all(AppSizes.lg),
       child: Row(
@@ -169,14 +204,14 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'More from CustomApps',
+                  l10n.promoTitle,
                   style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: AppSizes.xs),
                 Text(
-                  'Check out our other apps',
+                  l10n.promoSubtitle,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: context.colors.textSecondary,
                   ),
@@ -202,7 +237,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
   }
 
   /// Individual app row with logo, name, subtitle, and trailing chevron.
-  Widget _buildAppRow(_AppInfo app) {
+  Widget _buildAppRow(_AppInfo app, AppLocalizations l10n) {
     return InkWell(
       onTap: () => _openWebsite(app.websiteUrl),
       child: Padding(
@@ -224,7 +259,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: app.brandColor.withAlpha(40),
+                    color: app.brandColor.withValues(alpha: 40 / 255),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Center(
@@ -248,7 +283,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    app.name,
+                    _localizedName(l10n, app.name),
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -256,7 +291,7 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    app.subtitle,
+                    _localizedSubtitle(l10n, app.name),
                     style: TextStyle(
                       fontSize: 12,
                       color: context.colors.textSecondary,

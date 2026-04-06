@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Backup reminder dialog shown after user adds their 3rd subscription.
 ///
@@ -32,6 +33,7 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return AlertDialog(
       icon: Container(
@@ -46,21 +48,21 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
           color: context.colors.primary,
         ),
       ),
-      title: const Text(
-        'Back Up Your Data',
+      title: Text(
+        l10n.backupReminderTitle,
         textAlign: TextAlign.center,
       ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'You\'ve added 3 subscriptions! Consider backing up your data to prevent loss.',
+            l10n.backupReminderBody,
             style: theme.textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSizes.base),
           Text(
-            'You can export a backup anytime in Settings → Export Backup.',
+            l10n.backupReminderHint,
             style: theme.textTheme.bodySmall?.copyWith(
               color: context.colors.textSecondary,
             ),
@@ -76,7 +78,7 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
               });
             },
             title: Text(
-              'Don\'t show this again',
+              l10n.backupReminderDontShow,
               style: theme.textTheme.bodySmall,
             ),
             controlAffinity: ListTileControlAffinity.leading,
@@ -93,7 +95,7 @@ class _BackupReminderDialogState extends State<BackupReminderDialog> {
               Navigator.pop(context, _dontShowAgain);
             }
           },
-          child: const Text('Got it'),
+          child: Text(l10n.backupReminderGotIt),
         ),
       ],
     );

@@ -5,6 +5,7 @@ import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/models/subscription.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Card displaying cancellation information and interactive checklist.
 ///
@@ -105,6 +106,7 @@ class CancellationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       child: Padding(
@@ -113,7 +115,7 @@ class CancellationCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'How to Cancel',
+              l10n.cancelCardTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -134,7 +136,7 @@ class CancellationCard extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.open_in_new),
-                  label: const Text('Open Cancellation Page'),
+                  label: Text(l10n.cancelCardOpenPage),
                 ),
               ),
               const SizedBox(height: AppSizes.base),
@@ -152,7 +154,7 @@ class CancellationCard extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.phone),
-                  label: Text('Call ${subscription.cancelPhone!}'),
+                  label: Text(l10n.cancelCardCall(subscription.cancelPhone!)),
                 ),
               ),
               const SizedBox(height: AppSizes.base),
@@ -177,7 +179,7 @@ class CancellationCard extends StatelessWidget {
             // Checklist
             if (subscription.cancelChecklist.isNotEmpty) ...[
               Text(
-                'Cancellation Steps',
+                l10n.cancelCardStepsTitle,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
@@ -193,7 +195,10 @@ class CancellationCard extends StatelessWidget {
               ),
               const SizedBox(height: AppSizes.xs),
               Text(
-                '${subscription.checklistCompleted.where((c) => c).length} of ${subscription.cancelChecklist.length} complete',
+                l10n.cancelCardProgress(
+                  subscription.checklistCompleted.where((c) => c).length,
+                  subscription.cancelChecklist.length,
+                ),
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: context.colors.textSecondary,
                 ),

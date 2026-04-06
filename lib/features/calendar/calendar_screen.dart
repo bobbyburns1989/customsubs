@@ -13,6 +13,7 @@ import 'package:custom_subs/data/services/analytics_service.dart';
 import 'package:custom_subs/features/calendar/calendar_controller.dart';
 import 'package:custom_subs/features/calendar/widgets/calendar_day_cell.dart';
 import 'package:custom_subs/features/calendar/widgets/day_detail_list.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Calendar view showing billing dates as colored dots on a monthly grid.
 ///
@@ -38,9 +39,10 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   @override
   Widget build(BuildContext context) {
     final calendarAsync = ref.watch(calendarControllerProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Calendar')),
+      appBar: AppBar(title: Text(l10n.calendarTitle)),
       body: calendarAsync.when(
         data: (calendarData) {
           // Fire analytics event once per screen visit
@@ -56,10 +58,9 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           if (calendarData.activeSubscriptions.isEmpty) {
             return EmptyStateWidget(
               icon: Icons.calendar_month_outlined,
-              title: 'No Billing Dates',
-              subtitle:
-                  'Add your first subscription to see billing dates on the calendar.',
-              buttonText: 'Add Subscription',
+              title: l10n.calendarEmptyTitle,
+              subtitle: l10n.calendarEmptySubtitle,
+              buttonText: l10n.calendarAddSubscription,
               onButtonPressed: () => context.push(AppRouter.addSubscription),
             );
           }
@@ -96,8 +97,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
                       // Lock to month view — no week/2-week toggle
                       calendarFormat: CalendarFormat.month,
-                      availableCalendarFormats: const {
-                        CalendarFormat.month: 'Month',
+                      availableCalendarFormats: {
+                        CalendarFormat.month: l10n.calendarMonth,
                       },
                       startingDayOfWeek: StartingDayOfWeek.sunday,
 
@@ -212,7 +213,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                             padding: const EdgeInsets.all(AppSizes.xl),
                             child: Center(
                               child: Text(
-                                'Tap a date to see billing details',
+                                l10n.calendarTapHint,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -250,7 +251,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
         ),
 
         error: (error, stack) => Center(
-          child: Text('Error: $error'),
+          child: Text(l10n.calendarError(error.toString())),
         ),
       ),
     );

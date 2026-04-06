@@ -11,6 +11,7 @@ import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/features/analytics/widgets/category_donut_chart.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Analytics screen showing spending insights and breakdowns.
 ///
@@ -37,10 +38,11 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final analyticsAsync = ref.watch(analyticsControllerProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics'),
+        title: Text(l10n.analyticsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
@@ -66,9 +68,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           if (analytics.activeCount == 0) {
             return EmptyStateWidget(
               icon: Icons.analytics_outlined,
-              title: 'No Analytics Yet',
-              subtitle: 'Add your first subscription to see spending insights',
-              buttonText: 'Add Subscription',
+              title: l10n.analyticsEmptyTitle,
+              subtitle: l10n.analyticsEmptySubtitle,
+              buttonText: l10n.analyticsAddSubscription,
               onButtonPressed: () {
                 context.pop();
                 context.push('/add-subscription');
@@ -120,7 +122,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               ),
               const SizedBox(height: AppSizes.base),
               Text(
-                'Error loading analytics',
+                l10n.analyticsLoadError,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: AppSizes.sm),
@@ -329,6 +331,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final currencyFormat = NumberFormat.currency(
       symbol: _getCurrencySymbol(widget.analytics.primaryCurrency),
       decimalDigits: 2,
@@ -353,7 +356,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Yearly Forecast',
+              l10n.analyticsYearlyForecast,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.white.withValues(alpha: 0.85),
@@ -384,7 +387,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
             // Secondary: monthly equivalent
             const SizedBox(height: AppSizes.xs),
             Text(
-              '${currencyFormat.format(widget.analytics.monthlyTotal)}/mo',
+              l10n.analyticsMonthlyTotal(currencyFormat.format(widget.analytics.monthlyTotal)),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontFeatures: const [FontFeature.tabularFigures()],
@@ -400,7 +403,7 @@ class _YearlyForecastCardState extends State<_YearlyForecastCard> {
 
             // Compact tertiary stats on one line
             Text(
-              '${widget.analytics.activeCount} ${widget.analytics.activeCount == 1 ? 'subscription' : 'subscriptions'} · ${currencyFormat.format(widget.analytics.yearlyForecast / 365)}/day',
+              l10n.analyticsSubsAndDaily(widget.analytics.activeCount, currencyFormat.format(widget.analytics.yearlyForecast / 365)),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: Colors.white.withValues(alpha: 0.8),
@@ -460,6 +463,8 @@ class _CategoryBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -472,7 +477,7 @@ class _CategoryBreakdownCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Spending by Category',
+              l10n.analyticsSpendingByCategory,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -497,6 +502,8 @@ class _TopSubscriptionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -509,7 +516,7 @@ class _TopSubscriptionsCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Top Subscriptions',
+              l10n.analyticsTopSubscriptions,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -644,7 +651,9 @@ class _TopSubscriptionTileState extends ConsumerState<_TopSubscriptionTile> {
 
               // Monthly amount
               Text(
-                '${widget.currencySymbol}${widget.subscription.monthlyAmount.toStringAsFixed(2)}/mo',
+                AppLocalizations.of(context).analyticsMonthlyTotal(
+                  '${widget.currencySymbol}${widget.subscription.monthlyAmount.toStringAsFixed(2)}',
+                ),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontFeatures: const [FontFeature.tabularFigures()],
@@ -666,6 +675,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final currencyEntries = analytics.currencyBreakdown.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value)); // Sort by amount descending
 
@@ -681,7 +691,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'By Currency',
+              l10n.analyticsByCurrency,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -697,7 +707,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      '${entry.key} ($currencySymbol)',
+                      l10n.analyticsCurrencyEntry(entry.key, currencySymbol),
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                     Text(
@@ -719,13 +729,15 @@ class _CurrencyBreakdownCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total (${analytics.primaryCurrency})',
+                  l10n.analyticsTotalLabel(analytics.primaryCurrency),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
                 ),
                 Text(
-                  '≈ ${_getCurrencySymbol(analytics.primaryCurrency)}${analytics.monthlyTotal.toStringAsFixed(2)}',
+                  l10n.analyticsTotalApprox(
+                    '${_getCurrencySymbol(analytics.primaryCurrency)}${analytics.monthlyTotal.toStringAsFixed(2)}',
+                  ),
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: context.colors.primary,
@@ -736,7 +748,7 @@ class _CurrencyBreakdownCard extends StatelessWidget {
             ),
             const SizedBox(height: AppSizes.xs),
             Text(
-              'At bundled exchange rates',
+              l10n.analyticsExchangeNote,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.textTertiary,
                   ),
@@ -784,6 +796,7 @@ class _ActiveVsPausedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
     final currencyFormat = NumberFormat.currency(
       symbol: _getCurrencySymbol(analytics.primaryCurrency),
@@ -797,7 +810,7 @@ class _ActiveVsPausedCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Active vs Paused',
+              l10n.analyticsActiveVsPaused,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
               ),
@@ -809,8 +822,8 @@ class _ActiveVsPausedCard extends StatelessWidget {
             _SpendingRow(
               icon: Icons.play_arrow,
               iconColor: context.colors.success,
-              label: 'Active (${analytics.activeCount})',
-              amount: '${currencyFormat.format(analytics.monthlyTotal)}/mo',
+              label: l10n.analyticsActiveCount(analytics.activeCount),
+              amount: l10n.analyticsMonthlyTotal(currencyFormat.format(analytics.monthlyTotal)),
               isActive: true,
             ),
 
@@ -820,8 +833,8 @@ class _ActiveVsPausedCard extends StatelessWidget {
             _SpendingRow(
               icon: Icons.pause,
               iconColor: context.colors.textSecondary,
-              label: 'Paused (${analytics.pausedCount})',
-              amount: '${currencyFormat.format(analytics.pausedMonthlyTotal)}/mo',
+              label: l10n.analyticsPausedCount(analytics.pausedCount),
+              amount: l10n.analyticsMonthlyTotal(currencyFormat.format(analytics.pausedMonthlyTotal)),
               isActive: false,
             ),
 
@@ -834,14 +847,14 @@ class _ActiveVsPausedCard extends StatelessWidget {
                 const SizedBox(width: AppSizes.sm),
                 Expanded(
                   child: Text(
-                    'If all resumed',
+                    l10n.analyticsIfResumed,
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: context.colors.textSecondary,
                     ),
                   ),
                 ),
                 Text(
-                  '${currencyFormat.format(analytics.combinedMonthlyTotal)}/mo',
+                  l10n.analyticsMonthlyTotal(currencyFormat.format(analytics.combinedMonthlyTotal)),
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: context.colors.textSecondary,
                     fontWeight: FontWeight.w600,

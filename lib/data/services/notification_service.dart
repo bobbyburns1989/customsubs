@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
@@ -6,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:custom_subs/core/utils/notification_router.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 part 'notification_service.g.dart';
 
@@ -42,8 +44,11 @@ part 'notification_service.g.dart';
 ///
 /// See also: `docs/guides/working-with-notifications.md` for detailed guide
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _notifications;
   bool _initialized = false;
+
+  NotificationService({FlutterLocalNotificationsPlugin? notifications})
+    : _notifications = notifications ?? FlutterLocalNotificationsPlugin();
 
   /// Initializes the notification system for both iOS and Android.
   ///
@@ -235,14 +240,15 @@ class NotificationService {
   /// ## Example
   /// ```dart
   /// final subId = '123e4567-e89b-12d3-a456-426614174000';
-  /// _notificationId(subId, 'reminder1');  // → 1234567890 (deterministic)
-  /// _notificationId(subId, 'reminder1');  // → 1234567890 (same ID)
+  /// NotificationService.notificationId(subId, 'reminder1');  // → 1234567890 (deterministic)
+  /// NotificationService.notificationId(subId, 'reminder1');  // → 1234567890 (same ID)
   /// ```
   ///
   /// **Implementation Note:** Uses hashCode % 2147483647 to fit in int32 range.
   ///
   /// See: `docs/decisions/002-notification-id-strategy.md` for full rationale
-  int _notificationId(String subscriptionId, String type) {
+  @visibleForTesting
+  static int notificationId(String subscriptionId, String type) {
     return ('$subscriptionId:$type'.hashCode).abs() % 2147483647;
   }
 
@@ -293,7 +299,7 @@ class NotificationService {
   /// **Important:** Notifications in the past are automatically skipped.
   ///
   /// See: `docs/guides/working-with-notifications.md` for detailed guide
-  Future<void> scheduleNotificationsForSubscription(Subscription subscription) async {
+  Future<void> scheduleNotificationsForSubscription(Subscription subscription, {AppLocalizations? l10n}) async {
     if (!_initialized) {
       throw Exception('NotificationService not initialized. Call init() first.');
     }
@@ -316,25 +322,25 @@ class NotificationService {
 
     // Handle trial-specific notifications
     if (subscription.isTrial && subscription.trialEndDate != null) {
-      await _scheduleTrialNotifications(subscription);
+      await _scheduleTrialNotifications(subscription, l10n: l10n);
     } else {
       // Regular billing notifications
       if (reminders.firstReminderDays > 0) {
-        await _scheduleFirstReminder(subscription);
+        await _scheduleFirstReminder(subscription, l10n: l10n);
       }
 
       if (reminders.secondReminderDays > 0) {
-        await _scheduleSecondReminder(subscription);
+        await _scheduleSecondReminder(subscription, l10n: l10n);
       }
 
       if (reminders.remindOnBillingDay) {
-        await _scheduleDayOfReminder(subscription);
+        await _scheduleDayOfReminder(subscription, l10n: l10n);
       }
     }
   }
 
   /// Schedule first reminder (e.g., 7 days before)
-  Future<void> _scheduleFirstReminder(Subscription subscription) async {
+  Future<void> _scheduleFirstReminder(Subscription subscription, {AppLocalizations? l10n}) async {
     final reminderDate = subscription.nextBillingDate.subtract(
       Duration(days: subscription.reminders.firstReminderDays),
     );
@@ -355,13 +361,15 @@ class NotificationService {
     final formattedDate = DateFormat.yMMMd().format(subscription.nextBillingDate);
     final formattedAmount = _formatAmount(subscription);
 
-    // Rich notification body for expandable view
-    final notificationBody = '$formattedAmount charges on $formattedDate\n\nTap to view details or mark as paid.';
+    final title = l10n?.notifFirstReminderTitle(subscription.name, daysUntil) ?? '📅 ${subscription.name} — Billing in $daysUntil days';
+    final body = l10n?.notifFirstReminderBody(formattedAmount, formattedDate) ?? '$formattedAmount charges on $formattedDate';
+    final expanded = l10n?.notifFirstReminderExpanded(formattedAmount, formattedDate) ?? '$formattedAmount charges on $formattedDate\n\nTap to view details or mark as paid.';
+    final iosSubtitle = l10n?.notifFirstReminderSubtitle(daysUntil) ?? 'Billing in $daysUntil days';
 
     await _notifications.zonedSchedule(
-      _notificationId(subscription.id, 'reminder1'),
-      '📅 ${subscription.name} — Billing in $daysUntil days',
-      '$formattedAmount charges on $formattedDate', // Short body for collapsed view
+      NotificationService.notificationId(subscription.id, 'reminder1'),
+      title,
+      body,
       scheduledDate,
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -372,8 +380,8 @@ class NotificationService {
           priority: Priority.high,
           // BigTextStyle for expandable notifications with more detail
           styleInformation: BigTextStyleInformation(
-            notificationBody,
-            contentTitle: '📅 ${subscription.name} — Billing in $daysUntil days',
+            expanded,
+            contentTitle: title,
             summaryText: formattedAmount,
           ),
           // Action buttons for quick interactions
@@ -391,7 +399,7 @@ class NotificationService {
           ],
         ),
         iOS: DarwinNotificationDetails(
-          subtitle: 'Billing in $daysUntil days',
+          subtitle: iosSubtitle,
           categoryIdentifier: 'subscription_reminder', // Links to category with actions
         ),
       ),
@@ -404,7 +412,7 @@ class NotificationService {
   }
 
   /// Schedule second reminder (e.g., 1 day before)
-  Future<void> _scheduleSecondReminder(Subscription subscription) async {
+  Future<void> _scheduleSecondReminder(Subscription subscription, {AppLocalizations? l10n}) async {
     final reminderDate = subscription.nextBillingDate.subtract(
       Duration(days: subscription.reminders.secondReminderDays),
     );
@@ -426,16 +434,19 @@ class NotificationService {
 
     final daysUntil = subscription.reminders.secondReminderDays;
     final title = daysUntil == 1
-        ? '⚠️ ${subscription.name} — Bills tomorrow'
-        : '⚠️ ${subscription.name} — Bills in $daysUntil days';
+        ? (l10n?.notifSecondReminderTitleTomorrow(subscription.name) ?? '⚠️ ${subscription.name} — Bills tomorrow')
+        : (l10n?.notifSecondReminderTitle(subscription.name, daysUntil) ?? '⚠️ ${subscription.name} — Bills in $daysUntil days');
 
-    // Rich notification body
-    final notificationBody = '$formattedAmount will be charged on $formattedDate\n\nTap to view details or mark as paid.';
+    final body = l10n?.notifSecondReminderBody(formattedAmount, formattedDate) ?? '$formattedAmount will be charged on $formattedDate';
+    final expanded = l10n?.notifSecondReminderExpanded(formattedAmount, formattedDate) ?? '$formattedAmount will be charged on $formattedDate\n\nTap to view details or mark as paid.';
+    final iosSubtitle = daysUntil == 1
+        ? (l10n?.notifSecondReminderSubtitleTomorrow ?? 'Bills tomorrow')
+        : (l10n?.notifSecondReminderSubtitle(daysUntil) ?? 'Bills in $daysUntil days');
 
     await _notifications.zonedSchedule(
-      _notificationId(subscription.id, 'reminder2'),
+      NotificationService.notificationId(subscription.id, 'reminder2'),
       title,
-      '$formattedAmount will be charged on $formattedDate',
+      body,
       scheduledDate,
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -445,7 +456,7 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           styleInformation: BigTextStyleInformation(
-            notificationBody,
+            expanded,
             contentTitle: title,
             summaryText: formattedAmount,
           ),
@@ -463,7 +474,7 @@ class NotificationService {
           ],
         ),
         iOS: DarwinNotificationDetails(
-          subtitle: daysUntil == 1 ? 'Bills tomorrow' : 'Bills in $daysUntil days',
+          subtitle: iosSubtitle,
           categoryIdentifier: 'subscription_reminder',
         ),
       ),
@@ -475,7 +486,7 @@ class NotificationService {
   }
 
   /// Schedule day-of reminder
-  Future<void> _scheduleDayOfReminder(Subscription subscription) async {
+  Future<void> _scheduleDayOfReminder(Subscription subscription, {AppLocalizations? l10n}) async {
     final reminderDate = subscription.nextBillingDate;
 
     final scheduledDate = tz.TZDateTime(
@@ -491,12 +502,15 @@ class NotificationService {
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
 
     final formattedAmount = _formatAmount(subscription);
-    final notificationBody = '$formattedAmount charge expected today\n\nTap to view details or mark as paid.';
+    final title = l10n?.notifDayOfTitle(subscription.name) ?? '💰 ${subscription.name} — Billing today';
+    final body = l10n?.notifDayOfBody(formattedAmount) ?? '$formattedAmount charge expected today';
+    final expanded = l10n?.notifDayOfExpanded(formattedAmount) ?? '$formattedAmount charge expected today\n\nTap to view details or mark as paid.';
+    final iosSubtitle = l10n?.notifDayOfSubtitle ?? 'Billing today';
 
     await _notifications.zonedSchedule(
-      _notificationId(subscription.id, 'dayof'),
-      '💰 ${subscription.name} — Billing today',
-      '$formattedAmount charge expected today',
+      NotificationService.notificationId(subscription.id, 'dayof'),
+      title,
+      body,
       scheduledDate,
       NotificationDetails(
         android: AndroidNotificationDetails(
@@ -506,8 +520,8 @@ class NotificationService {
           importance: Importance.max,
           priority: Priority.high,
           styleInformation: BigTextStyleInformation(
-            notificationBody,
-            contentTitle: '💰 ${subscription.name} — Billing today',
+            expanded,
+            contentTitle: title,
             summaryText: formattedAmount,
           ),
           actions: <AndroidNotificationAction>[
@@ -523,8 +537,8 @@ class NotificationService {
             ),
           ],
         ),
-        iOS: const DarwinNotificationDetails(
-          subtitle: 'Billing today',
+        iOS: DarwinNotificationDetails(
+          subtitle: iosSubtitle,
           categoryIdentifier: 'subscription_reminder',
         ),
       ),
@@ -536,7 +550,7 @@ class NotificationService {
   }
 
   /// Schedule trial-specific notifications
-  Future<void> _scheduleTrialNotifications(Subscription subscription) async {
+  Future<void> _scheduleTrialNotifications(Subscription subscription, {AppLocalizations? l10n}) async {
     final trialEndDate = subscription.trialEndDate!;
 
     // 3 days before trial ends
@@ -545,7 +559,8 @@ class NotificationService {
       subscription,
       threeDaysBefore,
       'trial_3days',
-      '🔔 ${subscription.name} — Trial ending in 3 days',
+      l10n?.notifTrialEnding3Days(subscription.name) ?? '🔔 ${subscription.name} — Trial ending in 3 days',
+      l10n: l10n,
     );
 
     // 1 day before trial ends
@@ -554,7 +569,8 @@ class NotificationService {
       subscription,
       oneDayBefore,
       'trial_1day',
-      '🔔 ${subscription.name} — Trial ending tomorrow',
+      l10n?.notifTrialEndingTomorrow(subscription.name) ?? '🔔 ${subscription.name} — Trial ending tomorrow',
+      l10n: l10n,
     );
 
     // Morning of trial end date
@@ -562,7 +578,8 @@ class NotificationService {
       subscription,
       trialEndDate,
       'trial_end',
-      '🔔 ${subscription.name} — Trial ends today',
+      l10n?.notifTrialEndsToday(subscription.name) ?? '🔔 ${subscription.name} — Trial ends today',
+      l10n: l10n,
     );
   }
 
@@ -571,8 +588,9 @@ class NotificationService {
     Subscription subscription,
     DateTime reminderDate,
     String type,
-    String title,
-  ) async {
+    String title, {
+    AppLocalizations? l10n,
+  }) async {
     final scheduledDate = tz.TZDateTime(
       tz.local,
       reminderDate.year,
@@ -592,10 +610,11 @@ class NotificationService {
       decimalDigits: 2,
     ).format(postAmount);
 
-    final notificationBody = 'Free trial ends $formattedDate. You\'ll be charged $formattedAmount/${subscription.cycle.shortName} after.\n\nTap to view details or mark as paid.';
+    final notificationBody = l10n?.notifTrialBody(formattedDate, formattedAmount, subscription.cycle.shortName) ?? 'Free trial ends $formattedDate. You\'ll be charged $formattedAmount/${subscription.cycle.shortName} after.\n\nTap to view details or mark as paid.';
+    final iosSubtitle = l10n?.notifTrialSubtitle ?? 'Trial ending';
 
     await _notifications.zonedSchedule(
-      _notificationId(subscription.id, type),
+      NotificationService.notificationId(subscription.id, type),
       title,
       notificationBody,
       scheduledDate,
@@ -618,8 +637,8 @@ class NotificationService {
               showsUserInterface: true),
           ],
         ),
-        iOS: const DarwinNotificationDetails(
-          subtitle: 'Trial ending',
+        iOS: DarwinNotificationDetails(
+          subtitle: iosSubtitle,
           categoryIdentifier: 'subscription_reminder',
         ),
       ),
@@ -648,12 +667,12 @@ class NotificationService {
   ///
   /// **Use case:** When deleting a subscription, call this to clean up notifications.
   Future<void> cancelNotificationsForSubscription(String subscriptionId) async {
-    await _notifications.cancel(_notificationId(subscriptionId, 'reminder1'));
-    await _notifications.cancel(_notificationId(subscriptionId, 'reminder2'));
-    await _notifications.cancel(_notificationId(subscriptionId, 'dayof'));
-    await _notifications.cancel(_notificationId(subscriptionId, 'trial_3days'));
-    await _notifications.cancel(_notificationId(subscriptionId, 'trial_1day'));
-    await _notifications.cancel(_notificationId(subscriptionId, 'trial_end'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'reminder1'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'reminder2'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'dayof'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'trial_3days'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'trial_1day'));
+    await _notifications.cancel(NotificationService.notificationId(subscriptionId, 'trial_end'));
   }
 
   /// Cancel all notifications
@@ -689,11 +708,14 @@ class NotificationService {
   ///
   /// **Best practice:** Always provide this feature in Settings so users can
   /// verify their device is configured correctly for notifications.
-  Future<void> showTestNotification() async {
+  Future<void> showTestNotification({AppLocalizations? l10n}) async {
+    final title = l10n?.notifTestTitle ?? '✅ Notifications are working!';
+    final body = l10n?.notifTestBody ?? 'You\'ll be reminded before every charge.';
+
     await _notifications.show(
       999999,
-      '✅ Notifications are working!',
-      'You\'ll be reminded before every charge.',
+      title,
+      body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'customsubs_reminders',

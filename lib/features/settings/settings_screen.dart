@@ -10,6 +10,7 @@ import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/core/utils/snackbar_utils.dart';
 import 'package:custom_subs/core/providers/settings_provider.dart';
 import 'package:custom_subs/core/providers/theme_provider.dart';
+import 'package:custom_subs/core/providers/locale_provider.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/data/services/backup_service.dart';
 import 'package:custom_subs/data/services/undo_service.dart';
@@ -18,6 +19,7 @@ import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
 import 'package:custom_subs/features/settings/widgets/custom_apps_promo_card.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -49,10 +51,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final primaryCurrency = ref.watch(primaryCurrencyProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settingsTitle),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () async {
@@ -66,10 +69,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       body: ListView(
         children: [
           // General section
-          const _SectionHeader(title: 'General'),
+          _SectionHeader(title: l10n.settingsGeneral),
           ListTile(
             leading: const Icon(Icons.attach_money),
-            title: const Text('Primary Currency'),
+            title: Text(l10n.settingsPrimaryCurrency),
             subtitle: Text(
               '$primaryCurrency - ${CurrencyUtils.getCurrencyName(primaryCurrency)}',
             ),
@@ -103,7 +106,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   SnackBarUtils.show(
                     context,
                     SnackBarUtils.success(
-                      'Currency changed to $selected',
+                      l10n.settingsCurrencyChanged(selected),
                       onUndo: () async {
                         await HapticUtils.medium();
                         final previous = undoService.getPreviousCurrency();
@@ -113,7 +116,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           if (context.mounted) {
                             SnackBarUtils.show(
                               context,
-                              SnackBarUtils.info('Currency restored to $previous'),
+                              SnackBarUtils.info(l10n.settingsCurrencyRestored(previous)),
                             );
                           }
                         }
@@ -126,6 +129,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           Consumer(
             builder: (context, ref, child) {
+              final l10n = AppLocalizations.of(context);
               final settingsAsync = ref.watch(settingsRepositoryProvider);
               final defaultReminderTime = settingsAsync.when(
                 data: (_) {
@@ -140,7 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
               return ListTile(
                 leading: const Icon(Icons.access_time),
-                title: const Text('Default Reminder Time'),
+                title: Text(l10n.settingsDefaultReminderTime),
                 subtitle: Text(
                   '${defaultReminderTime.hour.toString().padLeft(2, '0')}:${defaultReminderTime.minute.toString().padLeft(2, '0')}',
                 ),
@@ -172,7 +176,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       SnackBarUtils.show(
                         context,
                         SnackBarUtils.success(
-                          'Reminder time updated',
+                          l10n.settingsReminderTimeUpdated,
                           onUndo: () async {
                             await HapticUtils.medium();
                             final previous = undoService.getPreviousReminderTime();
@@ -182,7 +186,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                               if (context.mounted) {
                                 SnackBarUtils.show(
                                   context,
-                                  SnackBarUtils.info('Reminder time restored'),
+                                  SnackBarUtils.info(l10n.settingsReminderTimeRestored),
                                 );
                               }
                             }
@@ -197,12 +201,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           Consumer(
             builder: (context, ref, child) {
+              final l10n = AppLocalizations.of(context);
               final themeMode = ref.watch(themeModeProvider);
               final isDarkMode = themeMode == ThemeMode.dark;
 
               return SwitchListTile(
                 secondary: const Icon(Icons.dark_mode_outlined),
-                title: const Text('Dark Mode'),
+                title: Text(l10n.settingsDarkMode),
                 value: isDarkMode,
                 onChanged: (value) async {
                   await HapticUtils.medium();
@@ -216,15 +221,21 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               );
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(l10n.settingsLanguage),
+            trailing: Text(_getLanguageLabel(l10n)),
+            onTap: () => _showLanguagePicker(context, ref, l10n),
+          ),
 
           const Divider(height: 1),
 
           // Notifications section
-          const _SectionHeader(title: 'Notifications'),
+          _SectionHeader(title: l10n.settingsNotifications),
           ListTile(
             leading: const Icon(Icons.notifications_outlined),
-            title: const Text('Test Notification'),
-            subtitle: const Text('Verify reminders are working'),
+            title: Text(l10n.settingsTestNotification),
+            subtitle: Text(l10n.settingsTestNotificationSubtitle),
             trailing: const Icon(Icons.chevron_right),
             onTap: () async {
               await HapticUtils.medium();
@@ -240,15 +251,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 await showDialog<void>(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Notifications Disabled'),
-                    content: const Text(
-                      'Notifications are currently disabled for CustomSubs. '
-                      'Enable them in device settings to receive billing reminders.',
-                    ),
+                    title: Text(l10n.settingsNotificationsDisabled),
+                    content: Text(l10n.settingsNotificationsDisabledBody),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(ctx),
-                        child: const Text('Not Now'),
+                        child: Text(l10n.settingsNotNow),
                       ),
                       FilledButton(
                         onPressed: () async {
@@ -257,7 +265,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                             type: AppSettingsType.notification,
                           );
                         },
-                        child: const Text('Open Settings'),
+                        child: Text(l10n.settingsOpenSettings),
                       ),
                     ],
                   ),
@@ -275,11 +283,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               await showDialog<void>(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                  title: const Text('Test Sent'),
-                  content: const Text(
-                    'A test notification was just sent.\n\n'
-                    "Don't see it? Notifications may be disabled in your device settings.",
-                  ),
+                  title: Text(l10n.settingsTestSent),
+                  content: Text(l10n.settingsTestSentBody),
                   actions: [
                     TextButton(
                       onPressed: () async {
@@ -288,11 +293,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                           type: AppSettingsType.notification,
                         );
                       },
-                      child: const Text('Open Settings'),
+                      child: Text(l10n.settingsOpenSettings),
                     ),
                     FilledButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Got It'),
+                      child: Text(l10n.settingsGotIt),
                     ),
                   ],
                 ),
@@ -305,8 +310,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               vertical: AppSizes.sm,
             ),
             child: Text(
-              'CustomSubs sends reminders at your chosen time before billing dates. '
-              'Make sure notifications are enabled in your device settings.',
+              l10n.settingsNotificationsHelp,
               style: TextStyle(
                 fontSize: 13,
                 color: context.colors.textSecondary,
@@ -317,13 +321,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const Divider(height: 1),
 
           // Privacy section
-          const _SectionHeader(title: 'Privacy'),
+          _SectionHeader(title: l10n.settingsPrivacy),
           SwitchListTile(
             secondary: const Icon(Icons.analytics_outlined),
-            title: const Text('Share Anonymous Usage Data'),
-            subtitle: const Text(
-              'Helps us improve the app. No personal data is collected.',
-            ),
+            title: Text(l10n.settingsShareAnalytics),
+            subtitle: Text(l10n.settingsShareAnalyticsSubtitle),
             value: !_isAnalyticsOptedOut,
             onChanged: (value) async {
               final analytics = ref.read(analyticsServiceProvider);
@@ -341,9 +343,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const Divider(height: 1),
 
           // Data section
-          const _SectionHeader(title: 'Data'),
+          _SectionHeader(title: l10n.settingsData),
           Consumer(
             builder: (context, ref, child) {
+              final l10n = AppLocalizations.of(context);
               final settingsAsync = ref.watch(settingsRepositoryProvider);
               final lastBackupDate = settingsAsync.when(
                 data: (_) {
@@ -356,11 +359,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
               return ListTile(
                 leading: const Icon(Icons.access_time),
-                title: const Text('Last Backup'),
+                title: Text(l10n.settingsLastBackup),
                 subtitle: Text(
                   lastBackupDate != null
                       ? _formatBackupDate(lastBackupDate)
-                      : 'Never backed up',
+                      : l10n.settingsNeverBackedUp,
                   style: TextStyle(
                     color: lastBackupDate == null ? context.colors.warning : null,
                     fontWeight:
@@ -372,10 +375,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           Builder(
             builder: (context) {
+              final l10n = AppLocalizations.of(context);
               return ListTile(
                 leading: const Icon(Icons.upload_file),
-                title: const Text('Export Backup'),
-                subtitle: const Text('Save your subscriptions to a file'),
+                title: Text(l10n.settingsExportBackup),
+                subtitle: Text(l10n.settingsExportBackupSubtitle),
                 onTap: () async {
                   // Calculate share position origin for iOS before async gap
                   final box = context.findRenderObject() as RenderBox?;
@@ -390,7 +394,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (context.mounted) {
                       SnackBarUtils.show(
                         context,
-                        SnackBarUtils.info('Preparing backup...'),
+                        SnackBarUtils.info(l10n.settingsPreparingBackup),
                       );
                     }
 
@@ -415,14 +419,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     if (context.mounted) {
                       SnackBarUtils.show(
                         context,
-                        SnackBarUtils.success('Backup exported successfully!'),
+                        SnackBarUtils.success(l10n.settingsBackupSuccess),
                       );
                     }
                   } catch (e) {
                     if (context.mounted) {
                       SnackBarUtils.show(
                         context,
-                        SnackBarUtils.error('Failed to export backup: $e'),
+                        SnackBarUtils.error(l10n.settingsBackupError(e.toString())),
                       );
                     }
                   }
@@ -432,8 +436,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.download),
-            title: const Text('Import Backup'),
-            subtitle: const Text('Restore subscriptions from a file'),
+            title: Text(l10n.settingsImportBackup),
+            subtitle: Text(l10n.settingsImportBackupSubtitle),
             onTap: () async {
               await HapticUtils.medium(); // Action trigger feedback
               try{
@@ -450,19 +454,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   await showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('Import Complete'),
+                      title: Text(l10n.settingsImportComplete),
                       content: Column(
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Found: ${result.totalFound} subscriptions'),
-                          Text('Duplicates skipped: ${result.duplicates}'),
-                          Text('Imported: ${result.imported} subscriptions'),
+                          Text(l10n.settingsImportFound(result.totalFound)),
+                          Text(l10n.settingsImportDuplicates(result.duplicates)),
+                          Text(l10n.settingsImportImported(result.imported)),
+                          if (result.hasWarnings) ...[
+                            const SizedBox(height: AppSizes.sm),
+                            Text(
+                              l10n.settingsImportSkipped(result.skippedCount),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: context.colors.warning,
+                              ),
+                            ),
+                          ],
                           if (result.imported > 0) ...[
                             const SizedBox(height: AppSizes.base),
-                            const Text(
-                              'Notifications have been scheduled for all imported subscriptions.',
-                              style: TextStyle(fontSize: 12),
+                            Text(
+                              l10n.settingsImportNotifications,
+                              style: const TextStyle(fontSize: 12),
                             ),
                           ],
                         ],
@@ -470,7 +484,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: const Text('OK'),
+                          child: Text(l10n.settingsOk),
                         ),
                       ],
                     ),
@@ -487,7 +501,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 if (context.mounted) {
                   SnackBarUtils.show(
                     context,
-                    SnackBarUtils.error('Failed to import backup: $e'),
+                    SnackBarUtils.error(l10n.settingsBackupError(e.toString())),
                   );
                 }
               }
@@ -496,10 +510,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ListTile(
             leading: Icon(Icons.delete_forever, color: context.colors.error),
             title: Text(
-              'Delete All Data',
+              l10n.settingsDeleteAll,
               style: TextStyle(color: context.colors.error),
             ),
-            subtitle: const Text('Permanently delete all subscriptions'),
+            subtitle: Text(l10n.settingsDeleteAllSubtitle),
             onTap: () async {
               await HapticUtils.light(); // ListTile tap feedback
               if (!context.mounted) return;
@@ -508,21 +522,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               final confirmed = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Delete All Data?'),
-                  content: const Text(
-                    'This will permanently delete all subscriptions and settings. This cannot be undone.\n\nAre you sure you want to continue?',
-                  ),
+                  title: Text(l10n.settingsDeleteAllTitle),
+                  content: Text(l10n.settingsDeleteAllBody),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.settingsCancel),
                     ),
                     TextButton(
                       onPressed: () => Navigator.pop(context, true),
                       style: TextButton.styleFrom(
                         foregroundColor: context.colors.error,
                       ),
-                      child: const Text('Continue'),
+                      child: Text(l10n.settingsContinue),
                     ),
                   ],
                 ),
@@ -535,23 +547,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               final finalConfirmed = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: const Text('Final Confirmation'),
+                  title: Text(l10n.settingsFinalConfirmation),
                   content: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'This action is irreversible. All your subscription data will be lost forever.',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                      Text(
+                        l10n.settingsFinalConfirmationBody,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: AppSizes.base),
-                      const Text('Type DELETE to confirm:'),
+                      Text(l10n.settingsTypeDelete),
                       const SizedBox(height: AppSizes.sm),
                       TextField(
                         controller: textController,
-                        decoration: const InputDecoration(
-                          hintText: 'DELETE',
-                          border: OutlineInputBorder(),
+                        decoration: InputDecoration(
+                          hintText: l10n.settingsDeleteHint,
+                          border: const OutlineInputBorder(),
                         ),
                         textCapitalization: TextCapitalization.characters,
                       ),
@@ -560,7 +572,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.settingsCancel),
                     ),
                     TextButton(
                       onPressed: () {
@@ -569,14 +581,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         } else {
                           SnackBarUtils.show(
                             context,
-                            SnackBarUtils.warning('Please type DELETE to confirm'),
+                            SnackBarUtils.warning(l10n.settingsTypeDeleteWarning),
                           );
                         }
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: context.colors.error,
                       ),
-                      child: const Text('Delete All'),
+                      child: Text(l10n.settingsDeleteButton),
                     ),
                   ],
                 ),
@@ -599,7 +611,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 if (context.mounted) {
                   SnackBarUtils.show(
                     context,
-                    SnackBarUtils.warning('All data deleted successfully'),
+                    SnackBarUtils.warning(l10n.settingsAllDataDeleted),
                   );
 
                   // Pop back to home
@@ -609,7 +621,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 if (context.mounted) {
                   SnackBarUtils.show(
                     context,
-                    SnackBarUtils.error('Failed to delete data: $e'),
+                    SnackBarUtils.error(l10n.settingsDeleteError(e.toString())),
                   );
                 }
               }
@@ -619,16 +631,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const Divider(height: 1),
 
           // About section
-          const _SectionHeader(title: 'About'),
+          _SectionHeader(title: l10n.settingsAbout),
           ListTile(
             leading: const Icon(Icons.info_outline),
-            title: const Text('Version'),
+            title: Text(l10n.settingsVersion),
             subtitle: const Text('1.4.6'),
             onTap: _handleVersionTap,
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: const Text('Privacy Policy'),
+            title: Text(l10n.settingsPrivacyPolicy),
             trailing: const Icon(Icons.open_in_new, size: 20),
             onTap: () async {
               final url = Uri.parse('https://customsubs.us/privacy');
@@ -639,7 +651,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.description_outlined),
-            title: const Text('Terms of Service'),
+            title: Text(l10n.settingsTermsOfService),
             trailing: const Icon(Icons.open_in_new, size: 20),
             onTap: () async {
               final url = Uri.parse('https://customsubs.us/terms');
@@ -651,26 +663,26 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           const SizedBox(height: AppSizes.sm),
           const CustomAppsPromoCard(),
           const SizedBox(height: AppSizes.sm),
-          const ListTile(
-            leading: Icon(Icons.favorite_outline),
-            title: Text('Made with love by CustomApps LLC'),
+          ListTile(
+            leading: const Icon(Icons.favorite_outline),
+            title: Text(l10n.settingsMadeWith),
           ),
 
           // Developer Tools section — hidden until version tile tapped 11 times
           if (_devToolsUnlocked) ...[
             const Divider(height: 1),
-            const _SectionHeader(title: 'Developer Tools'),
+            _SectionHeader(title: l10n.settingsDeveloperTools),
             ListTile(
               leading: const Icon(Icons.science_outlined),
-              title: const Text('Load Demo Data'),
-              subtitle: const Text('Add 18 sample subscriptions'),
+              title: Text(l10n.settingsLoadDemoData),
+              subtitle: Text(l10n.settingsLoadDemoDataSubtitle),
               enabled: !_isLoadingDemo,
               onTap: _handleLoadDemoData,
             ),
             ListTile(
               leading: const Icon(Icons.cleaning_services_outlined),
-              title: const Text('Clear Demo Data'),
-              subtitle: const Text('Remove only demo subscriptions'),
+              title: Text(l10n.settingsClearDemoData),
+              subtitle: Text(l10n.settingsClearDemoDataSubtitle),
               enabled: !_isLoadingDemo,
               onTap: _handleClearDemoData,
             ),
@@ -699,9 +711,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       await HapticUtils.heavy();
       setState(() => _devToolsUnlocked = true);
       if (mounted) {
+        final l10n = AppLocalizations.of(context);
         SnackBarUtils.show(
           context,
-          SnackBarUtils.info('Developer tools unlocked'),
+          SnackBarUtils.info(l10n.settingsDeveloperUnlocked),
         );
       }
     } else if (_tapCount >= 7 && !_devToolsUnlocked) {
@@ -716,24 +729,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await HapticUtils.light();
     if (!mounted) return;
 
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Load Demo Data?'),
-        content: const Text(
-          'This will add 18 sample subscriptions to your app. '
-          'Existing subscriptions will not be affected.\n\n'
-          'Demo subscriptions are tagged and can be removed '
-          'with "Clear Demo Data".',
-        ),
+        title: Text(l10n.settingsLoadDemoTitle),
+        content: Text(l10n.settingsLoadDemoBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.settingsCancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Load'),
+            child: Text(l10n.settingsLoad),
           ),
         ],
       ),
@@ -761,14 +770,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.success('Loaded ${demoSubs.length} demo subscriptions'),
+          SnackBarUtils.success(l10n.settingsLoadedDemoCount(demoSubs.length)),
         );
       }
     } catch (e) {
       if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.error('Failed to load demo data: $e'),
+          SnackBarUtils.error(l10n.settingsLoadDemoError(e.toString())),
         );
       }
     } finally {
@@ -782,6 +791,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await HapticUtils.light();
     if (!mounted) return;
 
+    final l10n = AppLocalizations.of(context);
     final repository = await ref.read(subscriptionRepositoryProvider.future);
     if (!mounted) return;
 
@@ -792,7 +802,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (demoSubs.isEmpty) {
       SnackBarUtils.show(
         context,
-        SnackBarUtils.info('No demo subscriptions found'),
+        SnackBarUtils.info(l10n.settingsNoDemoFound),
       );
       return;
     }
@@ -800,20 +810,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Clear Demo Data?'),
-        content: Text(
-          'This will remove ${demoSubs.length} demo subscription${demoSubs.length == 1 ? '' : 's'}. '
-          'Your real subscriptions will not be affected.',
-        ),
+        title: Text(l10n.settingsClearDemoTitle),
+        content: Text(l10n.settingsClearDemoBody(demoSubs.length)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.settingsCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: TextButton.styleFrom(foregroundColor: context.colors.error),
-            child: const Text('Clear'),
+            child: Text(l10n.settingsClear),
           ),
         ],
       ),
@@ -835,20 +842,91 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.success(
-              'Cleared ${demoSubs.length} demo subscription${demoSubs.length == 1 ? '' : 's'}'),
+          SnackBarUtils.success(l10n.settingsClearedDemoCount(demoSubs.length)),
         );
       }
     } catch (e) {
       if (mounted) {
         SnackBarUtils.show(
           context,
-          SnackBarUtils.error('Failed to clear demo data: $e'),
+          SnackBarUtils.error(l10n.settingsClearDemoError(e.toString())),
         );
       }
     } finally {
       if (mounted) setState(() => _isLoadingDemo = false);
     }
+  }
+
+  /// Returns the display label for the currently selected language.
+  String _getLanguageLabel(AppLocalizations l10n) {
+    final locale = ref.watch(appLocaleProvider);
+    if (locale == null) return l10n.settingsLanguageSystem;
+    switch (locale.languageCode) {
+      case 'en':
+        return l10n.settingsLanguageEnglish;
+      case 'fr':
+        return l10n.settingsLanguageFrench;
+      case 'es':
+        return l10n.settingsLanguageSpanish;
+      default:
+        return l10n.settingsLanguageSystem;
+    }
+  }
+
+  /// Shows a bottom sheet / dialog for choosing a language.
+  void _showLanguagePicker(
+    BuildContext context,
+    WidgetRef ref,
+    AppLocalizations l10n,
+  ) async {
+    await HapticUtils.light();
+    if (!context.mounted) return;
+
+    final currentLocale = ref.read(appLocaleProvider);
+    final currentCode = currentLocale?.languageCode;
+
+    final selected = await showDialog<String?>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(l10n.settingsLanguage),
+        children: [
+          _buildLanguageOption(ctx, l10n.settingsLanguageSystem, null, currentCode),
+          _buildLanguageOption(ctx, l10n.settingsLanguageEnglish, 'en', currentCode),
+          _buildLanguageOption(ctx, l10n.settingsLanguageFrench, 'fr', currentCode),
+          _buildLanguageOption(ctx, l10n.settingsLanguageSpanish, 'es', currentCode),
+        ],
+      ),
+    );
+
+    // selected is the language code, or 'system' for system default
+    // null means dialog was dismissed without selection
+    if (selected == null) return;
+
+    await HapticUtils.medium();
+    final code = selected == 'system' ? null : selected;
+    await ref.read(settingsRepositoryProvider.notifier).setAppLocale(code);
+
+    ref.read(analyticsServiceProvider).capture('settings_changed', {
+      'setting': 'language',
+    });
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context,
+    String label,
+    String? code,
+    String? currentCode,
+  ) {
+    final isSelected = code == currentCode;
+    return SimpleDialogOption(
+      onPressed: () => Navigator.pop(context, code ?? 'system'),
+      child: Row(
+        children: [
+          Expanded(child: Text(label)),
+          if (isSelected) const Icon(Icons.check, size: 20),
+        ],
+      ),
+    );
   }
 }
 

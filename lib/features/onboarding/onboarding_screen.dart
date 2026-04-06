@@ -8,6 +8,7 @@ import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Single-screen onboarding that introduces key features.
 ///
@@ -89,6 +90,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -140,7 +142,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
 
                       // Welcome message
                       Text(
-                        'Welcome to CustomSubs',
+                        l10n.onboardingWelcome,
                         style: theme.textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                         ),
@@ -149,7 +151,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                       const SizedBox(height: AppSizes.sm),
 
                       Text(
-                        'Your private subscription tracker',
+                        l10n.onboardingSubtitle,
                         style: theme.textTheme.bodyLarge?.copyWith(
                           color: context.colors.textSecondary,
                         ),
@@ -164,11 +166,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 // Feature 1: Track Everything
                 FadeTransition(
                   opacity: _fadeAnimations[1],
-                  child: const _FeatureCard(
+                  child: _FeatureCard(
                     icon: Icons.dashboard_rounded,
-                    title: 'Track Everything',
-                    description:
-                        'All your subscriptions in one place. No bank linking. No login.',
+                    title: l10n.onboardingFeature1Title,
+                    description: l10n.onboardingFeature1Desc,
                   ),
                 ),
 
@@ -177,11 +178,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 // Feature 2: Smart Reminders
                 FadeTransition(
                   opacity: _fadeAnimations[2],
-                  child: const _FeatureCard(
+                  child: _FeatureCard(
                     icon: Icons.notifications_active_rounded,
-                    title: 'Never Miss a Charge',
-                    description:
-                        'Get notified 7 days before, 1 day before, and the morning of every billing date.',
+                    title: l10n.onboardingFeature2Title,
+                    description: l10n.onboardingFeature2Desc,
                   ),
                 ),
 
@@ -190,11 +190,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                 // Feature 3: Easy Cancellation
                 FadeTransition(
                   opacity: _fadeAnimations[3],
-                  child: const _FeatureCard(
+                  child: _FeatureCard(
                     icon: Icons.exit_to_app_rounded,
-                    title: 'Cancel with Confidence',
-                    description:
-                        'Step-by-step guides to cancel any subscription quickly.',
+                    title: l10n.onboardingFeature3Title,
+                    description: l10n.onboardingFeature3Desc,
                   ),
                 ),
 
@@ -215,9 +214,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                               vertical: AppSizes.base,
                             ),
                           ),
-                          child: const Text(
-                            'Get Started',
-                            style: TextStyle(fontSize: 16),
+                          child: Text(
+                            l10n.onboardingGetStarted,
+                            style: const TextStyle(fontSize: 16),
                           ),
                         ),
                       ),
@@ -234,7 +233,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen>
                           ),
                           const SizedBox(width: AppSizes.xs),
                           Text(
-                            '100% offline • No account required',
+                            l10n.onboardingPrivacyNote,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: context.colors.textTertiary,
                             ),

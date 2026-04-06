@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/models/reminder_config.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 class ReminderConfigWidget extends StatelessWidget {
   final ReminderConfig config;
@@ -15,13 +16,14 @@ class ReminderConfigWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // First reminder
         _buildReminderDropdown(
           context,
-          label: 'First reminder',
+          label: l10n.reminderFirstLabel,
           value: config.firstReminderDays,
           onChanged: (days) {
             onChanged(config.copyWith(firstReminderDays: days));
@@ -32,7 +34,7 @@ class ReminderConfigWidget extends StatelessWidget {
         // Second reminder
         _buildReminderDropdown(
           context,
-          label: 'Second reminder',
+          label: l10n.reminderSecondLabel,
           value: config.secondReminderDays,
           onChanged: (days) {
             onChanged(config.copyWith(secondReminderDays: days));
@@ -42,7 +44,7 @@ class ReminderConfigWidget extends StatelessWidget {
 
         // Remind on billing day
         SwitchListTile(
-          title: const Text('Remind on billing day'),
+          title: Text(l10n.reminderOnBillingDay),
           value: config.remindOnBillingDay,
           onChanged: (value) async {
             await HapticUtils.selection(); // Switch toggle feedback
@@ -54,7 +56,7 @@ class ReminderConfigWidget extends StatelessWidget {
 
         // Reminder time
         ListTile(
-          title: const Text('Reminder time'),
+          title: Text(l10n.reminderTimeLabel),
           subtitle: Text(
             '${config.reminderHour.toString().padLeft(2, '0')}:${config.reminderMinute.toString().padLeft(2, '0')}',
           ),
@@ -91,6 +93,7 @@ class ReminderConfigWidget extends StatelessWidget {
     required int value,
     required ValueChanged<int> onChanged,
   }) {
+    final l10n = AppLocalizations.of(context);
     final reminderOptions = [
       0, // Off
       1,
@@ -111,8 +114,8 @@ class ReminderConfigWidget extends StatelessWidget {
         return DropdownMenuItem(
           value: days,
           child: Text(days == 0
-              ? 'Off'
-              : '$days day${days == 1 ? '' : 's'} before'),
+              ? l10n.reminderOff
+              : l10n.reminderDaysBefore(days)),
         );
       }).toList(),
       onChanged: (newValue) async {

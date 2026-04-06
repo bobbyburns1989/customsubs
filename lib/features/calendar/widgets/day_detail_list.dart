@@ -5,9 +5,11 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
+import 'package:custom_subs/core/utils/localized_enums.dart';
 import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/core/widgets/subtle_pressable.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Displays the list of subscriptions billing on a selected calendar day.
 ///
@@ -30,12 +32,14 @@ class DayDetailList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (subscriptions.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(AppSizes.xxl),
         child: Center(
           child: Text(
-            'No bills on this date',
+            l10n.calendarNoBills,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: context.colors.textTertiary,
                 ),
@@ -97,6 +101,7 @@ class _DayDetailTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final currencyFormat =
         NumberFormat.simpleCurrency(name: subscription.currencyCode);
 
@@ -143,7 +148,7 @@ class _DayDetailTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${currencyFormat.format(subscription.amount)}/${subscription.cycle.shortName}',
+                    '${currencyFormat.format(subscription.amount)}/${subscription.cycle.localizedShortName(l10n)}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -152,7 +157,7 @@ class _DayDetailTile extends StatelessWidget {
 
             // Cycle label
             Text(
-              subscription.cycle.displayName,
+              subscription.cycle.localizedName(l10n),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: context.colors.textTertiary,
                   ),

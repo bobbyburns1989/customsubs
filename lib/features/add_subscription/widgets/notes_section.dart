@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Form section for general notes field.
 ///
@@ -23,17 +24,18 @@ class NotesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FormSectionCard(
-      title: 'Notes',
-      subtitle: 'Add any additional notes',
+      title: l10n.notesSectionTitle,
+      subtitle: l10n.notesSectionSubtitle,
       icon: Icons.note_outlined,
       isCollapsible: true,
       initiallyExpanded: false,
       child: TextFormField(
         controller: notesController,
-        decoration: const InputDecoration(
-          labelText: 'General Notes',
-          hintText: 'Add any additional notes...',
+        decoration: InputDecoration(
+          labelText: l10n.notesGeneralLabel,
+          hintText: l10n.notesGeneralHint,
         ),
         maxLines: 4,
       ),

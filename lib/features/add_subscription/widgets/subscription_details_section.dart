@@ -6,6 +6,8 @@ import 'package:custom_subs/core/widgets/form_section_card.dart';
 import 'package:custom_subs/core/widgets/styled_date_field.dart';
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
+import 'package:custom_subs/core/utils/localized_enums.dart';
 
 /// Form section for core subscription details (required fields).
 ///
@@ -78,8 +80,9 @@ class SubscriptionDetailsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return FormSectionCard(
-      title: 'Subscription Details',
+      title: l10n.detailsSection,
       icon: Icons.edit_outlined,
       isCollapsible: false, // Required fields - always visible
       child: Column(
@@ -87,13 +90,13 @@ class SubscriptionDetailsSection extends StatelessWidget {
           // Name field
           TextFormField(
             controller: nameController,
-            decoration: const InputDecoration(
-              labelText: 'Name *',
-              hintText: 'Netflix, Spotify, etc.',
+            decoration: InputDecoration(
+              labelText: l10n.detailsNameLabel,
+              hintText: l10n.detailsNameHint,
             ),
             validator: (value) {
               if (value == null || value.trim().isEmpty) {
-                return 'Please enter a name';
+                return l10n.detailsNameValidation;
               }
               return null;
             },
@@ -107,9 +110,9 @@ class SubscriptionDetailsSection extends StatelessWidget {
                 flex: 3,
                 child: TextFormField(
                   controller: amountController,
-                  decoration: const InputDecoration(
-                    labelText: 'Amount *',
-                    hintText: '0.00',
+                  decoration: InputDecoration(
+                    labelText: l10n.detailsAmountLabel,
+                    hintText: l10n.detailsAmountHint,
                   ),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
@@ -117,11 +120,11 @@ class SubscriptionDetailsSection extends StatelessWidget {
                   ],
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return 'Required';
+                      return l10n.detailsAmountRequired;
                     }
                     final amount = double.tryParse(value);
                     if (amount == null || amount <= 0) {
-                      return 'Invalid amount';
+                      return l10n.detailsAmountInvalid;
                     }
                     return null;
                   },
@@ -132,7 +135,7 @@ class SubscriptionDetailsSection extends StatelessWidget {
                 flex: 2,
                 child: DropdownButtonFormField<String>(
                   value: currencyCode,
-                  decoration: const InputDecoration(labelText: 'Currency'),
+                  decoration: InputDecoration(labelText: l10n.detailsCurrencyLabel),
                   items: CurrencyUtils.getSupportedCurrencies()
                       .map((code) => DropdownMenuItem(
                             value: code,
@@ -153,11 +156,11 @@ class SubscriptionDetailsSection extends StatelessWidget {
           // Billing cycle dropdown
           DropdownButtonFormField<SubscriptionCycle>(
             value: cycle,
-            decoration: const InputDecoration(labelText: 'Billing Cycle *'),
+            decoration: InputDecoration(labelText: l10n.detailsBillingCycleLabel),
             items: SubscriptionCycle.values
                 .map((cycle) => DropdownMenuItem(
                       value: cycle,
-                      child: Text(cycle.displayName),
+                      child: Text(cycle.localizedName(l10n)),
                     ))
                 .toList(),
             onChanged: (value) {
@@ -170,7 +173,7 @@ class SubscriptionDetailsSection extends StatelessWidget {
 
           // Next billing date picker
           StyledDateField(
-            label: 'Next Billing Date *',
+            label: l10n.detailsNextBillingDateLabel,
             value: nextBillingDate,
             firstDate: DateTime.now(),
             lastDate: DateTime.now().add(const Duration(days: 3650)),
@@ -181,11 +184,11 @@ class SubscriptionDetailsSection extends StatelessWidget {
           // Category dropdown
           DropdownButtonFormField<SubscriptionCategory>(
             value: category,
-            decoration: const InputDecoration(labelText: 'Category *'),
+            decoration: InputDecoration(labelText: l10n.detailsCategoryLabel),
             items: SubscriptionCategory.values
                 .map((cat) => DropdownMenuItem(
                       value: cat,
-                      child: Text('${cat.icon} ${cat.displayName}'),
+                      child: Text('${cat.icon} ${cat.localizedName(l10n)}'),
                     ))
                 .toList(),
             onChanged: (value) {

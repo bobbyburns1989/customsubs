@@ -4,6 +4,7 @@ import 'package:custom_subs/features/add_subscription/widgets/subscription_detai
 import 'package:custom_subs/data/models/subscription_cycle.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 void main() {
   group('SubscriptionDetailsSection', () {
@@ -30,6 +31,9 @@ void main() {
 
     Widget buildWidget() {
       return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: SubscriptionDetailsSection(
             nameController: nameController,

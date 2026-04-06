@@ -30,6 +30,7 @@ class SettingsRepository extends _$SettingsRepository {
   static const String _backupReminderShownKey = 'backup_reminder_shown';
   static const String _lastBackupDateKey = 'last_backup_date';
   static const String _isDarkModeKey = 'is_dark_mode';
+  static const String _appLocaleKey = 'app_locale';
 
   Box? _box;
 
@@ -125,6 +126,23 @@ class SettingsRepository extends _$SettingsRepository {
   /// Set dark mode preference
   Future<void> setIsDarkMode(bool value) async {
     await _getBox.put(_isDarkModeKey, value);
+    ref.invalidateSelf();
+  }
+
+  // App Locale
+
+  /// Get app locale code (null = follow system default)
+  String? getAppLocale() {
+    return _getBox.get(_appLocaleKey) as String?;
+  }
+
+  /// Set app locale code (null = follow system default)
+  Future<void> setAppLocale(String? localeCode) async {
+    if (localeCode == null) {
+      await _getBox.delete(_appLocaleKey);
+    } else {
+      await _getBox.put(_appLocaleKey, localeCode);
+    }
     ref.invalidateSelf();
   }
 }

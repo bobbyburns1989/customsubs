@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/info_row.dart';
 
 /// Card displaying reminder configuration for a subscription.
@@ -54,6 +55,7 @@ class ReminderInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final reminders = subscription.reminders;
 
     return Card(
@@ -63,7 +65,7 @@ class ReminderInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Reminder Settings',
+              l10n.reminderCardTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -73,29 +75,29 @@ class ReminderInfoCard extends StatelessWidget {
 
             if (reminders.firstReminderDays > 0)
               InfoRow(
-                label: 'First Reminder',
-                value: '${reminders.firstReminderDays} days before',
+                label: l10n.reminderCardFirst,
+                value: l10n.reminderCardFirstValue(reminders.firstReminderDays),
               ),
 
             if (reminders.secondReminderDays > 0) ...[
               const Divider(height: AppSizes.lg),
               InfoRow(
-                label: 'Second Reminder',
-                value: '${reminders.secondReminderDays} days before',
+                label: l10n.reminderCardSecond,
+                value: l10n.reminderCardSecondValue(reminders.secondReminderDays),
               ),
             ],
 
             if (reminders.remindOnBillingDay) ...[
               const Divider(height: AppSizes.lg),
-              const InfoRow(
-                label: 'Day-of Reminder',
-                value: 'Enabled',
+              InfoRow(
+                label: l10n.reminderCardDayOf,
+                value: l10n.reminderCardEnabled,
               ),
             ],
 
             const Divider(height: AppSizes.lg),
             InfoRow(
-              label: 'Reminder Time',
+              label: l10n.reminderCardTime,
               value: '${reminders.reminderHour.toString().padLeft(2, '0')}:${reminders.reminderMinute.toString().padLeft(2, '0')}',
             ),
           ],

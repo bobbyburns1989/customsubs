@@ -1,4 +1,5 @@
 import 'package:intl/intl.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// DateTime extensions for subscription billing date calculations and formatting.
 ///
@@ -55,7 +56,7 @@ extension DateTimeExtensions on DateTime {
   /// ```
   ///
   /// **Perfect for:** Subscription detail screens, analytics, anywhere you have space
-  String toRelativeString() {
+  String toRelativeString({AppLocalizations? l10n}) {
     final now = DateTime.now();
     final difference = this.difference(now);
 
@@ -63,31 +64,31 @@ extension DateTimeExtensions on DateTime {
       // Past dates
       final absDiff = difference.abs();
       if (absDiff.inDays == 0) {
-        return 'Today';
+        return l10n?.dateToday ?? 'Today';
       } else if (absDiff.inDays == 1) {
-        return 'Yesterday';
+        return l10n?.dateYesterday ?? 'Yesterday';
       } else if (absDiff.inDays < 7) {
-        return '${absDiff.inDays} days ago';
+        return l10n?.dateDaysAgo(absDiff.inDays) ?? '${absDiff.inDays} days ago';
       } else if (absDiff.inDays < 30) {
         final weeks = (absDiff.inDays / 7).floor();
-        return weeks == 1 ? '1 week ago' : '$weeks weeks ago';
+        return l10n?.dateWeeksAgo(weeks) ?? (weeks == 1 ? '1 week ago' : '$weeks weeks ago');
       } else {
         return DateFormat.yMMMd().format(this);
       }
     } else {
       // Future dates
       if (difference.inDays == 0) {
-        return 'Today';
+        return l10n?.dateToday ?? 'Today';
       } else if (difference.inDays == 1) {
-        return 'Tomorrow';
+        return l10n?.dateTomorrow ?? 'Tomorrow';
       } else if (difference.inDays < 7) {
-        return 'in ${difference.inDays} days';
+        return l10n?.dateInDays(difference.inDays) ?? 'in ${difference.inDays} days';
       } else if (difference.inDays < 30) {
         final weeks = (difference.inDays / 7).floor();
-        return weeks == 1 ? 'in 1 week' : 'in $weeks weeks';
+        return l10n?.dateInWeeks(weeks) ?? (weeks == 1 ? 'in 1 week' : 'in $weeks weeks');
       } else if (difference.inDays < 365) {
         final months = (difference.inDays / 30).floor();
-        return months == 1 ? 'in 1 month' : 'in $months months';
+        return l10n?.dateInMonths(months) ?? (months == 1 ? 'in 1 month' : 'in $months months');
       } else {
         return DateFormat.yMMMd().format(this);
       }
@@ -115,18 +116,18 @@ extension DateTimeExtensions on DateTime {
   /// ```
   ///
   /// **Perfect for:** List items, compact UI, mobile screens
-  String toShortRelativeString() {
+  String toShortRelativeString({AppLocalizations? l10n}) {
     final now = DateTime.now();
     final difference = this.difference(now);
 
     if (difference.isNegative) {
-      return 'Overdue';
+      return l10n?.dateOverdue ?? 'Overdue';
     } else if (difference.inDays == 0) {
-      return 'Today';
+      return l10n?.dateToday ?? 'Today';
     } else if (difference.inDays == 1) {
-      return 'Tomorrow';
+      return l10n?.dateTomorrow ?? 'Tomorrow';
     } else if (difference.inDays < 30) {
-      return 'in ${difference.inDays} days';
+      return l10n?.dateInDays(difference.inDays) ?? 'in ${difference.inDays} days';
     } else {
       return DateFormat.MMMd().format(this);
     }
@@ -238,20 +239,20 @@ extension DateTimeExtensions on DateTime {
   }
 
   /// Get human-readable string for days until this date ("in 3 days", "Tomorrow", "Today", etc.)
-  String relativeDaysUntil() {
+  String relativeDaysUntil({AppLocalizations? l10n}) {
     final now = DateTime.now();
     final difference = this.difference(now);
 
     if (difference.isNegative) {
-      return 'Overdue';
+      return l10n?.dateOverdue ?? 'Overdue';
     } else if (difference.inDays == 0) {
-      return 'Today';
+      return l10n?.dateToday ?? 'Today';
     } else if (difference.inDays == 1) {
-      return 'Tomorrow';
+      return l10n?.dateTomorrow ?? 'Tomorrow';
     } else if (difference.inDays < 7) {
-      return 'in ${difference.inDays} days';
+      return l10n?.dateInDays(difference.inDays) ?? 'in ${difference.inDays} days';
     } else {
-      return 'in ${difference.inDays} days';
+      return l10n?.dateInDays(difference.inDays) ?? 'in ${difference.inDays} days';
     }
   }
 }

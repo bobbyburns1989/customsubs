@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/extensions/theme_extensions.dart';
+import 'package:custom_subs/core/utils/localized_enums.dart';
 import 'package:custom_subs/data/models/subscription_category.dart';
 import 'package:custom_subs/features/analytics/analytics_controller.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 class CategoryDonutChart extends StatefulWidget {
   final Map<SubscriptionCategory, CategoryData> categoryBreakdown;
@@ -24,6 +26,7 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final sortedEntries = widget.categoryBreakdown.entries.toList()
       ..sort((a, b) => b.value.amount.compareTo(a.value.amount));
 
@@ -38,12 +41,12 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
 
     if (_touchedIndex != null && _touchedIndex! < sortedEntries.length) {
       final entry = sortedEntries[_touchedIndex!];
-      centerLabel = _getCategoryDisplayName(entry.key);
+      centerLabel = entry.key.localizedName(l10n);
       centerAmount =
           '${widget.currencySymbol}${entry.value.amount.toStringAsFixed(2)}';
       centerPercent = '${entry.value.percentage.toStringAsFixed(1)}%';
     } else {
-      centerLabel = 'Monthly';
+      centerLabel = l10n.analyticsMonthlyLabel;
       centerAmount = '${widget.currencySymbol}${total.toStringAsFixed(2)}';
     }
 
@@ -139,7 +142,7 @@ class _CategoryDonutChartState extends State<CategoryDonutChart> {
 
             return _LegendItem(
               color: color,
-              label: _getCategoryDisplayName(category),
+              label: category.localizedName(l10n),
               amount: '${widget.currencySymbol}${data.amount.toStringAsFixed(2)}',
               isSelected: isSelected,
             );
@@ -215,24 +218,6 @@ class _LegendItem extends StatelessWidget {
   }
 }
 
-// Helper functions
-String _getCategoryDisplayName(SubscriptionCategory category) {
-  switch (category) {
-    case SubscriptionCategory.entertainment: return 'Entertainment';
-    case SubscriptionCategory.productivity: return 'Productivity';
-    case SubscriptionCategory.fitness: return 'Fitness';
-    case SubscriptionCategory.news: return 'News';
-    case SubscriptionCategory.cloud: return 'Cloud Storage';
-    case SubscriptionCategory.gaming: return 'Gaming';
-    case SubscriptionCategory.education: return 'Education';
-    case SubscriptionCategory.finance: return 'Finance';
-    case SubscriptionCategory.shopping: return 'Shopping';
-    case SubscriptionCategory.utilities: return 'Utilities';
-    case SubscriptionCategory.health: return 'Health';
-    case SubscriptionCategory.other: return 'Other';
-    case SubscriptionCategory.sports: return 'Sports';
-  }
-}
 
 Color _getCategoryColor(SubscriptionCategory category) {
   switch (category) {

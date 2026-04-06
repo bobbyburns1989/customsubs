@@ -20,6 +20,8 @@ import 'package:custom_subs/features/settings/widgets/backup_reminder_dialog.dar
 import 'package:custom_subs/app/router.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
+import 'package:custom_subs/core/utils/localized_enums.dart';
 import 'package:flutter/material.dart' as material;
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -132,11 +134,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final controller = ref.watch(homeControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CustomSubs'),
+        title: Text(l10n.homeTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
@@ -154,10 +157,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           if (subscriptions.isEmpty) {
             return EmptyStateWidget(
               icon: Icons.inbox_outlined,
-              title: 'No subscriptions yet',
-              subtitle:
-                  'Tap + to add your first one. We\'ll remind you before every charge.',
-              buttonText: 'Add Subscription',
+              title: l10n.homeEmptyTitle,
+              subtitle: l10n.homeEmptySubtitle,
+              buttonText: l10n.homeAddSubscription,
               onButtonPressed: () async {
                 await HapticUtils.medium();
                 if (!mounted) return;
@@ -234,7 +236,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               }
                             },
                             icon: const Icon(Icons.add, size: 20),
-                            label: const Text('Add New', maxLines: 1, overflow: TextOverflow.ellipsis),
+                            label: Text(l10n.navAddNew, maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                         const SizedBox(width: AppSizes.sm),
@@ -258,7 +260,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               }
                             },
                             icon: const Icon(Icons.calendar_month_outlined, size: 20),
-                            label: const Text('Calendar', maxLines: 1, overflow: TextOverflow.ellipsis),
+                            label: Text(l10n.navCalendar, maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                         const SizedBox(width: AppSizes.sm),
@@ -282,7 +284,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               }
                             },
                             icon: const Icon(Icons.analytics_outlined, size: 20),
-                            label: const Text('Analytics', maxLines: 1, overflow: TextOverflow.ellipsis),
+                            label: Text(l10n.navAnalytics, maxLines: 1, overflow: TextOverflow.ellipsis),
                           ),
                         ),
                       ],
@@ -324,7 +326,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 (sub) => Padding(
                                   padding: const EdgeInsets.only(top: AppSizes.xs),
                                   child: Text(
-                                    '${sub.name} trial ends ${sub.trialEndDate!.toShortRelativeString()}',
+                                    '${sub.name} trial ends ${sub.trialEndDate!.toShortRelativeString(l10n: l10n)}',
                                     style: theme.textTheme.bodyMedium,
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
@@ -350,7 +352,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                     child: Row(
                       children: [
                         Text(
-                          'Upcoming',
+                          l10n.sectionUpcoming,
                           style: theme.textTheme.titleLarge,
                         ),
                         const SizedBox(width: AppSizes.sm),
@@ -358,8 +360,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         Flexible(
                           child: Text(
                             paidUpcoming.isNotEmpty
-                                ? '${paidUpcoming.length} of ${upcoming.length} paid'
-                                : 'next 30 days',
+                                ? l10n.homePaidCount(paidUpcoming.length, upcoming.length)
+                                : l10n.homeNext30Days,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: paidUpcoming.isNotEmpty
                                   ? context.colors.success
@@ -422,7 +424,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             SnackBarUtils.show(
                               context,
                               SnackBarUtils.success(
-                                '${subscription.name} marked as paid',
+                                l10n.homeMarkedAsPaid,
                                 onUndo: () {
                                   homeController.markAsPaid(subscription.id, false);
                                 },
@@ -464,12 +466,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       child: Row(
                         children: [
                           Text(
-                            'Later',
+                            l10n.sectionLater,
                             style: theme.textTheme.titleLarge,
                           ),
                           const SizedBox(width: AppSizes.sm),
                           Text(
-                            '31–90 days',
+                            l10n.homeLaterDays,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -509,12 +511,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           Icon(Icons.pause_circle_outline, size: 20, color: context.colors.textSecondary),
                           const SizedBox(width: AppSizes.sm),
                           Text(
-                            'Paused',
+                            l10n.sectionPaused,
                             style: theme.textTheme.titleLarge,
                           ),
                           const SizedBox(width: AppSizes.sm),
                           Text(
-                            '$pausedCount paused',
+                            l10n.homePausedCount(pausedCount),
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: context.colors.textSecondary,
                             ),
@@ -588,7 +590,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           ],
         ),
         error: (error, stack) => Center(
-          child: Text('Error: $error'),
+          child: Text(l10n.homeError(error.toString())),
         ),
       ),
     );
@@ -599,17 +601,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     subscription,
     homeController,
   ) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Subscription'),
+        title: Text(l10n.homeDeleteTitle),
         content: Text(
           'This will remove ${subscription.name} and cancel all reminders. This cannot be undone.',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(l10n.homeDeleteCancel),
           ),
           TextButton(
             onPressed: () {
@@ -617,7 +620,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               Navigator.pop(context);
             },
             style: TextButton.styleFrom(foregroundColor: context.colors.error),
-            child: const Text('Delete'),
+            child: Text(l10n.homeDeleteConfirm),
           ),
         ],
       ),
@@ -662,14 +665,15 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
   double get _targetAmount => _amountForPeriod(widget.monthlyTotal, _period);
 
   // Period label shown below the amount.
-  String get _periodLabel {
+  // Requires BuildContext for localization — use _periodLabelFor(l10n) instead.
+  String _periodLabelFor(AppLocalizations l10n) {
     switch (_period) {
       case _SpendingPeriod.monthly:
-        return '/month';
+        return l10n.homePerMonth;
       case _SpendingPeriod.yearly:
-        return '/year';
+        return l10n.homePerYear;
       case _SpendingPeriod.daily:
-        return '/day';
+        return l10n.homePerDay;
     }
   }
 
@@ -710,6 +714,7 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return GestureDetector(
       onTap: _cyclePeriod,
@@ -748,7 +753,7 @@ class _SpendingSummaryCardState extends State<_SpendingSummaryCard> {
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               child: Text(
-                _periodLabel,
+                _periodLabelFor(l10n),
                 // Key forces AnimatedSwitcher to treat each period as a
                 // different widget, triggering the crossfade animation.
                 key: ValueKey(_period),
@@ -832,6 +837,7 @@ class _SubscriptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final color = material.Color(subscription.colorValue);
 
     return Dismissible(
@@ -922,7 +928,7 @@ class _SubscriptionTile extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '/${subscription.cycle.shortName}',
+                            '/${subscription.cycle.localizedShortName(l10n)}',
                             style: theme.textTheme.bodySmall,
                           ),
                         ],
@@ -936,7 +942,7 @@ class _SubscriptionTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      subscription.nextBillingDate.toShortRelativeString(),
+                      subscription.nextBillingDate.toShortRelativeString(l10n: l10n),
                       style: theme.textTheme.bodyMedium?.copyWith(
                         // Mute urgency coloring when already paid
                         color: subscription.isPaid
@@ -980,7 +986,7 @@ class _SubscriptionTile extends StatelessWidget {
                             borderRadius: BorderRadius.circular(AppSizes.radiusSm),
                           ),
                           child: Text(
-                            'Paid',
+                            l10n.homePaid,
                             style: theme.textTheme.labelSmall?.copyWith(
                               color: context.colors.success,
                               fontWeight: FontWeight.bold,
@@ -1033,6 +1039,7 @@ class _PaidDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSizes.base,
@@ -1047,7 +1054,7 @@ class _PaidDivider extends StatelessWidget {
           ),
           const SizedBox(width: AppSizes.xs),
           Text(
-            'Paid · $paidCount of $totalCount',
+            l10n.homePaidCount(paidCount, totalCount),
             style: theme.textTheme.bodySmall?.copyWith(
               color: context.colors.success.withValues(alpha: 0.6),
               fontWeight: FontWeight.w500,
@@ -1080,6 +1087,7 @@ class _PausedSubscriptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final color = material.Color(subscription.colorValue);
 
     return Padding(
@@ -1142,7 +1150,7 @@ class _PausedSubscriptionTile extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          _getPauseStatusText(),
+                          _getPauseStatusText(l10n),
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: context.colors.textTertiary,
                           ),
@@ -1172,19 +1180,19 @@ class _PausedSubscriptionTile extends StatelessWidget {
     );
   }
 
-  String _getPauseStatusText() {
+  String _getPauseStatusText(AppLocalizations l10n) {
     if (subscription.resumeDate != null) {
       final daysUntil = subscription.resumeDate!.difference(DateTime.now()).inDays;
       if (daysUntil <= 0) {
-        return 'Resumes today';
+        return l10n.homeResumesToday;
       } else if (daysUntil == 1) {
-        return 'Resumes tomorrow';
+        return l10n.homeResumesTomorrow;
       } else {
-        return 'Resumes in $daysUntil days';
+        return l10n.homeResumesInDays(daysUntil);
       }
     }
 
-    return 'Paused ${subscription.daysPaused} days ago';
+    return l10n.homePausedDaysAgo(subscription.daysPaused);
   }
 }
 
@@ -1206,6 +1214,7 @@ class _LaterSubscriptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final color = material.Color(subscription.colorValue);
 
     return SubtlePressable(
@@ -1250,7 +1259,7 @@ class _LaterSubscriptionTile extends StatelessWidget {
                     ),
                     const SizedBox(height: AppSizes.xs),
                     Text(
-                      '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.shortName}',
+                      '${CurrencyUtils.formatAmount(subscription.amount, subscription.currencyCode)}/${subscription.cycle.localizedShortName(l10n)}',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: context.colors.textTertiary,
                       ),

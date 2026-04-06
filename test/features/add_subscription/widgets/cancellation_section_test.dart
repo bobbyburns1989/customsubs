@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:custom_subs/features/add_subscription/widgets/cancellation_section.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 void main() {
   group('CancellationSection', () {
@@ -25,6 +26,9 @@ void main() {
 
     Widget buildWidget() {
       return MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: Scaffold(
           body: CancellationSection(
             cancelUrlController: cancelUrlController,

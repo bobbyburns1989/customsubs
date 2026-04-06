@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:custom_subs/features/add_subscription/widgets/notes_section.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 void main() {
   group('NotesSection', () {
@@ -18,6 +19,9 @@ void main() {
     testWidgets('renders with controller', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -44,6 +48,9 @@ void main() {
     testWidgets('text input updates controller', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -71,6 +78,9 @@ void main() {
     testWidgets('multiline text works correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -95,6 +105,9 @@ void main() {
     testWidgets('displays hint text', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -114,6 +127,9 @@ void main() {
     testWidgets('displays label text', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -137,6 +153,9 @@ void main() {
     testWidgets('section is collapsible', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,
@@ -157,6 +176,9 @@ void main() {
     testWidgets('section starts collapsed', (WidgetTester tester) async {
       await tester.pumpWidget(
         MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
           home: Scaffold(
             body: NotesSection(
               notesController: controller,

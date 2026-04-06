@@ -23,6 +23,7 @@ import 'package:custom_subs/core/widgets/skeleton_widgets.dart';
 import 'package:custom_subs/core/widgets/empty_state_widget.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
 import 'package:custom_subs/data/services/review_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 class AddSubscriptionScreen extends ConsumerStatefulWidget {
   final String? subscriptionId;
@@ -130,7 +131,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     if (!_formState.validate()) {
       SnackBarUtils.show(
         context,
-        SnackBarUtils.warning('Please enter valid data'),
+        SnackBarUtils.warning(AppLocalizations.of(context).addSubscriptionInvalidData),
       );
       return;
     }
@@ -138,6 +139,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
     // Capture BuildContext and Navigator before async operations
     final navigator = Navigator.of(context);
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10nSave = AppLocalizations.of(context);
     final isEditing = widget.subscriptionId != null;
 
     try {
@@ -205,8 +207,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
       scaffoldMessenger.showSnackBar(
         SnackBarUtils.success(
           isEditing
-              ? 'Subscription updated!'
-              : 'Subscription added!',
+              ? l10nSave.addSubscriptionUpdated
+              : l10nSave.addSubscriptionAdded,
         ),
       );
       navigator.pop();
@@ -215,7 +217,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
 
       // Show generic error for exceptions
       scaffoldMessenger.showSnackBar(
-        SnackBarUtils.error('Error: $e'),
+        SnackBarUtils.error(l10nSave.addSubscriptionError(e.toString())),
       );
     }
   }
@@ -232,13 +234,14 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
     final templatesAsync = ref.watch(subscriptionTemplatesProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.subscriptionId == null
-            ? 'Add Subscription'
-            : 'Edit Subscription'),
+            ? l10n.addSubscriptionTitle
+            : l10n.editSubscriptionTitle),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () async {
@@ -251,7 +254,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
         actions: [
           TextButton(
             onPressed: _save,
-            child: const Text('Save'),
+            child: Text(l10n.addSubscriptionSave),
           ),
         ],
       ),
@@ -263,7 +266,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
             // Template Picker (only show when adding new)
             if (_showTemplates && widget.subscriptionId == null) ...[
               Text(
-                'Choose from templates',
+                l10n.addSubscriptionChooseTemplate,
                 style: theme.textTheme.titleLarge,
               ),
               const SizedBox(height: AppSizes.sm),
@@ -271,9 +274,9 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
               // Search bar
               TextField(
                 controller: _formState.searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Search services...',
-                  prefixIcon: Icon(Icons.search),
+                decoration: InputDecoration(
+                  hintText: l10n.addSubscriptionSearchHint,
+                  prefixIcon: const Icon(Icons.search),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -301,15 +304,14 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                       _lastNoResultsQuery = _searchQuery;
                       AnalyticsService().capture('template_search_no_results');
                     }
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
                         vertical: AppSizes.xxxl,
                       ),
                       child: EmptyStateWidget(
                         icon: Icons.search_off_outlined,
-                        title: 'No templates found',
-                        subtitle:
-                            'Try a different search term or create a custom subscription below',
+                        title: l10n.addSubscriptionNoTemplates,
+                        subtitle: l10n.addSubscriptionNoTemplatesHint,
                         iconSize: 64, // Smaller for inline display
                       ),
                     );
@@ -347,7 +349,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                   itemCount: 8, // 8 skeleton items
                   itemBuilder: (context, index) => const SkeletonTemplateItem(),
                 ),
-                error: (_, __) => const Text('Error loading templates'),
+                error: (_, __) => Text(l10n.addSubscriptionTemplateError),
               ),
               const SizedBox(height: AppSizes.md),
 
@@ -360,7 +362,7 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                   });
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Create Custom'),
+                label: Text(l10n.addSubscriptionCreateCustom),
               ),
               const SizedBox(height: AppSizes.xl),
             ],
@@ -448,8 +450,8 @@ class _AddSubscriptionScreenState extends ConsumerState<AddSubscriptionScreen> {
                   padding: const EdgeInsets.all(AppSizes.base),
                   child: Text(
                     widget.subscriptionId == null
-                        ? 'Add Subscription'
-                        : 'Update Subscription',
+                        ? l10n.addSubscriptionButton
+                        : l10n.updateSubscriptionButton,
                   ),
                 ),
               ),

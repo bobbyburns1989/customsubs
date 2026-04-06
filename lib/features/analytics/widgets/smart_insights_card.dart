@@ -7,6 +7,7 @@ import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/haptic_utils.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Smart Insights card shown at the bottom of the Analytics screen.
 ///
@@ -129,7 +130,7 @@ class _SmartInsightsCardContentState extends State<_SmartInsightsCardContent> {
                 const Text('💡', style: TextStyle(fontSize: 16)),
                 const SizedBox(width: AppSizes.sm),
                 Text(
-                  'Smart Insights',
+                  AppLocalizations.of(context).insightsTitle,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -161,14 +162,15 @@ class _OverlapRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final fmt = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
     final names = insight.names.join(' · ');
 
     return _InsightRow(
       accentColor: context.colors.warning,
       icon: Icons.warning_amber_rounded,
-      title: '${insight.names.length} ${insight.groupLabel} services',
-      subtitle: '$names = ${fmt.format(insight.combinedMonthly)}/mo combined',
+      title: l10n.insightsOverlapSummary(insight.names.length, insight.groupLabel),
+      subtitle: l10n.insightsOverlapCombined(names, fmt.format(insight.combinedMonthly)),
       onTap: () {
         AnalyticsService().capture('smart_insight_tapped', {
           'insight_type': 'service_overlap',
@@ -185,68 +187,72 @@ class _OverlapRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _BottomSheet(
-        title: 'Overlapping ${insight.groupLabel}',
-        accentColor: sheetContext.colors.warning,
-        icon: Icons.warning_amber_rounded,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'You have ${insight.names.length} ${insight.groupLabel} subscriptions. '
-              'These services offer similar content — you may only need one.',
-              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                    color: sheetContext.colors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.lg),
-            ...insight.names.map((name) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSizes.sm),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 8,
-                        color: sheetContext.colors.warning,
-                      ),
-                      const SizedBox(width: AppSizes.md),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: Theme.of(sheetContext).textTheme.bodyLarge,
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
-            const SizedBox(height: AppSizes.lg),
-            Container(
-              padding: const EdgeInsets.all(AppSizes.md),
-              decoration: BoxDecoration(
-                color: sheetContext.colors.warning.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.savings_outlined,
-                      size: 20, color: sheetContext.colors.warning),
-                  const SizedBox(width: AppSizes.sm),
-                  Expanded(
-                    child: Text(
-                      'Combined: ${fmt.format(insight.combinedMonthly)}/mo · '
-                      '${fmt.format(insight.combinedMonthly * 12)}/year',
-                      style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: sheetContext.colors.warning,
-                          ),
+      builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext);
+        return _BottomSheet(
+          title: l10n.insightsOverlapTitle(insight.groupLabel),
+          accentColor: sheetContext.colors.warning,
+          icon: Icons.warning_amber_rounded,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.insightsOverlapBody(insight.names.length, insight.groupLabel),
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                      color: sheetContext.colors.textSecondary,
                     ),
-                  ),
-                ],
               ),
-            ),
-          ],
-        ),
-      ),
+              const SizedBox(height: AppSizes.lg),
+              ...insight.names.map((name) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSizes.sm),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: sheetContext.colors.warning,
+                        ),
+                        const SizedBox(width: AppSizes.md),
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: Theme.of(sheetContext).textTheme.bodyLarge,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+              const SizedBox(height: AppSizes.lg),
+              Container(
+                padding: const EdgeInsets.all(AppSizes.md),
+                decoration: BoxDecoration(
+                  color: sheetContext.colors.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.savings_outlined,
+                        size: 20, color: sheetContext.colors.warning),
+                    const SizedBox(width: AppSizes.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.insightsOverlapCombinedDetail(
+                          fmt.format(insight.combinedMonthly),
+                          fmt.format(insight.combinedMonthly * 12),
+                        ),
+                        style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: sheetContext.colors.warning,
+                            ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -262,14 +268,17 @@ class _AnnualSavingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final fmt = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
 
     return _InsightRow(
       accentColor: context.colors.primary,
       icon: Icons.calendar_today_rounded,
-      title: 'Switch to annual billing',
-      subtitle: 'Est. save ${fmt.format(insight.minSavings)}–'
-          '${fmt.format(insight.maxSavings)}/year',
+      title: l10n.insightsAnnualTitle,
+      subtitle: l10n.insightsAnnualSummary(
+        fmt.format(insight.minSavings),
+        fmt.format(insight.maxSavings),
+      ),
       onTap: () {
         AnalyticsService().capture('smart_insight_tapped', {
           'insight_type': 'annual_savings',
@@ -287,77 +296,79 @@ class _AnnualSavingsRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _BottomSheet(
-        title: 'Annual Billing Savings',
-        accentColor: sheetContext.colors.primary,
-        icon: Icons.calendar_today_rounded,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Most services offer a 15–20% discount when you pay annually '
-              'instead of monthly.',
-              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                    color: sheetContext.colors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.lg),
+      builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext);
+        return _BottomSheet(
+          title: l10n.insightsAnnualHeading,
+          accentColor: sheetContext.colors.primary,
+          icon: Icons.calendar_today_rounded,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.insightsAnnualBody,
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                      color: sheetContext.colors.textSecondary,
+                    ),
+              ),
+              const SizedBox(height: AppSizes.lg),
 
-            // Savings range highlight
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSizes.lg),
-              decoration: BoxDecoration(
-                color: sheetContext.colors.primarySurface,
-                borderRadius: BorderRadius.circular(AppSizes.radiusMd),
-                border: Border.all(
-                  color: sheetContext.colors.primary.withValues(alpha: 0.3),
+              // Savings range highlight
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSizes.lg),
+                decoration: BoxDecoration(
+                  color: sheetContext.colors.primarySurface,
+                  borderRadius: BorderRadius.circular(AppSizes.radiusMd),
+                  border: Border.all(
+                    color: sheetContext.colors.primary.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      l10n.insightsAnnualRange(
+                        fmtShort.format(insight.minSavings),
+                        fmtShort.format(insight.maxSavings),
+                      ),
+                      style: Theme.of(sheetContext).textTheme.headlineMedium?.copyWith(
+                            color: sheetContext.colors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Text(
+                      l10n.insightsAnnualEstimated,
+                      style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                            color: sheetContext.colors.primary,
+                          ),
+                    ),
+                  ],
                 ),
               ),
-              child: Column(
-                children: [
-                  Text(
-                    '${fmtShort.format(insight.minSavings)}–'
-                    '${fmtShort.format(insight.maxSavings)}',
-                    style: Theme.of(sheetContext).textTheme.headlineMedium?.copyWith(
-                          color: sheetContext.colors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  Text(
-                    'estimated annual savings',
-                    style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                          color: sheetContext.colors.primary,
-                        ),
-                  ),
-                ],
+
+              const SizedBox(height: AppSizes.md),
+
+              Text(
+                l10n.insightsAnnualAppliesTo(insight.subscriptionCount),
+                style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: sheetContext.colors.textSecondary,
+                    ),
               ),
-            ),
 
-            const SizedBox(height: AppSizes.md),
+              const SizedBox(height: AppSizes.sm),
 
-            Text(
-              'Applies to ${insight.subscriptionCount} monthly-billed '
-              '${insight.subscriptionCount == 1 ? 'subscription' : 'subscriptions'}.',
-              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                    color: sheetContext.colors.textSecondary,
-                  ),
-            ),
-
-            const SizedBox(height: AppSizes.sm),
-
-            // Disclaimer
-            Text(
-              '* Estimated based on a 15–20% typical discount. Check each '
-              'provider\'s current annual pricing for exact savings.',
-              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                    color: sheetContext.colors.textTertiary,
-                    fontStyle: FontStyle.italic,
-                  ),
-            ),
-          ],
-        ),
-      ),
+              // Disclaimer
+              Text(
+                l10n.insightsAnnualDisclaimer,
+                style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: sheetContext.colors.textTertiary,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -373,13 +384,14 @@ class _BundleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final fmt = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
     return _InsightRow(
       accentColor: context.colors.primary,
       icon: Icons.workspace_premium_rounded,
-      title: '${insight.bundleName} available',
-      subtitle: 'Save ~${fmt.format(insight.potentialSavings)}/mo vs separate plans',
+      title: l10n.insightsBundleTitle(insight.bundleName),
+      subtitle: l10n.insightsBundleSummary(fmt.format(insight.potentialSavings)),
       onTap: () {
         AnalyticsService().capture('smart_insight_tapped', {
           'insight_type': 'bundle_opportunity',
@@ -396,87 +408,89 @@ class _BundleRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _BottomSheet(
-        title: insight.bundleName,
-        accentColor: sheetContext.colors.primary,
-        icon: Icons.workspace_premium_rounded,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              insight.description,
-              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                    color: sheetContext.colors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.lg),
-
-            // Price comparison table
-            _PriceComparisonRow(
-              label: 'You pay now',
-              amount: fmt.format(insight.currentCost),
-              color: sheetContext.colors.textSecondary,
-            ),
-            const SizedBox(height: AppSizes.sm),
-            _PriceComparisonRow(
-              label: insight.bundleName,
-              amount: fmt.format(insight.bundleAmount),
-              color: sheetContext.colors.primary,
-            ),
-            const Divider(height: AppSizes.lg),
-            _PriceComparisonRow(
-              label: 'Monthly savings',
-              amount: '~${fmt.format(insight.potentialSavings)}',
-              color: sheetContext.colors.primary,
-              bold: true,
-            ),
-            const SizedBox(height: AppSizes.xs),
-            Text(
-              '≈ ${fmt.format(insight.potentialSavings * 12)}/year',
-              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                    color: sheetContext.colors.primary,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-
-            const SizedBox(height: AppSizes.lg),
-
-            // Disclaimer
-            Text(
-              '* Bundle price shown in USD. Check current pricing — '
-              'promotions and regional pricing vary.',
-              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                    color: sheetContext.colors.textTertiary,
-                    fontStyle: FontStyle.italic,
-                  ),
-            ),
-
-            // URL button (if available)
-            if (insight.url != null) ...[
+      builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext);
+        return _BottomSheet(
+          title: insight.bundleName,
+          accentColor: sheetContext.colors.primary,
+          icon: Icons.workspace_premium_rounded,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                insight.description,
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                      color: sheetContext.colors.textSecondary,
+                    ),
+              ),
               const SizedBox(height: AppSizes.lg),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  onPressed: () async {
-                    await HapticUtils.light();
-                    final uri = Uri.parse(insight.url!);
-                    if (await canLaunchUrl(uri)) {
-                      await launchUrl(uri,
-                          mode: LaunchMode.externalApplication);
-                    }
-                  },
-                  icon: const Icon(Icons.open_in_new, size: 16),
-                  label: const Text('Check current pricing'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: sheetContext.colors.primary,
-                    side: BorderSide(color: sheetContext.colors.primary),
+
+              // Price comparison table
+              _PriceComparisonRow(
+                label: l10n.insightsBundleYouPayNow,
+                amount: fmt.format(insight.currentCost),
+                color: sheetContext.colors.textSecondary,
+              ),
+              const SizedBox(height: AppSizes.sm),
+              _PriceComparisonRow(
+                label: insight.bundleName,
+                amount: fmt.format(insight.bundleAmount),
+                color: sheetContext.colors.primary,
+              ),
+              const Divider(height: AppSizes.lg),
+              _PriceComparisonRow(
+                label: l10n.insightsBundleMonthlySavings,
+                amount: '~${fmt.format(insight.potentialSavings)}',
+                color: sheetContext.colors.primary,
+                bold: true,
+              ),
+              const SizedBox(height: AppSizes.xs),
+              Text(
+                l10n.insightsBundleSavingsDetail(fmt.format(insight.potentialSavings * 12)),
+                style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: sheetContext.colors.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+
+              const SizedBox(height: AppSizes.lg),
+
+              // Disclaimer
+              Text(
+                l10n.insightsBundleDisclaimer,
+                style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: sheetContext.colors.textTertiary,
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+
+              // URL button (if available)
+              if (insight.url != null) ...[
+                const SizedBox(height: AppSizes.lg),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await HapticUtils.light();
+                      final uri = Uri.parse(insight.url!);
+                      if (await canLaunchUrl(uri)) {
+                        await launchUrl(uri,
+                            mode: LaunchMode.externalApplication);
+                      }
+                    },
+                    icon: const Icon(Icons.open_in_new, size: 16),
+                    label: Text(l10n.insightsBundleCheckPricing),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: sheetContext.colors.primary,
+                      side: BorderSide(color: sheetContext.colors.primary),
+                    ),
                   ),
                 ),
-              ),
+              ],
             ],
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -531,13 +545,14 @@ class _HighSpendRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pct = insight.percentage.toStringAsFixed(0);
 
     return _InsightRow(
       accentColor: context.colors.warning,
       icon: Icons.pie_chart_rounded,
-      title: '${insight.categoryName} = $pct% of spend',
-      subtitle: 'One category dominates your subscription budget',
+      title: l10n.insightsHighSpendSummary(insight.categoryName, pct),
+      subtitle: l10n.insightsHighSpendSubtitle,
       onTap: () {
         AnalyticsService().capture('smart_insight_tapped', {
           'insight_type': 'high_spend_category',
@@ -555,68 +570,74 @@ class _HighSpendRow extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (sheetContext) => _BottomSheet(
-        title: '${insight.categoryName} Spending',
-        accentColor: sheetContext.colors.warning,
-        icon: Icons.pie_chart_rounded,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${insight.categoryName} accounts for $pct% of your active '
-              'subscription spend — ${fmt.format(insight.monthlyAmount)}/mo '
-              '(${fmt.format(insight.monthlyAmount * 12)}/year).',
-              style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
-                    color: sheetContext.colors.textSecondary,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.lg),
-
-            // Percentage bar
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: insight.percentage / 100,
-                minHeight: 8,
-                backgroundColor: sheetContext.colors.divider,
-                valueColor:
-                    AlwaysStoppedAnimation<Color>(sheetContext.colors.warning),
+      builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext);
+        return _BottomSheet(
+          title: l10n.insightsHighSpendTitle(insight.categoryName),
+          accentColor: sheetContext.colors.warning,
+          icon: Icons.pie_chart_rounded,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.insightsHighSpendBody(
+                  insight.categoryName,
+                  pct,
+                  fmt.format(insight.monthlyAmount),
+                  fmt.format(insight.monthlyAmount * 12),
+                ),
+                style: Theme.of(sheetContext).textTheme.bodyMedium?.copyWith(
+                      color: sheetContext.colors.textSecondary,
+                    ),
               ),
-            ),
-            const SizedBox(height: AppSizes.md),
+              const SizedBox(height: AppSizes.lg),
 
-            // List subscriptions in this category
-            Text(
-              'Subscriptions in this category:',
-              style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
-                    color: sheetContext.colors.textTertiary,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-            const SizedBox(height: AppSizes.sm),
+              // Percentage bar
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: insight.percentage / 100,
+                  minHeight: 8,
+                  backgroundColor: sheetContext.colors.divider,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(sheetContext.colors.warning),
+                ),
+              ),
+              const SizedBox(height: AppSizes.md),
 
-            ...insight.subscriptionNames.map((name) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSizes.xs),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.circle,
-                        size: 8,
-                        color: sheetContext.colors.warning,
-                      ),
-                      const SizedBox(width: AppSizes.md),
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: Theme.of(sheetContext).textTheme.bodyMedium,
+              // List subscriptions in this category
+              Text(
+                l10n.insightsHighSpendListTitle,
+                style: Theme.of(sheetContext).textTheme.bodySmall?.copyWith(
+                      color: sheetContext.colors.textTertiary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              const SizedBox(height: AppSizes.sm),
+
+              ...insight.subscriptionNames.map((name) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSizes.xs),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: sheetContext.colors.warning,
                         ),
-                      ),
-                    ],
-                  ),
-                )),
-          ],
-        ),
-      ),
+                        const SizedBox(width: AppSizes.md),
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: Theme.of(sheetContext).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ],
+          ),
+        );
+      },
     );
   }
 }

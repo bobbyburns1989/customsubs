@@ -14,6 +14,7 @@ import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/data/services/notification_service.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/notes_card.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/header_card.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/billing_info_card.dart';
@@ -97,9 +98,10 @@ class _SubscriptionDetailScreenState
         await controller.togglePaid();
 
         if (mounted) {
+          final l10n = AppLocalizations.of(context);
           SnackBarUtils.show(
             context,
-            SnackBarUtils.success('Marked as paid ✓'),
+            SnackBarUtils.success(l10n.detailMarkedAsPaid),
           );
         }
       });
@@ -129,17 +131,18 @@ class _SubscriptionDetailScreenState
               context.pop();
             }
           });
-          return const Scaffold(
-            body: Center(child: Text('Subscription not found')),
+          return Scaffold(
+            body: Center(child: Text(AppLocalizations.of(context).detailNotFound)),
           );
         }
 
         final subscriptionColor = Color(subscription.colorValue);
+        final l10n = AppLocalizations.of(context);
         int cardIndex = 0;
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Details'),
+            title: Text(l10n.detailScreenTitle),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () async {
@@ -289,7 +292,7 @@ class _SubscriptionDetailScreenState
       },
       loading: () => Scaffold(
         appBar: AppBar(
-          title: const Text('Details'),
+          title: Text(AppLocalizations.of(context).detailScreenTitle),
           leading: const BackButton(),
         ),
         body: SingleChildScrollView(
@@ -346,11 +349,11 @@ class _SubscriptionDetailScreenState
             children: [
               Icon(Icons.error_outline, size: 48, color: context.colors.error),
               const SizedBox(height: AppSizes.base),
-              Text('Error loading subscription: $error'),
+              Text(AppLocalizations.of(context).detailLoadError(error.toString())),
               const SizedBox(height: AppSizes.base),
               ElevatedButton(
                 onPressed: () => context.pop(),
-                child: const Text('Go Back'),
+                child: Text(AppLocalizations.of(context).detailGoBack),
               ),
             ],
           ),
@@ -360,18 +363,16 @@ class _SubscriptionDetailScreenState
   }
 
   void _showDeleteConfirmation(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Subscription?'),
-        content: const Text(
-          'This will permanently delete this subscription and cancel all reminders. '
-          'This cannot be undone.',
-        ),
+        title: Text(l10n.detailDeleteTitle),
+        content: Text(l10n.detailDeleteBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.settingsCancel),
           ),
           FilledButton(
             style: FilledButton.styleFrom(
@@ -439,7 +440,7 @@ class _SubscriptionDetailScreenState
                 );
               }
             },
-            child: const Text('Delete'),
+            child: Text(l10n.detailDeleteButton),
           ),
         ],
       ),
@@ -448,26 +449,27 @@ class _SubscriptionDetailScreenState
 
   void _showPauseDialog(BuildContext context, WidgetRef ref, Subscription subscription) {
     DateTime? selectedResumeDate;
+    final l10n = AppLocalizations.of(context);
 
     showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Pause Subscription'),
+          title: Text(l10n.detailPauseTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'While paused:',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                l10n.detailPauseWhilePaused,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSizes.sm),
               Row(
                 children: [
                   Icon(Icons.notifications_off, size: 16, color: context.colors.textSecondary),
                   const SizedBox(width: AppSizes.sm),
-                  const Expanded(child: Text('No reminders will be sent')),
+                  Expanded(child: Text(l10n.detailPauseNoReminders)),
                 ],
               ),
               const SizedBox(height: AppSizes.xs),
@@ -475,7 +477,7 @@ class _SubscriptionDetailScreenState
                 children: [
                   Icon(Icons.pause_circle_outline, size: 16, color: context.colors.textSecondary),
                   const SizedBox(width: AppSizes.sm),
-                  const Expanded(child: Text('Billing dates won\'t advance')),
+                  Expanded(child: Text(l10n.detailPauseNoBilling)),
                 ],
               ),
               const SizedBox(height: AppSizes.xs),
@@ -483,15 +485,15 @@ class _SubscriptionDetailScreenState
                 children: [
                   Icon(Icons.trending_down, size: 16, color: context.colors.textSecondary),
                   const SizedBox(width: AppSizes.sm),
-                  const Expanded(child: Text('Excluded from spending totals')),
+                  Expanded(child: Text(l10n.detailPauseNoSpending)),
                 ],
               ),
 
               const SizedBox(height: AppSizes.lg),
 
-              const Text(
-                'Auto-resume date (optional):',
-                style: TextStyle(fontWeight: FontWeight.w600),
+              Text(
+                l10n.detailPauseAutoResume,
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSizes.sm),
               OutlinedButton(
@@ -509,7 +511,7 @@ class _SubscriptionDetailScreenState
                 child: Text(
                   selectedResumeDate != null
                       ? DateFormat('MMM d, y').format(selectedResumeDate!)
-                      : 'Resume manually',
+                      : l10n.detailPauseManual,
                 ),
               ),
 
@@ -517,7 +519,7 @@ class _SubscriptionDetailScreenState
                 const SizedBox(height: AppSizes.sm),
                 TextButton(
                   onPressed: () => setState(() => selectedResumeDate = null),
-                  child: const Text('Clear date'),
+                  child: Text(l10n.detailPauseClearDate),
                 ),
               ],
             ],
@@ -525,7 +527,7 @@ class _SubscriptionDetailScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
+              child: Text(l10n.settingsCancel),
             ),
             FilledButton(
               onPressed: () async {
@@ -535,7 +537,7 @@ class _SubscriptionDetailScreenState
                     .read(subscriptionDetailControllerProvider(widget.subscriptionId).notifier)
                     .pauseSubscription(resumeDate: selectedResumeDate);
               },
-              child: const Text('Pause'),
+              child: Text(l10n.detailPauseButton),
             ),
           ],
         ),
@@ -558,6 +560,7 @@ class _ActiveSubscriptionActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Row(
       children: [
         // Mark as Paid button (2/3 width)
@@ -570,7 +573,7 @@ class _ActiveSubscriptionActions extends StatelessWidget {
                   ? Icons.check_circle
                   : Icons.check_circle_outline,
             ),
-            label: Text(subscription.isPaid ? 'Paid' : 'Mark as Paid'),
+            label: Text(subscription.isPaid ? l10n.detailPaid : l10n.detailMarkAsPaid),
           ),
         ),
 
@@ -602,6 +605,7 @@ class _PausedSubscriptionActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Column(
       children: [
@@ -622,7 +626,7 @@ class _PausedSubscriptionActions extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Subscription Paused',
+                      l10n.detailPaused,
                       style: theme.textTheme.titleSmall?.copyWith(
                         color: context.colors.primary,
                         fontWeight: FontWeight.w600,
@@ -630,7 +634,7 @@ class _PausedSubscriptionActions extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _getResumeInfoText(),
+                      _getResumeInfoText(l10n),
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: context.colors.textSecondary,
                       ),
@@ -650,18 +654,18 @@ class _PausedSubscriptionActions extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: onResume,
             icon: const Icon(Icons.play_arrow, size: 20),
-            label: const Text('Resume Subscription'),
+            label: Text(l10n.detailResumeButton),
           ),
         ),
       ],
     );
   }
 
-  String _getResumeInfoText() {
+  String _getResumeInfoText(AppLocalizations l10n) {
     if (subscription.resumeDate != null) {
       final formatter = DateFormat('MMM d, y');
-      return 'Auto-resumes on ${formatter.format(subscription.resumeDate!)}';
+      return l10n.detailAutoResumes(formatter.format(subscription.resumeDate!));
     }
-    return 'Paused ${subscription.daysPaused} days ago';
+    return l10n.detailPausedDaysAgo(subscription.daysPaused);
   }
 }

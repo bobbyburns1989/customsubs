@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
 import 'package:custom_subs/core/widgets/form_section_card.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// Form section for cancellation information and checklist.
 ///
@@ -45,10 +46,11 @@ class CancellationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return FormSectionCard(
-      title: 'Cancellation Info',
-      subtitle: 'How to cancel this subscription',
+      title: l10n.cancelSectionTitle,
+      subtitle: l10n.cancelSectionSubtitle,
       icon: Icons.exit_to_app_outlined,
       isCollapsible: true,
       initiallyExpanded: false,
@@ -56,27 +58,27 @@ class CancellationSection extends StatelessWidget {
         children: [
           TextFormField(
             controller: cancelUrlController,
-            decoration: const InputDecoration(
-              labelText: 'Cancellation URL',
-              hintText: 'https://...',
+            decoration: InputDecoration(
+              labelText: l10n.cancelUrlLabel,
+              hintText: l10n.cancelUrlHint,
             ),
             keyboardType: TextInputType.url,
           ),
           const SizedBox(height: AppSizes.md),
           TextFormField(
             controller: cancelPhoneController,
-            decoration: const InputDecoration(
-              labelText: 'Cancellation Phone',
-              hintText: '+1 (555) 123-4567',
+            decoration: InputDecoration(
+              labelText: l10n.cancelPhoneLabel,
+              hintText: l10n.cancelPhoneHint,
             ),
             keyboardType: TextInputType.phone,
           ),
           const SizedBox(height: AppSizes.md),
           TextFormField(
             controller: cancelNotesController,
-            decoration: const InputDecoration(
-              labelText: 'Cancellation Notes',
-              hintText: 'How to cancel...',
+            decoration: InputDecoration(
+              labelText: l10n.cancelNotesLabel,
+              hintText: l10n.cancelNotesHint,
             ),
             maxLines: 3,
           ),
@@ -87,7 +89,7 @@ class CancellationSection extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Cancellation Steps',
+                l10n.cancelStepsTitle,
                 style: theme.textTheme.titleSmall,
               ),
               TextButton.icon(
@@ -96,7 +98,7 @@ class CancellationSection extends StatelessWidget {
                   onChecklistChanged(newList);
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Add Step'),
+                label: Text(l10n.cancelAddStep),
               ),
             ],
           ),
@@ -110,8 +112,8 @@ class CancellationSection extends StatelessWidget {
                     child: TextFormField(
                       initialValue: entry.value,
                       decoration: InputDecoration(
-                        labelText: 'Step ${index + 1}',
-                        hintText: 'Enter step...',
+                        labelText: l10n.cancelStepLabel(index + 1),
+                        hintText: l10n.cancelStepHint,
                       ),
                       onChanged: (value) {
                         final newList = List<String>.from(cancelChecklist);

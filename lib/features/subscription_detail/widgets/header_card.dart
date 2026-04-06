@@ -4,6 +4,7 @@ import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/widgets/subscription_icon.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/status_badge.dart';
 
 /// Header card displaying subscription icon, name, amount, and status badges.
@@ -128,7 +129,7 @@ class HeaderCard extends StatelessWidget {
                 // Trial badge
                 if (subscription.isTrial)
                   StatusBadge(
-                    label: 'Trial',
+                    label: AppLocalizations.of(context).headerTrialBadge,
                     color: context.colors.trial,
                   ),
 
@@ -138,7 +139,7 @@ class HeaderCard extends StatelessWidget {
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOut,
                   child: StatusBadge(
-                    label: 'Paid',
+                    label: AppLocalizations.of(context).headerPaidBadge,
                     color: context.colors.success,
                   ),
                 ),

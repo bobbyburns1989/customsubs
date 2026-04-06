@@ -4,6 +4,8 @@ import 'package:custom_subs/core/extensions/theme_extensions.dart';
 import 'package:custom_subs/core/utils/currency_utils.dart';
 import 'package:custom_subs/core/extensions/date_extensions.dart';
 import 'package:custom_subs/data/models/subscription.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
+import 'package:custom_subs/core/utils/localized_enums.dart';
 import 'package:custom_subs/features/subscription_detail/widgets/info_row.dart';
 
 /// Card displaying billing cycle, amounts, dates, and trial information.
@@ -76,6 +78,7 @@ class BillingInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       child: Padding(
@@ -84,7 +87,7 @@ class BillingInfoCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Billing Information',
+              l10n.billingInfoTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -94,24 +97,24 @@ class BillingInfoCard extends StatelessWidget {
 
             // Next billing date
             InfoRow(
-              label: 'Next Billing',
+              label: l10n.billingNextBilling,
               value: subscription.nextBillingDate.toFormattedString(),
-              highlight: subscription.nextBillingDate.toShortRelativeString(),
+              highlight: subscription.nextBillingDate.toShortRelativeString(l10n: l10n),
             ),
 
             const Divider(height: AppSizes.lg),
 
             // Billing cycle
             InfoRow(
-              label: 'Billing Cycle',
-              value: subscription.cycle.displayName,
+              label: l10n.billingCycle,
+              value: subscription.cycle.localizedName(l10n),
             ),
 
             const Divider(height: AppSizes.lg),
 
             // Amount
             InfoRow(
-              label: 'Amount',
+              label: l10n.billingAmount,
               value: CurrencyUtils.formatAmount(
                 subscription.amount,
                 subscription.currencyCode,
@@ -122,7 +125,7 @@ class BillingInfoCard extends StatelessWidget {
 
             // Start date
             InfoRow(
-              label: 'Started',
+              label: l10n.billingStarted,
               value: subscription.startDate.toFormattedString(),
             ),
 
@@ -130,14 +133,17 @@ class BillingInfoCard extends StatelessWidget {
             if (subscription.isTrial) ...[
               const Divider(height: AppSizes.lg),
               InfoRow(
-                label: 'Trial Ends',
+                label: l10n.billingTrialEnds,
                 value: subscription.trialEndDate?.toFormattedString() ?? 'Unknown',
-                highlight: subscription.trialEndDate?.toShortRelativeString(),
+                highlight: subscription.trialEndDate?.toShortRelativeString(l10n: l10n),
               ),
               if (subscription.postTrialAmount != null) ...[
                 const SizedBox(height: AppSizes.sm),
                 Text(
-                  'Then ${CurrencyUtils.formatAmount(subscription.postTrialAmount!, subscription.currencyCode)}/${subscription.cycle.shortName}',
+                  l10n.billingThenAmount(
+                    CurrencyUtils.formatAmount(subscription.postTrialAmount!, subscription.currencyCode),
+                    subscription.cycle.localizedShortName(l10n),
+                  ),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: context.colors.textSecondary,
                   ),

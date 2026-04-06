@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:custom_subs/core/constants/app_sizes.dart';
+import 'package:custom_subs/l10n/generated/app_localizations.dart';
 
 /// A simple card displaying user-entered notes for a subscription.
 ///
@@ -36,6 +37,7 @@ class NotesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context);
 
     return Card(
       child: Padding(
@@ -44,7 +46,7 @@ class NotesCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Notes',
+              l10n.notesCardTitle,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
