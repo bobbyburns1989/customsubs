@@ -13,3 +13,8 @@
 
 # Preserve annotations used by both SDKs
 -keepattributes *Annotation*
+
+# Google Play Core — referenced by Flutter engine for deferred components (not used, suppress warnings)
+-dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
+-dontwarn com.google.android.play.core.splitinstall.**
+-dontwarn com.google.android.play.core.tasks.**

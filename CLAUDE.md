@@ -49,7 +49,7 @@
 
 **Core philosophy:** Do one thing perfectly — track subscriptions and remind users before they get charged.
 
-**Current version:** v1.5.0+54. All build phases complete. Active post-launch improvements only.
+**Current version:** v1.5.1+55. Live on **iOS App Store** and **Google Play Store**. Active post-launch improvements only.
 **Monetization:** App is **completely free** (no subscription limits). RevenueCat SDK remains initialized for passive tracking. Toggle: `RevenueCatConstants.isFreeMode` in `lib/core/constants/revenue_cat_constants.dart`.
 **Templates:** 329 pre-built templates (as of March 2026), including a `sports` analytics category.
 
@@ -286,6 +286,27 @@ flutter run
 Run `build_runner` after any Hive model or Riverpod annotation change.
 
 Verify notifications on a **real device** — simulators have limited notification support.
+
+### Android Release AAB (Google Play)
+
+```bash
+flutter clean
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter build appbundle --release --no-tree-shake-icons
+```
+
+Output: `build/app/outputs/bundle/release/app-release.aab`
+
+**Note:** `--no-tree-shake-icons` is required — the AOT snapshotter gets OOM-killed without it on 16GB machines. The icon fonts (SimpleIcons + MaterialIcons) add ~1.4MB uncompressed but this is acceptable.
+
+### Android Build Config Notes
+
+- **minSdk:** 23 (Android 6.0) — required by PostHog SDK. Covers 99%+ of active devices.
+- **Core library desugaring:** Enabled — required by `flutter_local_notifications` for `java.time` APIs on API < 26.
+- **R8 minification:** Enabled with ProGuard rules for RevenueCat, PostHog, Flutter, and Play Core suppression.
+- **Gradle JVM:** `-Xmx4G` — reduced from 8G to avoid OOM on 16GB machines during AOT compilation.
+- **Signing:** Upload keystore at `android/app/upload-keystore.jks`, config in `android/key.properties` (gitignored).
 
 Full setup guide: [`docs/guides/development-setup.md`](docs/guides/development-setup.md)
 

@@ -21,6 +21,8 @@ android {
     ndkVersion = "27.0.12077973"
 
     compileOptions {
+        // Required by flutter_local_notifications for java.time APIs on older Android versions
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -44,7 +46,8 @@ android {
         applicationId = "com.customsubs.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // PostHog SDK requires minSdk 23 (Android 6.0); covers 99%+ of active devices
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -64,6 +67,11 @@ android {
             )
         }
     }
+}
+
+dependencies {
+    // Core library desugaring — required by flutter_local_notifications for java.time on API < 26
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
 
 flutter {

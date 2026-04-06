@@ -40,6 +40,13 @@ const _apps = [
     brandColor: Color(0xFFF59E0B), // amber
   ),
   _AppInfo(
+    name: 'CustomNotify',
+    subtitle: 'Smart reminders & alerts',
+    websiteUrl: 'https://customnotify.us',
+    logoAsset: 'assets/images/customnotify_logo.png',
+    brandColor: Color(0xFFCDA434), // gold
+  ),
+  _AppInfo(
     name: 'CustomWorth',
     subtitle: 'Track your net worth',
     websiteUrl: 'https://customworth.com',

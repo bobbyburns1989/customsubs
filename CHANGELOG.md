@@ -20,9 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Opt-out toggle**: "Share Anonymous Usage Data" switch in Settings > Privacy section — default on, immediately disables SDK when toggled off
   - **No PII**: only categorical properties (category names, cycle types, booleans) — never subscription names, amounts, or user text
   - Files: `lib/data/services/analytics_service.dart` (new), `lib/core/constants/posthog_constants.dart` (new), `lib/main.dart`, `lib/app/router.dart`, `lib/features/paywall/paywall_screen.dart`, `lib/features/add_subscription/add_subscription_screen.dart`, `lib/features/home/home_controller.dart`, `lib/features/onboarding/onboarding_screen.dart`, `lib/features/settings/settings_screen.dart`
-- **CustomApps Portfolio card** — collapsible cross-promotion card in Settings (above "Made with love" footer) showcasing CustomBank, CustomCrypto, and CustomWorth with logos, descriptions, and website links. Collapsed by default; expands with animated chevron + haptic feedback. Uses `StandardCard` styling and `errorBuilder` fallback for missing logo assets.
+- **CustomApps Portfolio card** — collapsible cross-promotion card in Settings (above "Made with love" footer) showcasing CustomBank, CustomCrypto, CustomNotify, and CustomWorth with logos, descriptions, and website links. Collapsed by default; expands with animated chevron + haptic feedback. Uses `StandardCard` styling and `errorBuilder` fallback for missing logo assets.
   - Files: `lib/features/settings/widgets/custom_apps_promo_card.dart` (new), `lib/features/settings/settings_screen.dart` (modified)
-  - Assets: `assets/images/custombank_logo.png`, `customcrypto_logo.png`, `customworth_logo.png`
+  - Assets: `assets/images/custombank_logo.png`, `customcrypto_logo.png`, `customnotify_logo.png`, `customworth_logo.png`
 
 ### Improved
 - **Mark as Paid — UX overhaul**

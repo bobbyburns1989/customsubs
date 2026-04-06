@@ -396,7 +396,7 @@ For questions or suggestions about documentation, update this INDEX or create a 
 - ✅ Calendar View — monthly grid with colored billing dots, day detail list, `table_calendar` integration (`lib/features/calendar/`)
 
 **March 16, 2026 (v1.4.7)**:
-- ✅ CustomApps Portfolio card — collapsible cross-promotion card in Settings showcasing CustomBank, CustomCrypto, and CustomWorth (`lib/features/settings/widgets/custom_apps_promo_card.dart`)
+- ✅ CustomApps Portfolio card — collapsible cross-promotion card in Settings showcasing CustomBank, CustomCrypto, CustomNotify, and CustomWorth (`lib/features/settings/widgets/custom_apps_promo_card.dart`)
 
 **March 6, 2026 (v1.4.3)**:
 - ✅ [Smart Insights](completion/SMART_INSIGHTS_2026-03-06.md) — Analytics optimization card (overlap detection, annual savings, bundle opportunities, high-spend flag)

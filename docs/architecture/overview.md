@@ -439,7 +439,7 @@ class SubscriptionRepository {
 ### Why PostHog for Analytics? (v1.4.7+)
 
 - **Privacy-first** — anonymous-only (no user IDs, no PII), with opt-out toggle
-- **Consistent** — same analytics platform used across CustomBank, CustomCrypto, and CustomSubs
+- **Consistent** — same analytics platform used across CustomBank, CustomCrypto, CustomNotify, and CustomSubs
 - **Lightweight** — Dart-side configuration only, no native platform config needed
 - **Self-serve** — dashboards, funnels, and retention analysis without building custom tooling
 
