@@ -17,6 +17,7 @@ import 'package:custom_subs/data/services/undo_service.dart';
 import 'package:custom_subs/data/services/demo_data_service.dart';
 import 'package:custom_subs/data/repositories/subscription_repository.dart';
 import 'package:custom_subs/features/settings/widgets/currency_picker_dialog.dart';
+import 'package:custom_subs/features/settings/widgets/compact_action_buttons.dart';
 import 'package:custom_subs/features/settings/widgets/custom_apps_promo_card.dart';
 import 'package:custom_subs/data/services/analytics_service.dart';
 import 'package:custom_subs/l10n/generated/app_localizations.dart';
@@ -68,6 +69,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ),
       body: ListView(
         children: [
+          // Share, Rate, Feedback action buttons
+          const CompactActionButtons(),
+
           // General section
           _SectionHeader(title: l10n.settingsGeneral),
           ListTile(

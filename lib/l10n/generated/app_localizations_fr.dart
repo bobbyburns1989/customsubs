@@ -230,6 +230,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settingsTitle => 'Paramètres';
 
   @override
+  String get settingsShare => 'Partager';
+
+  @override
+  String get settingsRateApp => 'Évaluer';
+
+  @override
+  String get settingsFeedback => 'Commentaires';
+
+  @override
   String get settingsGeneral => 'Général';
 
   @override
@@ -562,13 +571,20 @@ class AppLocalizationsFr extends AppLocalizations {
   String get promoCustomBank => 'CustomBank';
 
   @override
-  String get promoCustomBankDesc => 'Simulateur bancaire — pas de vrai argent';
+  String get promoCustomBankDesc => 'Simulateur bancaire, pas de vrai argent';
 
   @override
   String get promoCustomCrypto => 'CustomCrypto';
 
   @override
-  String get promoCustomCryptoDesc => 'S\'entraîner au trading crypto';
+  String get promoCustomCryptoDesc => 'Trading crypto virtuel';
+
+  @override
+  String get promoCustomDashboards => 'CustomDashboards';
+
+  @override
+  String get promoCustomDashboardsDesc =>
+      'Simulateur de tableau de bord e-commerce';
 
   @override
   String get promoCustomNotify => 'CustomNotify';

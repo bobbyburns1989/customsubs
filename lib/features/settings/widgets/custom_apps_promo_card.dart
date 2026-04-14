@@ -28,17 +28,24 @@ class _AppInfo {
 const _apps = [
   _AppInfo(
     name: 'CustomBank',
-    subtitle: 'Banking simulator — no real money',
+    subtitle: 'Banking simulator, no real money',
     websiteUrl: 'https://custombank.us',
     logoAsset: 'assets/images/custombank_logo.png',
     brandColor: Color(0xFF3B82F6), // blue
   ),
   _AppInfo(
     name: 'CustomCrypto',
-    subtitle: 'Practice Crypto Trading',
+    subtitle: 'Crypto paper trader',
     websiteUrl: 'https://customcrypto.us',
     logoAsset: 'assets/images/customcrypto_logo.png',
     brandColor: Color(0xFFF59E0B), // amber
+  ),
+  _AppInfo(
+    name: 'CustomDashboards',
+    subtitle: 'E-commerce dashboard simulator',
+    websiteUrl: 'https://customdashboards.com',
+    logoAsset: 'assets/images/customdashboards_logo.png',
+    brandColor: Color(0xFF10B981), // emerald
   ),
   _AppInfo(
     name: 'CustomNotify',
@@ -83,6 +90,8 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
         return l10n.promoCustomBank;
       case 'CustomCrypto':
         return l10n.promoCustomCrypto;
+      case 'CustomDashboards':
+        return l10n.promoCustomDashboards;
       case 'CustomNotify':
         return l10n.promoCustomNotify;
       case 'CustomWorth':
@@ -99,6 +108,8 @@ class _CustomAppsPromoCardState extends State<CustomAppsPromoCard> {
         return l10n.promoCustomBankDesc;
       case 'CustomCrypto':
         return l10n.promoCustomCryptoDesc;
+      case 'CustomDashboards':
+        return l10n.promoCustomDashboardsDesc;
       case 'CustomNotify':
         return l10n.promoCustomNotifyDesc;
       case 'CustomWorth':

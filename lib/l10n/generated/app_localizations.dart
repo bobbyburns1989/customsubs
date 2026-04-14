@@ -502,6 +502,24 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settingsTitle;
 
+  /// No description provided for @settingsShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get settingsShare;
+
+  /// No description provided for @settingsRateApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Rate App'**
+  String get settingsRateApp;
+
+  /// No description provided for @settingsFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Feedback'**
+  String get settingsFeedback;
+
   /// No description provided for @settingsGeneral.
   ///
   /// In en, this message translates to:
@@ -1039,7 +1057,7 @@ abstract class AppLocalizations {
   /// No description provided for @promoCustomBankDesc.
   ///
   /// In en, this message translates to:
-  /// **'Banking simulator — no real money'**
+  /// **'Banking simulator, no real money'**
   String get promoCustomBankDesc;
 
   /// No description provided for @promoCustomCrypto.
@@ -1051,8 +1069,20 @@ abstract class AppLocalizations {
   /// No description provided for @promoCustomCryptoDesc.
   ///
   /// In en, this message translates to:
-  /// **'Practice Crypto Trading'**
+  /// **'Crypto paper trader'**
   String get promoCustomCryptoDesc;
+
+  /// No description provided for @promoCustomDashboards.
+  ///
+  /// In en, this message translates to:
+  /// **'CustomDashboards'**
+  String get promoCustomDashboards;
+
+  /// No description provided for @promoCustomDashboardsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'E-commerce dashboard simulator'**
+  String get promoCustomDashboardsDesc;
 
   /// No description provided for @promoCustomNotify.
   ///
